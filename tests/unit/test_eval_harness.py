@@ -1524,9 +1524,9 @@ def test_build_workspace_drops_fixture_bytecode(tmp_path, monkeypatch):
 def test_test_reflect_gate_fixture_states(tmp_path):
     """Both variants hold the fix commit after the only review round and a green
     Proof. The first stops there with the feature open and fails a run that
-    closes it; the second adds the docs commit /sc:implement makes (Result: on
-    the fix commit, plan and README complete) and fails a run that edits the
-    README, whose phase never moves back."""
+    closes it; the second adds a docs commit that already closed the plan
+    (Result: on the fix commit, plan and README complete) and fails a run that
+    edits the README, whose phase never moves back."""
     run_eval, task, ws = _fixture_ws(tmp_path, "test-reflect-gate")
     log = _git(ws, "log", "--format=%s", "--name-only")
     assert log.index("fix: apply review F-1") < log.index("review round 1")

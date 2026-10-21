@@ -39,26 +39,26 @@ revised: 2026-10-22
 - [x] Step 2: Verify it fails
 - [x] Step 3: task 둘 추가(`covers: [reflect]`)
 - [x] Step 4: Verify it passes
-- [ ] Step 5: 바꾸기 전 값: 새 프로브 셋을 지금 src로 한 번씩(sonnet, low). 05a 대신 이 계획의 Measurements에 적는다
+- [x] Step 5: 바꾸기 전 값: 새 프로브 셋을 지금 src로 한 번씩(sonnet, low). 05a 대신 이 계획의 Measurements에 적는다
 - [x] Commit Phase 1: `test(evals): implement-proof-green, reflect-plan-close probes; proof-fail reads the Result line`
 
 ## Phase 2: shipped 문구 (one commit)
 
 **Files:** Modify: `src/superclaude/commands/implement.md`(Integrate), `src/superclaude/commands/reflect.md`(새 Plan-Close 단계, bounds), `src/superclaude/commands/intent.md`(Run, Report), `src/superclaude/core/rules/RULES_DOCS.md:58,88`, `README.md`(표 두 행, `--through` 문단), `tests/unit/test_docs_ssot_guards.py`(`_GATE_PHRASES`)
 
-- [ ] Step 1: Write failing test: `_GATE_PHRASES`에 implement(녹색 Proof 뒤 `implementing`, 되돌림), reflect Plan-Close 세 조건과 사용자 답, intent Run·Report, RULES_DOCS 작성자 표기
-- [ ] Step 2: Verify it fails: `uv run pytest tests/unit/test_docs_ssot_guards.py -k gate -q`
-- [ ] Step 3: 문구 편집
-- [ ] Step 4: Verify it passes; `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_description_overlap.py tests/unit/test_docs_ssot_guards.py -q`
-- [ ] Commit Phase 2: `fix(core,implement,reflect,intent): a plan becomes complete on the user's yes to /sc:reflect, not on a green Proof`
+- [x] Step 1: Write failing test: `_GATE_PHRASES`에 implement(녹색 Proof 뒤 `implementing`, 되돌림), reflect Plan-Close 세 조건과 사용자 답, intent Run·Report, RULES_DOCS 작성자 표기
+- [x] Step 2: Verify it fails: `uv run pytest tests/unit/test_docs_ssot_guards.py -k gate -q`
+- [x] Step 3: 문구 편집
+- [x] Step 4: Verify it passes; `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_description_overlap.py tests/unit/test_docs_ssot_guards.py -q`
+- [x] Commit Phase 2: `fix(core,implement,reflect,intent): a plan becomes complete on the user's yes to /sc:reflect, not on a green Proof`
 
 ## Phase 3: 기록 (one commit)
 
 **Files:** Modify: `CHANGELOG.md`(`[Unreleased]` Changed + upgrade note, 거짓이 된 문장), `evals/tasks.yaml`·`tests/unit/test_eval_harness.py`의 거짓이 된 주석과 docstring, 분석 문서 D, feature README
 
-- [ ] Step 1: 편집
+- [x] Step 1: 편집
 - [ ] Step 2: `make canary-commands BASE=<merge-base>`와 새 프로브 셋 3회씩, Measurements에 적는다
-- [ ] Commit Phase 3: `docs: plan-complete-order — CHANGELOG, upgrade note, measurements`
+- [x] Commit Phase 3: `docs: plan-complete-order — CHANGELOG, upgrade note, measurements`
 
 ## Integration (커밋 아님)
 
@@ -68,7 +68,13 @@ revised: 2026-10-22
 
 ## Measurements
 
+- 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
+
 ## Deviations
+
+- Phase 1: 프로브와 채점 테스트를 한 번에 썼다. red는 `evals/tasks.yaml`을 HEAD로 되돌려 확인했다(4 failed).
+- Phase 2: drift test의 단계 정규식이 `3.6.` 같은 하위 단계와 `Run (--through only):` 같은 괄호 라벨을 읽게 넓혔다. README `/sc:implement --plan` 행도 고정 대상에 넣었다.
+- Phase 3의 CHANGELOG와 주석 편집은 Phase 2 커밋 바로 뒤 한 커밋이다.
 
 ## Risks
 

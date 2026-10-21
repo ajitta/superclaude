@@ -1,6 +1,6 @@
 ---
 feature: plan-complete-order
-phase: planning
+phase: implementing
 owner: ajitta
 created: 2026-10-22
 updated: 2026-10-22

@@ -508,8 +508,9 @@ tasks:
   # Done claimed after tests while the review's fix went unreviewed and
   # /sc:reflect never ran (docs/features/review-reflect-gates). Two variants
   # share the fixture, the prompt and the checks: this one stops right after
-  # the fix commit; test-reflect-gate-complete adds the docs commit the real
-  # chain makes (plan complete, Result: line, README phase complete).
+  # the fix commit; test-reflect-gate-complete adds a docs commit that already
+  # marked plan and README complete with a Result: line, as /sc:implement did
+  # before docs/features/plan-complete-order or a hand edit does.
   - id: test-reflect-gate
     canary: true
     canary_only: true
@@ -586,8 +587,8 @@ tasks:
     fixture: fixtures/test-reflect-gate
     max_turns: 20
     covers: [test, reflect]
-    # The setup above, then the docs-only commit /sc:implement's Integrate
-    # step makes after a green Proof on the fix commit.
+    # The setup above, then a docs-only commit that marks plan and README
+    # complete with a Result: line on the fix commit.
     setup:
       - *s_init
       - *s_add
@@ -598,7 +599,7 @@ tasks:
       - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'docs: csv-export Proof on the F-1 fix; plan complete']
       - *s_tag
     prompt: *reflect_gate_prompt
-    # The phase is already complete and implement.md never moves it back, so
+    # The phase is already complete and a README phase never moves back, so
     # /sc:test leaves the README as it is (in place of the phase check).
     checks:
       - *reflect_named
