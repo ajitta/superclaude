@@ -124,8 +124,8 @@ revised: 2026-10-21
 
 ## Phase 4: 통합 (커밋 없음)
 
-- [ ] `uv run pytest` exit 0, `ruff format --check src/ tests/`, `make lint`, `make typecheck` clean.
-- [ ] 소유자 승인 후 master에 병합, master에서 전체 suite 다시 exit 0, push.
+- [x] `uv run pytest` exit 0, `ruff format --check src/ tests/`, `make lint`, `make typecheck` clean.
+- [x] 소유자 승인 후 master에 병합, master에서 전체 suite 다시 exit 0, push. (브랜치가 master 끝 위에 있어 병합 트리 = 브랜치 트리. 브랜치에서 돈 suite가 병합 결과를 덮는다.)
 - [ ] 릴리스는 소유자가 정한다. command 본문이 바뀌었으므로 `make release`는 `make canary-commands` 결과(또는 `CANARY_OK=1`)를 요구한다.
 - [ ] 릴리스 뒤 두 컴퓨터 모두 `superclaude doctor --scope user` → `superclaude install --force --scope user`로 맞춘다(gotcha `sync-scope-creates`: doctor가 설치를 보고할 때만).
 
@@ -159,4 +159,4 @@ revised: 2026-10-21
 3. `make canary-commands` → cmd-delegated-load, cmd-save-host-record, cmd-load-other-host 통과(보고서 경로 기록)
 4. 소유자 확인(릴리스 뒤): 두 컴퓨터가 같은 날 master에서 `/sc:save` → `.claude/memories/`에 `session_<date>_<host>_master.md` 두 파일, 서로 `git pull` 시 충돌 없음
 
-Result:
+Result: 21382833 (마지막 코드 커밋) — `uv run pytest` 3781 passed, 12 skipped; ruff format/check, mypy clean; `make canary-commands` cmd-delegated-load 1/1, cmd-load-other-host 3/3, cmd-save-host-record 3/3 (sonnet, `C:/sc-evals/smm-final/report.md`). Proof 4(두 컴퓨터 확인)는 릴리스 뒤 소유자 확인으로 남는다.
