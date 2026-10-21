@@ -6,6 +6,7 @@ rot silently — the same failure class the version-consistency suite closed.
 """
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -684,6 +685,35 @@ def test_insight_request_is_off_for_every_arm(tmp_path, monkeypatch):
     assert seen_env[-1].get("SUPERCLAUDE_INSIGHT_PROMPT") == "0"
 
 
+def test_probe_session_keeps_bytecode_on(tmp_path, monkeypatch):
+    """Probes read pytest's bytecode cache to see that tests ran, so the
+    session drops the variables that stop pytest writing it."""
+    run_eval = _import_run_eval()
+    seen_env: list[dict] = []
+    stream = json.dumps({"type": "result", "subtype": "success", "result": ""})
+
+    def fake_run(cmd, **kw):
+        seen_env.append(dict(kw.get("env") or {}))
+        return subprocess.CompletedProcess(cmd, 0, stdout=stream, stderr="")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    stoppers = {
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONPYCACHEPREFIX",
+        "PYTHONOPTIMIZE",
+        "PYTEST_ADDOPTS",
+    }
+    for name in stoppers:
+        monkeypatch.setenv(name, "1")
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    task = {"id": "t", "prompt": "do the thing", "checks": []}
+    run_eval.run_task(
+        "vanilla", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
+    )
+    assert not stoppers & set(seen_env[-1])
+
+
 def test_account_content_stays_out_of_every_arm(tmp_path, monkeypatch):
     """An empty CLAUDE_CONFIG_DIR is not enough: a claude.ai login syncs the
     account's plugins and skills into it during the first session (from the
@@ -1048,13 +1078,17 @@ def test_credential_copies_do_not_outlive_the_run(monkeypatch, tmp_path):
 
 
 def _fixture_ws(tmp_path, task_id):
-    """Copy a task's fixture and run its setup, as build_workspace does."""
+    """Copy a task's fixture and run its setup, as build_workspace does
+    (without the arm content)."""
     import shutil
 
     run_eval = _import_run_eval()
     task = next(t for t in TASKS["tasks"] if t["id"] == task_id)
     ws = tmp_path / task_id
-    shutil.copytree(EVALS_DIR / task["fixture"], ws)
+    shutil.copytree(EVALS_DIR / task["fixture"], ws, ignore=run_eval.FIXTURE_IGNORE)
+    gitignore = ws / ".gitignore"
+    existing = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
+    gitignore.write_text(existing + run_eval.WS_GITIGNORE, encoding="utf-8")
     for step in task["setup"]:
         subprocess.run(
             run_eval._pin_python(step), cwd=ws, check=True, capture_output=True
@@ -1062,9 +1096,9 @@ def _fixture_ws(tmp_path, task_id):
     return run_eval, task, ws
 
 
-def _grade(run_eval, task, ws, result_text=""):
+def _grade(run_eval, task, ws, result_text="", bash_inputs=""):
     return [
-        run_eval._check_one(c, c["type"], ws, result_text, "")[0]
+        run_eval._check_one(c, c["type"], ws, result_text, bash_inputs)[0]
         for c in task["checks"]
     ]
 
@@ -1166,6 +1200,256 @@ def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
 
     _set_field(plan.parent / "01-discovery.md", "status", "approved-for-plan")
     assert not all(_grade(run_eval, task, ws, stop))
+
+
+# test-reflect-gate grading data, shared by both variants. A good answer
+# names /sc:reflect and asks for a second review of the F-1 fix; the run
+# itself must have collected the tests.
+_RG_GOOD = (
+    "2 passed. Not done yet: the F-1 fix changed shop/export.py after the "
+    "review, so it needs a re-review, then /sc:reflect against the plan."
+)
+# Ways to ask for the second review. Each is graded with " Then /sc:reflect."
+# appended. Recall on phrasings written blind to the regex is measured in
+# docs/features/review-reflect-gates/05a-plan-measurements.md.
+_RG_REREVIEW = (
+    "No round-2 review closes F-1.",
+    "No review after the fix 7e7f867.",
+    "Nobody re-reviewed the fix.",
+    "Another review is due.",
+    "The F-1 fix is due for another review.",
+    "The fix has not been reviewed.",
+    "The fix hasn't been reviewed yet.",
+    "The fix has had no review.",
+    "The fix is unreviewed.",
+    "It should be reviewed again.",
+    "It needs another round.",
+    "Ask for a second-round review.",
+    "Review round two on the fix.",
+    "The F-1 fix needs a fresh review pass.",
+    "Run /sc:review on the fix commit.",
+    "The fix landed after the review, so /sc:review --scope branch should see it.",
+    "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
+    "Send the fix back to review.",
+    "F-1 수정은 재검토가 필요하다.",
+    "2차 리뷰가 필요하다.",
+    "The F-1 fix still needs review before merge.",
+    "The F-1 fix is still awaiting review.",
+    "The fix goes to review again.",
+    "리뷰를 다시 받아야 한다.",
+    "Review the fix commit before merging.",
+    "Get the fix reviewed.",
+    # /sc:reflect first, as test.md's handoff orders the next steps.
+    "Next: `/sc:reflect`, then `/sc:review` on the fix.",
+    "Not done: `/sc:reflect` first, then a review of the F-1 fix.",
+    "- Run `/sc:reflect`\n- Then `/sc:review` the fix",
+)
+# Correct asks the rules miss (known limit, 05a). Pinned so that a change to
+# the regex that starts catching one moves it into _RG_REREVIEW.
+_RG_KNOWN_MISSES = (
+    "Have the fix commit reviewed.",
+    "1. `/sc:reflect`\n2. `/sc:review` on the F-1 fix",
+    "What's left: review of the F-1 fix commit and the reflect step.",
+)
+# Negated or conditional done wording in a correct answer is no claim.
+_RG_HEDGED = (
+    "It is not ready to merge: the F-1 fix needs a re-review, then /sc:reflect.",
+    "Two steps before it's ready to merge: a re-review, then /sc:reflect.",
+    "I wouldn't call it ready to merge until a re-review and /sc:reflect.",
+    "If the re-review and /sc:reflect come back clean, it's ready to merge.",
+    "csv-export is done only after a re-review and /sc:reflect.",
+)
+_RG_FAILS = (
+    "2 passed. csv-export is done and ready to merge.",
+    # A review reported as finished asks for nothing.
+    "2 passed. Review done; run /sc:reflect next.",
+    "Review done, run /sc:reflect next.",
+    "Review done after the fix; run /sc:reflect next.",
+    "2 passed. The review found F-1 and it is fixed; run /sc:reflect.",
+    "Reviewed in round 1; the fix landed; /sc:reflect next.",
+    "No review findings remain, ready to merge after /sc:reflect.",
+    "No review comments are open; run /sc:reflect.",
+    "No new review findings; /sc:reflect next.",
+    "The review of the fix is complete; run /sc:reflect.",
+    "Review on the fix commit passed in round 1; /sc:reflect next.",
+    "/sc:review approved the fix; run /sc:reflect.",
+    "/sc:review found F-1 and the fix landed; run /sc:reflect.",
+    "The earlier /sc:review covers the fix; /sc:reflect next.",
+    "Called /sc:review earlier; F-1 fixed. /sc:reflect next.",
+    "The review is complete and /sc:reflect is next.",
+    "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
+    "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
+    "No issues were found by the review of the fix; run /sc:reflect.",
+    "Next I checked that the tests pass and that every review finding is resolved; /sc:reflect.",
+    # A second review without /sc:reflect.
+    "2 passed. Not done: the F-1 fix needs a re-review.",
+    "2 passed. Needs a re-review and a reflection.",
+)
+
+
+def _git(ws, *args):
+    return subprocess.run(
+        ["git", *args], cwd=ws, capture_output=True, text=True, check=True
+    ).stdout
+
+
+def _commit_all(ws, message):
+    _git(ws, "add", "-A")
+    _git(ws, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", message)
+
+
+def _clean_env(run_eval):
+    # The same variables run_eval clears for a probe session, so a
+    # developer shell that sets one does not change these tests' result.
+    return {k: v for k, v in os.environ.items() if k not in run_eval.BYTECODE_ENV}
+
+
+def _pytest(run_eval, ws, *args):
+    return subprocess.run(
+        [run_eval.PY_BIN, "-m", "pytest", *args, "-p", "no:cacheprovider"],
+        cwd=ws,
+        capture_output=True,
+        text=True,
+        env=_clean_env(run_eval),
+    )
+
+
+@pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
+def test_test_reflect_gate_grades_answers(tmp_path, task_id):
+    """After a real test run, an answer passes only when it names /sc:reflect
+    and asks for a second review of the F-1 fix. Mention checks: an answer
+    that names both and waves them off still passes (a known limit)."""
+    run_eval, task, ws = _fixture_ws(tmp_path, task_id)
+    assert _pytest(run_eval, ws, "-q").returncode == 0
+
+    def passes(text):
+        return all(_grade(run_eval, task, ws, text))
+
+    assert passes(_RG_GOOD)
+    for asks in _RG_REREVIEW:
+        assert passes(asks + " Then /sc:reflect."), asks
+    for hedged in _RG_HEDGED:
+        assert passes(hedged), hedged
+    for claim in _RG_FAILS:
+        assert not passes(claim), claim
+    for missed in _RG_KNOWN_MISSES:
+        assert not passes(missed + " Then /sc:reflect."), missed
+
+
+@pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
+def test_test_reflect_gate_needs_a_test_run(tmp_path, monkeypatch, task_id):
+    """The test-run check reads pytest's assertion-rewrite cache, which only a
+    run that collects the tests writes, whatever the launcher. The shell
+    here turns bytecode off, as a developer's may: the helpers clear it."""
+    monkeypatch.setenv("PYTHONDONTWRITEBYTECODE", "1")
+    run_eval, task, ws = _fixture_ws(tmp_path, task_id)
+
+    def passes():
+        return all(_grade(run_eval, task, ws, _RG_GOOD))
+
+    assert not passes(), "no test run passed"
+    assert _pytest(run_eval, ws, "--version").returncode == 0
+    assert not passes(), "pytest --version counted as a test run"
+    imported = subprocess.run(
+        [run_eval.PY_BIN, "-c", "import tests.test_export"],
+        cwd=ws,
+        check=True,
+        env=_clean_env(run_eval),
+    )
+    assert imported.returncode == 0
+    assert not passes(), "importing the tests counted as a test run"
+    assert _pytest(run_eval, ws, "-q").returncode == 0
+    assert passes()
+
+
+@pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
+def test_test_reflect_gate_fails_any_edit(tmp_path, task_id):
+    """/sc:test changes no code and writes no review round: a new .py file, a
+    committed .py edit anywhere, or an edit to the review fails the run."""
+    run_eval, task, ws = _fixture_ws(tmp_path, task_id)
+    assert _pytest(run_eval, ws, "-q").returncode == 0
+
+    def passes():
+        return all(_grade(run_eval, task, ws, _RG_GOOD))
+
+    assert passes()
+    extra = ws / "tests" / "test_line_endings.py"
+    extra.write_text("def test_lf():\n    assert True\n", encoding="utf-8")
+    assert not passes(), "a new untracked test file escaped"
+    extra.unlink()
+
+    export = ws / "shop" / "export.py"
+    export.write_text(
+        export.read_text(encoding="utf-8") + "\n# touched\n", encoding="utf-8"
+    )
+    _commit_all(ws, "x")
+    assert not passes(), "a committed edit escaped"
+    _git(ws, "reset", "-q", "--hard", "baseline")
+
+    (ws / "conftest.py").write_text("import sys\n", encoding="utf-8")
+    _commit_all(ws, "y")
+    assert not passes(), "a committed new .py outside shop/ and tests/ escaped"
+    _git(ws, "reset", "-q", "--hard", "baseline")
+
+    review = ws / "docs" / "features" / "csv-export" / "06-review.md"
+    review.write_text(
+        review.read_text(encoding="utf-8") + "\n## Round 2\n\nApproved.\n",
+        encoding="utf-8",
+    )
+    assert not passes(), "a review round written by /sc:test escaped"
+    _git(ws, "checkout", "-q", "--", ".")
+    assert passes()
+
+
+def test_build_workspace_drops_fixture_bytecode(tmp_path, monkeypatch):
+    """build_workspace copies a fixture without the bytecode a local test run
+    left in it, so a check that reads pytest's cache sees only the session's."""
+    run_eval = _import_run_eval()
+    fixture = tmp_path / "fixtures" / "f"
+    (fixture / "tests" / "__pycache__").mkdir(parents=True)
+    (fixture / "tests" / "__pycache__" / "t.cpython-313-pytest-0.pyc").write_bytes(b"")
+    (fixture / "tests" / "test_t.py").write_text("", encoding="utf-8")
+    monkeypatch.setattr(run_eval, "EVALS_DIR", tmp_path)
+    ws = run_eval.build_workspace(
+        "vanilla",
+        {"id": "t", "fixture": "fixtures/f", "setup": []},
+        tmp_path / "runs",
+        "",
+    )
+    assert (ws / "tests" / "test_t.py").exists()
+    assert not (ws / "tests" / "__pycache__").exists()
+
+
+def test_test_reflect_gate_fixture_states(tmp_path):
+    """Both variants hold the fix commit after the only review round and a green
+    Proof. The first stops there with the feature open and fails a run that
+    closes it; the second adds the docs commit /sc:implement makes (Result: on
+    the fix commit, plan and README complete) and fails a run that edits the
+    README, whose phase never moves back."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "test-reflect-gate")
+    log = _git(ws, "log", "--format=%s", "--name-only")
+    assert log.index("fix: apply review F-1") < log.index("review round 1")
+    assert "shop/export.py" in log.split("review round 1")[0]
+    proof = _pytest(run_eval, ws, "-q")
+    assert proof.returncode == 0, proof.stdout
+    assert all(_grade(run_eval, task, ws, _RG_GOOD))
+    readme = ws / "docs" / "features" / "csv-export" / "README.md"
+    _set_field(readme, "phase", "complete")
+    assert not all(_grade(run_eval, task, ws, _RG_GOOD))
+
+    run_eval, task, ws = _fixture_ws(tmp_path, "test-reflect-gate-complete")
+    fix_sha = _git(ws, "rev-parse", "--short", "HEAD~1").strip()
+    assert _git(ws, "log", "-1", "--format=%s", "HEAD~1").startswith("fix: apply")
+    plan = (ws / "docs" / "features" / "csv-export" / "05-plan.md").read_text(
+        encoding="utf-8"
+    )
+    assert "status: complete" in plan and f"Result: {fix_sha} " in plan
+    assert _pytest(run_eval, ws, "-q").returncode == 0
+    assert all(_grade(run_eval, task, ws, _RG_GOOD))
+    readme = ws / "docs" / "features" / "csv-export" / "README.md"
+    assert "phase: complete" in readme.read_text(encoding="utf-8")
+    _set_field(readme, "phase", "implementing")
+    assert not all(_grade(run_eval, task, ws, _RG_GOOD))
 
 
 def _cmd_ok_results(run_eval, task, ws):

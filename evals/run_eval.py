@@ -172,12 +172,28 @@ def _credentials_file() -> Path | None:
 # ── arm construction ─────────────────────────────────────────────────────────
 
 
+# Environment that stops pytest writing tests/__pycache__/*-pytest-*.pyc:
+# no bytecode, bytecode under another root, .pyo names under -O, or
+# operator pytest options such as --assert=plain.
+BYTECODE_ENV = (
+    "PYTHONDONTWRITEBYTECODE",
+    "PYTHONPYCACHEPREFIX",
+    "PYTHONOPTIMIZE",
+    "PYTEST_ADDOPTS",
+)
+
+# A fixture is copied without the bytecode and caches a local test run may
+# have left in it, so a check that reads what a run writes (pytest's
+# assertion-rewrite cache) sees only what the task's own session wrote.
+FIXTURE_IGNORE = shutil.ignore_patterns("__pycache__", ".pytest_cache")
+
+
 def build_workspace(arm: str, task: dict, runs_dir: Path, superclaude_bin: str) -> Path:
     """Copy fixture, apply arm content, run task setup. Order matters: arm
     content lands BEFORE the task's baseline git commit so .claude/ noise
     never pollutes git_diff checks."""
     ws = runs_dir / arm / task["id"]
-    shutil.copytree(EVALS_DIR / task["fixture"], ws)
+    shutil.copytree(EVALS_DIR / task["fixture"], ws, ignore=FIXTURE_IGNORE)
     gitignore = ws / ".gitignore"
     existing = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
     gitignore.write_text(existing + WS_GITIGNORE, encoding="utf-8")
@@ -300,6 +316,11 @@ def run_task(
     # The account's claude.ai MCP connectors load in every session whatever
     # the config dir holds; same for every arm, still not the arm's content.
     env["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
+    # Probes read pytest's bytecode cache to see that tests ran; an operator
+    # shell that turns bytecode off, moves it or renames it would fail them
+    # every run.
+    for name in BYTECODE_ENV:
+        env.pop(name, None)
 
     started = time.monotonic()
     try:
