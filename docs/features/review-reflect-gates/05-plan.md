@@ -1,5 +1,5 @@
 ---
-status: complete
+status: implementing
 revised: 2026-10-21
 ---
 
@@ -178,7 +178,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 봤다: [06-review](./06-review.md) 3차
 - [x] 4차 리뷰(소유자 결정): Phase 7의 바뀐 문구와 채점을 1–3차 발견을 수용 기준으로 봤다: [06-review](./06-review.md) 4차. Phase 8 뒤 round는 소유자가 멈췄다(남은 것은 테스트·프로브·drift test로 확인)
 - [x] `/sc:reflect`로 Goal과 Proof 대비 판정(2026-10-21, `--type completion`): reflect 부분은 충족(`/sc:test`만 도는 세션에서 0/6 → 12/12, sonnet). 재리뷰 부분은 규칙과 drift test로만 확인했고 어느 프로브도 `review.md` 줄을 재지 않는다. 소유자가 이 빈틈을 받아들였다. 다른 빈틈(`/sc:reflect` 세션에 재리뷰 괄호 없음, 언급만 보는 프로브, `--through` Report 목록, 분석 문서 D)은 이미 받아들였거나 후속이다
-- [x] 계획 `status: complete`와 `Result:` 줄, README `phase: complete`
+- [ ] 계획 `status: complete`와 README `phase: complete`: 소유자가 완료를 정할 때까지 `implementing`(2026-10-21 소유자 결정). `Result:` 줄은 적었다
 - [x] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다. 소유자 답(2026-10-21): 브랜치만 push, 병합은 나중
 
 ## Measurements
