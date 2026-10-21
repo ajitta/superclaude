@@ -83,7 +83,7 @@ revised: 2026-10-22
 - [x] Step 3: 재리뷰 채점 문장 일곱 개 복귀·추가(06a 3). `through_left_open`의 README 상태
 - [x] Step 4: 가드: 약화어 목록 확장, 앵커 다섯, `rules`는 Plan docs 줄만
 - [x] Step 5: review 포인터를 acceptance criteria 문장으로, RULES_DOCS:58 괄호를 문장으로, README `--through`와 intent Run의 `Result:`, 기록, `import re`
-- [ ] Commit Phase 5: `fix: Plan-Close closes after a Proof re-run; honest proposal check; grading data guards each regex rule`
+- [x] Commit Phase 5: `fix: Plan-Close closes after a Proof re-run; honest proposal check; grading data guards each regex rule`
 
 ## Integration (커밋 아님)
 
