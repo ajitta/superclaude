@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-21
 ---
 
@@ -37,9 +37,9 @@ revised: 2026-10-21
 - [x] 낡은 범프 브랜치 `chore/version-4.34.2`는 지웠다.
 - [ ] 릴리스: 소유자가 보류했다(2026-10-21 "release는 아직"). 할 때는 범프 브랜치를 새로 만들고, `CANARY_OK=1 make release` 뒤 두 컴퓨터에서 설치를 맞추고 두 컴퓨터로 확인한다(feature README `릴리스 뒤`). B를 같은 릴리스에 묶으면 canary를 한 번만 돌린다.
 
-### B. 규칙과 문서 맞추기 (새 브랜치, 예: `fix/review-reflect-gates`)
+### B. 규칙과 문서 맞추기 — 결정됨 (2026-10-21), 진행: [review-reflect-gates](../features/review-reflect-gates/README.md)
 
-결정이 필요하다. ★는 추천.
+소유자는 ★(a), 재리뷰 줄, canary 프로브를 골랐다. RULES_DOCS가 `/sc:test`에서 로드되지 않는 것(`context_loader.py:191`)을 확인한 뒤 `test.md` handoff의 (b)도 더했다. 릴리스는 보류한다. 아래는 결정 전 선택지다. ★는 추천이었다.
 
 - reflect를 어디에 둘지:
   - ★(a) RULES_DOCS `workflow_gates`에 `/sc:test -> /sc:reflect (Medium, Large)` 같은 게이트를 넣어 README 표와 맞춘다.
