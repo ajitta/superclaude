@@ -874,15 +874,18 @@ def test_c05_drift_remediation_carries_the_scope(
         assert where == ("" if scope == "user" else f" from {project}"), output
 
 
-def test_sandbox_walk_stops_at_the_fake_home(tmp_path: Path, monkeypatch) -> None:
+@pytest.mark.parametrize("scope", SCOPES)
+def test_sandbox_walk_stops_at_the_fake_home(
+    tmp_path: Path, monkeypatch, scope: str
+) -> None:
     """2026-10-21, Windows: c05[user] failed because sandbox put home and
     project side by side. The install walk from the project passed the fake
     $HOME, reached the developer's real ~/.claude/superclaude (pytest's temp
     root sits under the user profile) and reported it as a healthy project
     install. A decoy install above the sandbox stands in for that real one on
-    every platform."""
+    every platform; each scope must find its own install, not the decoy."""
     (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
-    _home, _project, base = fresh_install(tmp_path, monkeypatch, "user")
+    _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
     analyze = base / "commands" / "sc" / "analyze.md"
     analyze.write_text(
         analyze.read_text(encoding="utf-8") + "\nlocal edit\n", encoding="utf-8"
@@ -891,8 +894,11 @@ def test_sandbox_walk_stops_at_the_fake_home(tmp_path: Path, monkeypatch) -> Non
     result = CliRunner().invoke(main, ["verify-drift"])
 
     output = all_output(result)
-    assert "(scope: user)" in output, output
+    assert f"(scope: {scope})" in output, output
     assert result.exit_code == 1, output
+    # The scope's own install: the one edited file and nothing else. The empty
+    # decoy would read as every file missing.
+    assert "Drift detected: 1 drifted, 0 missing, 0 extra" in output, output
 
 
 @pytest.mark.parametrize("era", ERAS)
