@@ -78,6 +78,34 @@ def test_load_reads_every_machine_record_of_the_newest_date() -> None:
     assert "one per machine" in _flow_step(LOAD, LOAD_MEMORY_STEP)
 
 
+def _first_flow_step(path: Path) -> str:
+    flow = _read(path).split("<flow>", 1)[1].split("</flow>", 1)[0]
+    return next(ln.strip() for ln in flow.splitlines() if ln.strip().startswith("1."))
+
+
+def test_load_starts_with_a_sync_step_that_asks_before_pulling() -> None:
+    # Two machines share the records through git: loading before a pull reads
+    # the other machine's state from before its last push.
+    step = _first_flow_step(LOAD)
+    assert step.startswith("1. Sync:"), step
+    for token in ("git fetch", "git pull --ff-only", "[y/n]"):
+        assert token in step, f"load.md Sync step lacks {token!r}"
+
+
+def test_save_starts_with_the_load_sync_step() -> None:
+    # One definition: save points at load's Sync step instead of restating it.
+    step = _first_flow_step(SAVE)
+    assert step.startswith("1. Sync:"), step
+    assert "the /sc:load Sync step" in step, step
+
+
+def test_save_offers_to_share_and_never_pushes_unasked() -> None:
+    step = _flow_step(SAVE, "Share")
+    assert step, "save.md has no Share step"
+    for token in ("[y/n]", "git push", "memory files only"):
+        assert token in step, f"save.md Share step lacks {token!r}"
+
+
 @pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])
 def test_no_fixed_name_session_file(path: Path) -> None:
     text = _read(path)

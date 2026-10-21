@@ -77,28 +77,28 @@ revised: 2026-10-21
 
 **Files:** Test: `tests/unit/test_session_memory_folder.py`
 
-- [ ] Step 1: 새 테스트.
+- [x] Step 1: 새 테스트.
   - `test_save_and_load_start_with_a_sync_step` (save, load 매개변수): flow의 `1.` 줄이 `Sync:`로 시작하고 `git fetch`, `git pull --ff-only`, `[y/n]`을 담는다.
   - `test_save_offers_to_share_and_never_pushes_unasked`: save.md에 `Share:` 단계가 있고 `[y/n]`, `git push`, 그리고 "memory files only" 조건(push 안 된 커밋이 모두 메모리 파일일 때만 push 제안)을 담는다.
-- [ ] Step 2: `uv run pytest tests/unit/test_session_memory_folder.py -q` → 두 테스트 실패.
+- [x] Step 2: `uv run pytest tests/unit/test_session_memory_folder.py -q` → 두 테스트 실패.
 
 ### Task 2.2: load.md Sync 단계
 
 **Files:** Modify: `src/superclaude/commands/load.md` (`<flow>`)
 
-- [ ] Step 3: flow 맨 앞에 넣고 뒤 단계 번호를 하나씩 민다(단계 참조는 라벨이라 깨지지 않는다; `test_command_structure.py`가 확인):
+- [x] Step 3: flow 맨 앞에 넣고 뒤 단계 번호를 하나씩 민다(단계 참조는 라벨이라 깨지지 않는다; `test_command_structure.py`가 확인):
   `` 1. Sync: the branch has an upstream (`git rev-parse --abbrev-ref @{u}`) → `git fetch --quiet`, then `git rev-list --count HEAD..@{u}`; behind → tell the user the count and ask `[y/n]` before `git pull --ff-only`, and wait for the answer; no upstream, fetch fails or the pull stops → say so in one line and go on with the files on disk ``
-- [ ] Step 4: `<tools>`에 `- Bash: git fetch in the Sync step; git pull only after the user's yes`를 더하고, `<bounds>` `<never>`에 "pulls without the user's yes"를 더한다.
+- [x] Step 4: `<tools>`에 `- Bash: git fetch in the Sync step; git pull only after the user's yes`를 더하고, `<bounds>` `<never>`에 "pulls without the user's yes"를 더한다.
 
 ### Task 2.3: save.md Sync·Share 단계
 
 **Files:** Modify: `src/superclaude/commands/save.md` (`<flow>`, `<tools>`, `<bounds>`)
 
-- [ ] Step 5: flow 맨 앞에 `` 1. Sync: the /sc:load Sync step, before writing — a `learnings_` file the other machine changed would otherwise conflict `` 를 넣고 뒤 번호를 민다.
-- [ ] Step 6: Verify 단계 뒤에 넣는다: `` Share: the memory files written are uncommitted → list them and ask `[y/n]` to commit only those files (`docs: session memory — <topic>`); yes and every unpushed commit on the branch touches memory files only → ask `[y/n]` again before `git push`; other unpushed commits → commit only and say the push is left to the user; no → leave the files uncommitted ``
-- [ ] Step 7: `<tools>`에 `- Bash: git fetch in the Sync step; pull, commit and push in the Sync and Share steps only after the user's yes`를 더한다. `<bounds>` `<never>`에 "commits, pulls or pushes without the user's yes"를 더한다.
-- [ ] Step 8: `uv run pytest tests/unit/test_session_memory_folder.py tests/unit/test_command_structure.py tests/unit/test_description_overlap.py -q` 통과. 설명(description)은 바꾸지 않는다.
-- [ ] Commit Phase 2: `feat(save,load): check the upstream before loading or saving, offer to share`
+- [x] Step 5: flow 맨 앞에 `` 1. Sync: the /sc:load Sync step, before writing — a `learnings_` file the other machine changed would otherwise conflict `` 를 넣고 뒤 번호를 민다.
+- [x] Step 6: Verify 단계 뒤에 넣는다: `` Share: the memory files written are uncommitted → list them and ask `[y/n]` to commit only those files (`docs: session memory — <topic>`); yes and every unpushed commit on the branch touches memory files only → ask `[y/n]` again before `git push`; other unpushed commits → commit only and say the push is left to the user; no → leave the files uncommitted ``
+- [x] Step 7: `<tools>`에 `- Bash: git fetch in the Sync step; pull, commit and push in the Sync and Share steps only after the user's yes`를 더한다. `<bounds>` `<never>`에 "commits, pulls or pushes without the user's yes"를 더한다.
+- [x] Step 8: `uv run pytest tests/unit/test_session_memory_folder.py tests/unit/test_command_structure.py tests/unit/test_description_overlap.py -q` 통과. 설명(description)은 바꾸지 않는다.
+- [x] Commit Phase 2: `feat(save,load): check the upstream before loading or saving, offer to share`
 
 ## Phase 3: canary 프로브와 CHANGELOG (커밋 1개)
 
@@ -132,6 +132,8 @@ revised: 2026-10-21
 ## Deviations
 
 - Phase 0: 계획 브랜치에서 만든 `feature/session-memory-multi-machine`을 master(b662d843 이후, sandbox·run_shell 수정 포함)로 rebase했고, 커밋을 이어받은 `docs/session-memory-multi-machine` 브랜치는 지웠다(푸시된 적 없음). master에 sandbox 수정이 없으면 이 브랜치의 전체 suite에서 `c05[user]`가 이 컴퓨터에서 실패하기 때문이다.
+- Phase 2 Task 2.1: `test_save_and_load_start_with_a_sync_step`을 둘로 나눴다. save.md Sync 단계는 load.md Sync 단계를 가리키기만 하므로(command-authoring: 다시 쓰지 않고 가리킨다), git 명령·`[y/n]` 검사는 load에만 두고 save는 `the /sc:load Sync step` 포인터를 검사한다(`test_load_starts_with_a_sync_step_that_asks_before_pulling`, `test_save_starts_with_the_load_sync_step`).
+- Phase 2: save.md 4.6 단계의 `from 3.5`는 번호 참조라 단계 번호가 밀리면 틀어진다. `from the Corrections-Review step`으로 바꿨다.
 
 ## Risks
 
