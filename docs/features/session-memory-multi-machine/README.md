@@ -1,6 +1,6 @@
 ---
 feature: session-memory-multi-machine
-phase: implementing
+phase: complete
 owner: ajitta
 created: 2026-10-21
 updated: 2026-10-21
