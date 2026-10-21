@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implementing
 revised: 2026-10-21
 ---
 
@@ -39,7 +39,7 @@ revised: 2026-10-21
 
 ## Phase 0: 브랜치
 
-- [ ] 이 계획서와 README는 `docs/session-memory-multi-machine` 브랜치에 커밋돼 있다. 구현은 그 브랜치에서 `git switch -c feature/session-memory-multi-machine`으로 시작한다(계획 커밋을 이어받는다).
+- [x] 이 계획서와 README는 `docs/session-memory-multi-machine` 브랜치에 커밋돼 있다. 구현은 그 브랜치에서 `git switch -c feature/session-memory-multi-machine`으로 시작한다(계획 커밋을 이어받는다).
 
 ## Phase 1: 컴퓨터별 세션 기록 이름 (커밋 1개)
 
@@ -47,29 +47,29 @@ revised: 2026-10-21
 
 **Files:** Test: `tests/unit/test_session_memory_folder.py`
 
-- [ ] Step 1: 모듈 docstring 둘째 문단을 "Session state goes into an add-only record named by date, machine and branch …"로 고치고, 같은 날 같은 브랜치를 쓰는 두 컴퓨터도 서로 다른 파일을 쓴다는 문장을 더한다.
-- [ ] Step 2: `SESSION_RECORD = "session_[date]_[host-slug]_[branch-slug].md"`로 바꾼다. `SESSION_RECORD_GLOB`은 그대로 둔다.
-- [ ] Step 3: `_load_flow_step_one()`을 번호가 아니라 라벨로 찾게 바꾼다: `_load_flow_step(label)`이 flow에서 `N. <label>` 줄을 돌려준다. 호출부(`test_load_reads_the_record_save_writes`, `_load_flow_step_one_keys`)는 `"Load (memory folder)"`로 찾는다. Phase 2에서 Sync가 1번이 되기 때문이다.
-- [ ] Step 4: 새 테스트 두 개.
+- [x] Step 1: 모듈 docstring 둘째 문단을 "Session state goes into an add-only record named by date, machine and branch …"로 고치고, 같은 날 같은 브랜치를 쓰는 두 컴퓨터도 서로 다른 파일을 쓴다는 문장을 더한다.
+- [x] Step 2: `SESSION_RECORD = "session_[date]_[host-slug]_[branch-slug].md"`로 바꾼다. `SESSION_RECORD_GLOB`은 그대로 둔다.
+- [x] Step 3: `_load_flow_step_one()`을 번호가 아니라 라벨로 찾게 바꾼다: `_load_flow_step(label)`이 flow에서 `N. <label>` 줄을 돌려준다. 호출부(`test_load_reads_the_record_save_writes`, `_load_flow_step_one_keys`)는 `"Load (memory folder)"`로 찾는다. Phase 2에서 Sync가 1번이 되기 때문이다.
+- [x] Step 4: 새 테스트 두 개.
   - `test_save_defines_the_host_slug`: save.md `<storage>`에 `Host slug:` 줄이 있고 그 줄에 `hostname`과 `[a-z0-9]`가 있다.
   - `test_load_reads_every_machine_record_of_the_newest_date`: load.md Load (memory folder) 단계에 `one per machine`이 있다.
-- [ ] Step 5: `uv run pytest tests/unit/test_session_memory_folder.py -q` → 새 이름·Host slug·one per machine 테스트가 실패해야 한다(나머지 통과).
+- [x] Step 5: `uv run pytest tests/unit/test_session_memory_folder.py -q` → 새 이름·Host slug·one per machine 테스트가 실패해야 한다(나머지 통과).
 
 ### Task 1.2: save.md
 
 **Files:** Modify: `src/superclaude/commands/save.md` (Persist (memory folder) 단계, `<storage>`, `<outputs>` 표)
 
-- [ ] Step 6: Persist (memory folder) 단계의 이름을 `.claude/memories/session_[date]_[host-slug]_[branch-slug].md`로, 갱신 규칙을 "a second save the same day on the same branch from the same machine updates it; a record another machine wrote is never edited"로 바꾼다.
-- [ ] Step 7: `<storage>` Branch slug 줄 뒤에 Host slug 줄을 넣는다: `` Host slug: `hostname` output, lowercased, each run of characters outside [a-z0-9] → `-`, leading and trailing `-` removed; no `hostname` → the `COMPUTERNAME` or `HOSTNAME` variable; neither → `unknown-host` ``. Branch slug 줄의 "Session records are add-only per branch, so parallel branches and worktrees never conflict on merge"를 "add-only per branch and machine, so parallel branches, worktrees and machines never conflict on merge"로 바꾼다.
-- [ ] Step 8: `<outputs>` 표 session 행을 `session_[date]_[host-slug]_[branch-slug]`로 바꾼다.
+- [x] Step 6: Persist (memory folder) 단계의 이름을 `.claude/memories/session_[date]_[host-slug]_[branch-slug].md`로, 갱신 규칙을 "a second save the same day on the same branch from the same machine updates it; a record another machine wrote is never edited"로 바꾼다.
+- [x] Step 7: `<storage>` Branch slug 줄 뒤에 Host slug 줄을 넣는다: `` Host slug: `hostname` output, lowercased, each run of characters outside [a-z0-9] → `-`, leading and trailing `-` removed; no `hostname` → the `COMPUTERNAME` or `HOSTNAME` variable; neither → `unknown-host` ``. Branch slug 줄의 "Session records are add-only per branch, so parallel branches and worktrees never conflict on merge"를 "add-only per branch and machine, so parallel branches, worktrees and machines never conflict on merge"로 바꾼다.
+- [x] Step 8: `<outputs>` 표 session 행을 `session_[date]_[host-slug]_[branch-slug]`로 바꾼다.
 
 ### Task 1.3: load.md
 
 **Files:** Modify: `src/superclaude/commands/load.md` (Load (memory folder) 단계)
 
-- [ ] Step 9: "the newest session_*_[branch-slug].md of the current branch"를 다음으로 바꾼다: "the current branch's records of the newest date among session_*_[branch-slug].md, one per machine — the part between the date and `_[branch-slug]` names the machine, and an empty part marks a record from before machine names; read each and say which machine wrote it". "none → the newest session_* of any branch" 이하는 그대로 둔다.
-- [ ] Step 10: `uv run pytest tests/unit/test_session_memory_folder.py tests/unit/test_command_structure.py -q` 통과.
-- [ ] Commit Phase 1: `feat(save,load): one session record per machine`
+- [x] Step 9: "the newest session_*_[branch-slug].md of the current branch"를 다음으로 바꾼다: "the current branch's records of the newest date among session_*_[branch-slug].md, one per machine — the part between the date and `_[branch-slug]` names the machine, and an empty part marks a record from before machine names; read each and say which machine wrote it". "none → the newest session_* of any branch" 이하는 그대로 둔다.
+- [x] Step 10: `uv run pytest tests/unit/test_session_memory_folder.py tests/unit/test_command_structure.py -q` 통과.
+- [x] Commit Phase 1: `feat(save,load): one session record per machine`
 
 ## Phase 2: Sync·Share 단계 (커밋 1개)
 
@@ -128,6 +128,10 @@ revised: 2026-10-21
 - [ ] 소유자 승인 후 master에 병합, master에서 전체 suite 다시 exit 0, push.
 - [ ] 릴리스는 소유자가 정한다. command 본문이 바뀌었으므로 `make release`는 `make canary-commands` 결과(또는 `CANARY_OK=1`)를 요구한다.
 - [ ] 릴리스 뒤 두 컴퓨터 모두 `superclaude doctor --scope user` → `superclaude install --force --scope user`로 맞춘다(gotcha `sync-scope-creates`: doctor가 설치를 보고할 때만).
+
+## Deviations
+
+- Phase 0: 계획 브랜치에서 만든 `feature/session-memory-multi-machine`을 master(b662d843 이후, sandbox·run_shell 수정 포함)로 rebase했고, 커밋을 이어받은 `docs/session-memory-multi-machine` 브랜치는 지웠다(푸시된 적 없음). master에 sandbox 수정이 없으면 이 브랜치의 전체 suite에서 `c05[user]`가 이 컴퓨터에서 실패하기 때문이다.
 
 ## Risks
 

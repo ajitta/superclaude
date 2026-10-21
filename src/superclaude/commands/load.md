@@ -10,7 +10,7 @@ description: Load session context from the project memory folder (.claude/memori
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Load (memory folder): Glob .claude/memories/*.md → Read learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the newest session_*_[branch-slug].md of the current branch (slug per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
+  1. Load (memory folder): Glob .claude/memories/*.md → Read learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the current branch's records of the newest date among session_*_[branch-slug].md, one per machine — the part between the date and `_[branch-slug]` names the machine, and an empty part marks a record from before machine names; read each and say which machine wrote it (slugs per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
   2. Load (auto memory): MEMORY.md is already in context (Claude Code loads it); Read a memory file it points to only when that pointer bears on the session's work
   3. Discover: project structure and requirements (Glob/Grep/Read)
   4. Activate: project context and workflow preparation
