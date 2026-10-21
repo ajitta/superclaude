@@ -104,7 +104,7 @@ revised: 2026-10-22
 - [x] Step 2: `Result:` 줄이 없는 상자 다 찬 계획: Plan-Close와 implement Load가 `/sc:implement --plan`의 Proof 재실행으로
 - [x] Step 3: 거절 guard에 "marked"·"setting"·"isn't". 재리뷰 채점 문장 넷. `--through` phase 파일 상태
 - [x] Step 4: 앵커는 바뀐 절과 되돌림 동사까지만. 약화어 목록은 늘리지 않는다(Deviations)
-- [ ] Commit Phase 7: `fix: Plan-Close waits for open review findings; a plan with no Result: line goes back to implement`
+- [x] Commit Phase 7: `fix: Plan-Close waits for open review findings; a plan with no Result: line goes back to implement`
 
 ## Integration (커밋 아님)
 
