@@ -242,3 +242,25 @@ class TestRealMake:
 
     def test_missing_prerequisite_is_a_real_failure(self, tmp_path):
         assert self._run(tmp_path, "test: test-data.json\n\ttrue\n") is None
+
+
+def test_own_timeout_is_below_the_hooks_json_timeout() -> None:
+    # Claude Code's hook timer starts before run_shell's; with equal values
+    # Claude Code always cuts the hook off first and the tree kill never runs.
+    import superclaude
+
+    hooks = json.loads(
+        (Path(superclaude.__file__).parent / "hooks" / "hooks.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    timeouts = [
+        h["timeout"]
+        for groups in hooks["hooks"].values()
+        for group in groups
+        for h in group.get("hooks", [])
+        if h.get("command", "").endswith("test_runner_hook")
+    ]
+    assert timeouts, "hooks.json registers no test_runner_hook"
+    for t in timeouts:
+        assert hook.TEST_TIMEOUT_SECONDS + 5 <= t, (hook.TEST_TIMEOUT_SECONDS, t)

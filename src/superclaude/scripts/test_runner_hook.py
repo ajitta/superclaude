@@ -18,6 +18,12 @@ from pathlib import Path
 
 from superclaude.utils import read_hook_input, run_shell
 
+# Below the hook's `timeout` in hooks.json (120 s): Claude Code's timer starts
+# with the hook, before this one, so an equal value lets Claude Code cut the
+# hook off first and run_shell's tree kill never runs
+# (test_test_runner_hook.py checks the gap).
+TEST_TIMEOUT_SECONDS = 110
+
 # File extensions that should trigger test runs
 SOURCE_EXTENSIONS = {
     ".py",
@@ -212,7 +218,7 @@ def main() -> None:
             return
         test_cmd, cwd = detected
 
-        result = run_shell(test_cmd, timeout=120, cwd=cwd)
+        result = run_shell(test_cmd, timeout=TEST_TIMEOUT_SECONDS, cwd=cwd)
 
         file_name = Path(file_path).name
 
@@ -247,7 +253,7 @@ def main() -> None:
             print(msg)
 
     except subprocess.TimeoutExpired:
-        print("test hook: timeout after 120s", file=sys.stderr)
+        print(f"test hook: timeout after {TEST_TIMEOUT_SECONDS}s", file=sys.stderr)
     except OSError as e:
         print(f"test hook: OS error: {e}", file=sys.stderr)
 
