@@ -1,5 +1,5 @@
 ---
-status: implementing
+status: complete
 revised: 2026-10-21
 ---
 
@@ -126,8 +126,7 @@ revised: 2026-10-21
 
 - [x] `uv run pytest` exit 0, `ruff format --check src/ tests/`, `make lint`, `make typecheck` clean.
 - [x] 소유자 승인 후 master에 병합, master에서 전체 suite 다시 exit 0, push. (브랜치가 master 끝 위에 있어 병합 트리 = 브랜치 트리. 브랜치에서 돈 suite가 병합 결과를 덮는다.)
-- [ ] 릴리스는 소유자가 정한다. command 본문이 바뀌었으므로 `make release`는 `make canary-commands` 결과(또는 `CANARY_OK=1`)를 요구한다.
-- [ ] 릴리스 뒤 두 컴퓨터 모두 `superclaude doctor --scope user` → `superclaude install --force --scope user`로 맞춘다(gotcha `sync-scope-creates`: doctor가 설치를 보고할 때만).
+- [x] 독립 리뷰: `self-review` 에이전트가 병합 범위(master cd7b4358..9b625e2b)를 계획의 결정과 소유자 요청에 비춰 본다. 발견을 반영한 커밋 뒤 Proof 1–3을 다시 돌리고 `Result:`를 그 커밋으로 고친다. 리뷰는 4차까지 돌았다(반영 커밋 ec090829, 28d92471, 51d61fa4, b13591f4; [06-review](./06-review.md)). `/sc:reflect`도 돌렸다(Deviations).
 
 ## Deviations
 
@@ -137,6 +136,10 @@ revised: 2026-10-21
 - Phase 3 Step 2: headless Claude Code는 작업공간 `.claude/` 아래 Write를 모두 sensitive file로 거부한다(2026-10-21, `~/.claude`만이 아님). 그래서 `cmd-save-host-record`의 파일 존재 검사는 이전·새 내용 모두 2/3이었다. 모델이 답에 적는 계획한 기록 이름을 `output_regex`(`session_<date>_<host>_main.md`, otherbox 제외)로 채점하게 바꿨다(21382833).
 - Phase 3 Step 4 기준선(master cd7b4358 내용 + 새 프로브 정의, sonnet): `cmd-save-host-record` 2/3 — 답이 옛 이름 `session_2026-10-21_main.md`를 적어 이름 검사만 실패. `cmd-load-other-host` 3/3 — 옛 "newest" 규칙도 같은 날짜 두 파일을 읽었다. 그래서 load 프로브는 회귀 방지용이라고 tasks.yaml에 적었다. 브랜치: save 3/3(`session_2026-10-21_chosh-g14_main.md`), load 3/3, cmd-delegated-load 1/1.
 - Phase 3: 프로브 커밋을 CHANGELOG와 따로 두 번 냈다(014ffcf1, 21382833). 기준선이 master로 체크아웃해야 해서, 그 전에 작업을 커밋해 두었다(gotcha: 체크아웃 전 커밋).
+- Phase 4: 리뷰 게이트(RULES_DOCS `workflow_gates`: `/sc:implement` 뒤 `/sc:review --scope branch`) 전에 master로 병합하고 push했다(9b625e2b). 소유자가 버전 범프를 멈추게 한 뒤 리뷰를 `fix/session-memory-review`에서 돌린다. 릴리스·두 컴퓨터 설치 맞추기·두 컴퓨터 확인은 릴리스 뒤의 일이라 계획 체크박스에서 README `릴리스 뒤`로 옮겼다. 계획에 두면 릴리스 전에 `complete`가 될 수 없다.
+- Phase 4: 첫 반영(ec090829)을 다시 리뷰하지 않고 Proof로 가려다 멈췄다. 원인은 [review-reflect-gate-gap 분석](../../analysis/review-reflect-gate-gap-ajitta-2026-10-21.md)에 있다. 그 뒤 반영 커밋마다 리뷰를 다시 돌렸고, 4차에서 멈췄다. 남은 변경이 채점·테스트·canary로 확인되는 프로브 정규식이었기 때문이다.
+- Phase 4: `/sc:reflect`(2026-10-21) 판정은 "재리뷰 전에는 끝나지 않음"이었다. 남은 것: 두 컴퓨터 확인(README `릴리스 뒤`), `[y/n]`에 yes로 답하는 경로는 headless에서 돌 수 없다. Share의 커밋 형태는 scratch 저장소에서 확인했다. 기록만 커밋되고, 미리 stage된 `app.py`는 stage에 남았다.
+- Phase 4 기준선(기능 전 cd7b4358 내용 + 최종 프로브, sonnet): `cmd-load-sync-behind` 2/4로 구별된다. `cmd-load-other-host` 3/3이다. 옛 load도 같은 날짜 두 기록을 읽고 컴퓨터별로 말해서 회귀 방지용이다.
 
 ## Risks
 
@@ -144,6 +147,8 @@ revised: 2026-10-21
 - `git fetch`가 인증 프롬프트에서 멈출 수 있다. 비대화 셸에서는 실패로 끝나므로 Sync 단계의 "fetch fails → go on"으로 처리된다.
 - 같은 컴퓨터라도 셸에 따라 `hostname` 결과가 달라질 수 있다(WSL은 Windows와 다른 이름). 다른 이름이면 다른 컴퓨터로 기록될 뿐 충돌은 없다.
 - 공개 저장소에 컴퓨터 이름이 남는다(소유자 결정). fork 사용자도 `.claude/memories/`를 커밋하면 같다 — CHANGELOG 항목이 hostname을 쓴다고 밝힌다.
+
+- 리뷰(06-review.md)에서 남긴 위험: 같은 hostname을 쓰는 두 컴퓨터·컨테이너·macOS의 hostname 변화(S-7), 가장 최근 날짜만 읽어 어제의 다른 컴퓨터 Next actions가 안 보임(S-8), `.claude/` gitignore·pre-commit hook·commitlint와의 충돌(S-9).
 
 ## Alternatives not taken
 
@@ -157,6 +162,5 @@ revised: 2026-10-21
 1. `uv run pytest tests/unit/test_session_memory_folder.py tests/unit/test_command_structure.py tests/unit/test_eval_harness.py -q` → 모두 통과
 2. `uv run pytest` → exit 0; `ruff format --check src/ tests/`, `make lint`, `make typecheck` → exit 0
 3. `make canary-commands` → cmd-delegated-load, cmd-save-host-record, cmd-load-other-host 통과(보고서 경로 기록)
-4. 소유자 확인(릴리스 뒤): 두 컴퓨터가 같은 날 master에서 `/sc:save` → `.claude/memories/`에 `session_<date>_<host>_master.md` 두 파일, 서로 `git pull` 시 충돌 없음
 
-Result: 21382833 (마지막 코드 커밋) — `uv run pytest` 3781 passed, 12 skipped; ruff format/check, mypy clean; `make canary-commands` cmd-delegated-load 1/1, cmd-load-other-host 3/3, cmd-save-host-record 3/3 (sonnet, `C:/sc-evals/smm-final/report.md`). Proof 4(두 컴퓨터 확인)는 릴리스 뒤 소유자 확인으로 남는다.
+Result: b13591f4 (마지막 코드 커밋) — `uv run pytest` 3786 passed, 12 skipped; ruff format/check, mypy clean; `make canary-commands` cmd-delegated-load 1/1, cmd-load-other-host 3/3, cmd-load-sync-behind 4/4, cmd-save-host-record 3/3 (sonnet, `C:/sc-evals/smm-final2/report.md`). 두 컴퓨터 확인은 README `릴리스 뒤`에 있다.

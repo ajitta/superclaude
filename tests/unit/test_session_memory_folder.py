@@ -88,22 +88,89 @@ def test_load_starts_with_a_sync_step_that_asks_before_pulling() -> None:
     # the other machine's state from before its last push.
     step = _first_flow_step(LOAD)
     assert step.startswith("1. Sync:"), step
-    for token in ("git fetch", "git pull --ff-only", "[y/n]"):
+    # Prompts off in both shells: a fetch waiting on a credential prompt would
+    # hang every /sc:load and /sc:save until the shell tool timed out.
+    for token in (
+        "fetch --quiet",
+        "git pull --ff-only",
+        "[y/n]",
+        "`GIT_TERMINAL_PROMPT=0`",
+        "`$env:GIT_TERMINAL_PROMPT=0`",
+        "credential.interactive=never",
+    ):
         assert token in step, f"load.md Sync step lacks {token!r}"
 
 
+# A bare @{u} is a hashtable literal to PowerShell, and a partly quoted
+# '@{u}'...HEAD reaches git as two arguments (usage error, exit 129; seen
+# 2026-10-21). Only a whole argument in single quotes works in PowerShell and
+# a POSIX shell alike.
+_QUOTED_UPSTREAM_ARG = re.compile(r"'[^'\s]*@\{u\}[^'\s]*'(?=[\s`;)]|$)")
+
+
+@pytest.mark.parametrize(
+    ("path", "label"),
+    [(LOAD, "Sync"), (SAVE, "Share")],
+    ids=["load-sync", "save-share"],
+)
+def test_upstream_ref_is_quoted(path: Path, label: str) -> None:
+    step = _flow_step(path, label)
+    assert "@{u}" in step, f"{path.name} {label} step names no upstream ref"
+    quoted = len(_QUOTED_UPSTREAM_ARG.findall(step))
+    assert quoted == step.count("@{u}"), (
+        f"{path.name} {label}: {step.count('@{u}')} upstream refs, "
+        f"{quoted} quoted as a whole argument"
+    )
+
+
 def test_save_starts_with_the_load_sync_step() -> None:
-    # One definition: save points at load's Sync step instead of restating it.
+    # One definition: save points at load's Sync step instead of restating it,
+    # and names the installed file, since /sc:save may run without /sc:load.
     step = _first_flow_step(SAVE)
     assert step.startswith("1. Sync:"), step
     assert "the /sc:load Sync step" in step, step
+    assert "commands/sc/load.md" in step, step
 
 
 def test_save_offers_to_share_and_never_pushes_unasked() -> None:
     step = _flow_step(SAVE, "Share")
     assert step, "save.md has no Share step"
-    for token in ("[y/n]", "git push", "memory files only"):
+    for token in ("git push", "memory files only", "only those files"):
         assert token in step, f"save.md Share step lacks {token!r}"
+    # One yes for the commit, a second one for the push.
+    assert step.count("[y/n]") >= 2, step
+    # The pathspec on the commit itself keeps whatever else was staged out;
+    # `git add -- <files>` alone would leave a bare `git commit` passing.
+    assert re.search(r"git commit [^`]*-- <files>`", step), step
+    # Git refuses a partial commit during a merge, cherry-pick or revert.
+    assert "a merge, cherry-pick or revert in progress" in step, step
+
+
+def test_share_runs_after_every_step_that_writes() -> None:
+    # Checkpoint and Validate still write or fix memory files; a Share before
+    # them commits and pushes an incomplete, unvalidated set.
+    flow = _read(SAVE).split("<flow>", 1)[1].split("</flow>", 1)[0]
+    top = [ln.strip() for ln in flow.splitlines() if re.match(r"^\s*\d+\.\s", ln)]
+    assert top[-1].startswith(f"{len(top)}. Share:"), top[-1]
+
+
+def test_save_never_edits_another_machines_record() -> None:
+    assert "a record another machine wrote is never edited" in _flow_step(
+        SAVE, "Persist (memory folder)"
+    )
+
+
+def test_load_takes_the_branch_from_the_record_header() -> None:
+    # A branch slug may hold `_` (`fix_x`), so the filename alone can misread
+    # machine and branch; the `branch:` first line settles it, both before the
+    # newest date is chosen and in the any-branch fallback.
+    step = _flow_step(LOAD, LOAD_MEMORY_STEP)
+    filter_at = step.find("whose `branch:` line names the current branch")
+    newest_at = step.find("of the newest date")
+    assert 0 <= filter_at < newest_at, step
+    assert "reported as the branch its `branch:` line names" in step, step
+    # Filtering every day's record of the branch must not Read them whole.
+    assert "Grep `^branch:`" in step, step
 
 
 @pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])

@@ -10,17 +10,17 @@ description: Save session context to the committed project memory folder (.claud
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
   <flow>
-  1. Sync: the /sc:load Sync step, before writing — a `learnings_` file the other machine changed would otherwise conflict
+  1. Sync: run the /sc:load Sync step (installed sibling commands/sc/load.md; Read it when its text is not in context) before writing — a `learnings_` file the other machine changed would otherwise conflict
   2. Analyze: session progress + discoveries
   3. Persist (memory folder): Write .claude/memories/session_[date]_[host-slug]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch from the same machine updates it; a record another machine wrote is never edited → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
   4. Persist (auto memory): save the durable facts a later session needs (the no-ephemeral gotcha) to the auto memory folder, in the file layout Claude Code's memory instructions give; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
     4.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory whose body names the broken rule as `violated_rule: "[RNN Name]"` [R14 Correction Capture].
     4.6. Auto memory off: Claude Code names no auto memory folder anywhere in the session's context, neither in the system prompt nor in the first message (an agent's own agent memory folder does not count; for example the `autoMemoryEnabled` setting, `CLAUDE_CODE_DISABLE_AUTO_MEMORY`, or a self-hosted session turns it off) → skip the Persist (auto memory) step and write each correction from the Corrections-Review step to .claude/memories/learnings_corrections.md instead, so /sc:analyze still finds its `violated_rule` line
   5. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores (auto memory off: the memory folder only)
-  6. Share: the memory files written are uncommitted → list them and ask `[y/n]` to commit only those files (`docs: session memory — <topic>`); yes, and the branch's unpushed commits change memory files only → ask `[y/n]` again before `git push`; other unpushed commits → commit only and say the push is left to the user; no → leave the files uncommitted
-  7. Checkpoint: recovery points + progress tracking
-  8. Validate: data integrity + no duplicates across stores
-  9. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
+  6. Checkpoint: recovery points + progress tracking
+  7. Validate: data integrity + no duplicates across stores
+  8. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
+  9. Share: the .claude/memories/ files this save wrote are uncommitted → list them and ask `[y/n]` to commit only those files: `git add -- <files>`, then `git commit -m "docs: session memory — <topic>" -- <files>`, so nothing else already staged goes in; detached HEAD, or a merge, cherry-pick or revert in progress → no commit offer, say why; yes, and the branch has an upstream, is not behind it, and `git diff --name-only '@{u}...HEAD'` lists memory files only → ask `[y/n]` again before `git push`; otherwise commit only and say the push is left to the user; no → leave the files uncommitted
   </flow>
 
   <flags>
@@ -59,7 +59,7 @@ Every type also saves its durable facts to auto memory as memory files, unless a
   - Write/Edit: memory folder + auto memory persistence
   - Glob: list memory files
   - Read: verify both stores
-  - Bash: git fetch in the Sync step; pull, commit and push in the Sync and Share steps only after the user's yes
+  - Bash: `hostname` and read-only git (branch, status, rev-parse, rev-list, diff) for the record name and the Sync and Share steps; fetch in the Sync step; pull, add, commit and push only after the user's yes
   </tools>
 
   <examples>
