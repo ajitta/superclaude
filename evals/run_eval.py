@@ -306,6 +306,10 @@ def run_task(
     # The account's claude.ai MCP connectors load in every session whatever
     # the config dir holds; same for every arm, still not the arm's content.
     env["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
+    # Probes read pytest's bytecode cache to see that tests ran; an operator
+    # shell that turns bytecode off or moves it would fail them every run.
+    for name in ("PYTHONDONTWRITEBYTECODE", "PYTHONPYCACHEPREFIX"):
+        env.pop(name, None)
 
     started = time.monotonic()
     try:

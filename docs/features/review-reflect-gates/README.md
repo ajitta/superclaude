@@ -29,6 +29,7 @@ README 작업 크기 표의 Medium·Large 체인은 `/sc:reflect`로 끝나는�
 - [06-review.md](./06-review.md): branch review rounds
 - [06a-verify-independent.md](./06a-verify-independent.md): independent verification of 81776c29 (headless opus, Linux)
 - [06b-verify-fixes.md](./06b-verify-fixes.md): second independent verification, of the 06a fixes (4223ed1d)
+- [06c-verify-phase10.md](./06c-verify-phase10.md): third independent verification, of the 06b fixes (56da83a1)
 
 ## 릴리스 뒤
 

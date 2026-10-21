@@ -167,3 +167,18 @@ green인 mutation은 처음에 `-k`로 고른 테스트에서 돌렸고, 두 테
 - `run_eval.py:297`이 운영자의 환경 변수를 그대로 물려주는 것은 이 브랜치 이전부터다. 발견 3의 `pop` 두 줄은 다른 프로브에도 좋다.
 - `_fixture_ws`(`test_eval_harness.py:1050`, 이 브랜치 이전부터 있음)는 docstring에 "as build_workspace does"라고 쓴다. 그러나 `WS_GITIGNORE`를 쓰지 않는다. 그래서 `_commit`의 "`add -A` would also commit the run's pytest cache" 우회가 필요했다. helper가 같은 `.gitignore`를 쓰면 우회 주석이 필요 없다.
 - `/sc:test`가 `isolation: worktree` 서브에이전트에서 테스트를 돌리는 경우는 확인하지 않았다. 그러면 캐시가 `tests/__pycache__` 밖에 생기고, 이 check는 실패로 채점한다.
+
+## 반영 (2026-10-21, claude-box, Phase 11)
+
+| # | 처리 |
+|---|---|
+| 1 | 반영: 규칙 2의 요청 낱말에 `then`. 위 여덟 중 여섯과 `- Run /sc:reflect / - Then /sc:review the fix` 꼴이 통과한다. 번호 목록 꼴은 `_RG_KNOWN_MISSES`로 고정했다. 규칙을 고정한 뒤 새 묶음(heldout3, 목록·두 순서 포함)으로 한 번 쟀다: 21/30·false pass 1/30. `then`은 이 묶음 값을 바꾸지 않았다 |
+| 2 | 반영: 정규식은 더 넓히지 않았다. 05a와 `tasks.yaml` 주석에 recall 범위(heldout2 25/30, heldout3 21/30, 이 보고서의 묶음 17/32), heldout2 생성에서 뺀 문장 종류, false pass 종류(같은 절의 표지 낱말), miss 종류를 적었다 |
+| 3 | 반영: `run_task`가 세션 환경에서 `PYTHONDONTWRITEBYTECODE`, `PYTHONPYCACHEPREFIX`를 지운다. 주석과 CHANGELOG의 한계에 `-B`, `--assert=plain`, worktree 서브에이전트(실패 쪽), `--co`, `--fixtures`, 모두 deselect한 `-k`(통과 쪽)를 적었다. 환경 정리는 `claude`를 띄워야 해서 단위 테스트로 지키지 않는다 |
+| 4 | 반영: `--version` 뒤 `python -c "import tests.test_export"`가 실패로 채점되는지 본다(M2, M3 red). `build_workspace`를 tmp fixture로 불러 `__pycache__`가 복사되지 않는지 본다(M1 red). 함수만 보던 `test_fixture_copy_skips_bytecode`는 지웠다 |
+| 5 | 반영: 표지마다 한 문장("still awaiting", "goes to review again", "before merging", "다시"), 창마다 넓어지면 통과할 완료 주장 하나를 넣었다. 못 맞히는 셋은 `_RG_KNOWN_MISSES`로 `assert not`. M4, M5, M6, M8, M9, M11 red |
+| 6 | 반영: 패턴이 `/sc:test` 뒤의 backtick 하나를 허용한다. M16 red |
+| 7 | 반영: CHANGELOG가 출처를 나눈다(`/sc:implement`: "even when its Proof is green", `/sc:review`: 다음 round와 수용 기준) |
+| 이 브랜치 밖 | `_fixture_ws`가 `WS_GITIGNORE`를 쓰게 했다. `_commit`의 우회가 필요 없어져 `_commit_all`로 돌렸다. worktree 서브에이전트는 한계로 적었다 |
+
+Mutation(반영 뒤, 메모리의 원본으로 되돌림, `git diff --stat`이 mutation 전과 같다): M1, M2, M3, M4, M5, M6, M8, M9, M11, M16, 규칙 2의 `then` 삭제. 11건 모두 red다.

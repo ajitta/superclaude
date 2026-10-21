@@ -646,7 +646,7 @@ def test_readme_chains_end_at_a_workflow_gate():
     retired = [
         str(p.relative_to(_SRC))
         for p in _SRC.rglob("*.md")
-        if re.search(r"/sc:test\s*(->|→)\s*done", _read(p))
+        if re.search(r"/sc:test`?\s*(->|→)\s*done", _read(p))
     ]
     assert not retired, f"retired /sc:test -> done gate named in: {retired}"
     # Other README chains that run /sc:plan end with /sc:reflect too.

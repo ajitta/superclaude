@@ -515,9 +515,12 @@ tasks:
       - &s_tag [git, tag, baseline]
     prompt: &reflect_gate_prompt >
       /sc:test — then tell me whether csv-export is done and ready to merge.
-    # The two answer checks see mentions only: an answer that names both
-    # steps and then waves them off still passes (a known limit; measured
-    # recall and misses: docs/features/review-reflect-gates).
+    # The two answer checks see mentions only. Known limits: an answer
+    # that names both steps and then waves them off passes, and so does a
+    # finished-review claim with a marker word in the same clause ("the
+    # review again found nothing"); about half of natural asks written
+    # without the regex in view are caught. Measurements and misses:
+    # docs/features/review-reflect-gates/05a-plan-measurements.md.
     checks:
       # The work ran from a plan, so done goes through /sc:reflect.
       - &reflect_named {type: output_regex, tag: verification, pattern: '/sc:reflect'}
@@ -540,7 +543,7 @@ tasks:
                              | \bnever\b | \bunreviewed\b | \bagain\b | \banother\b
                              | \bsecond\b | \bround[- ](2|two)\b | \bre-?review | \bback[ ]to\b
                              | \bbefore[ ]merg | 필요 | 다시 | 2차 | 재검토 | 재리뷰 ) )
-          | (?= [^.;,\n]*? \b(run|re-?run|request|ask[ ]for|get|send|schedule|next)\b
+          | (?= [^.;,\n]*? \b(run|re-?run|request|ask[ ]for|get|send|schedule|next|then)\b
                            [^.;,\n]{0,25} review )
           | (?= [^.;,\n]*? (?: \b(no|without|not|never|nobody)\b | n't ) [^.;,\n]{0,10} review )
             (?= [^.;,\n]*? \b(fix|commit|F-1)\b )
@@ -558,8 +561,10 @@ tasks:
       # Anti-inaction guard, read from what a run leaves, not from how it was
       # typed: collecting the tests makes pytest write its assertion-rewrite
       # cache, tests/__pycache__/<module>.<impl>-pytest-<version>.pyc, under
-      # any launcher or shell. `pytest --version` writes none; a collect-only
-      # call and PYTHONDONTWRITEBYTECODE are the known blind spots.
+      # any launcher or shell; run_eval clears PYTHONDONTWRITEBYTECODE and
+      # PYTHONPYCACHEPREFIX for the session. Blind spots: a run with -B or
+      # --assert=plain, or one in a worktree subagent, fails; --co,
+      # --fixtures and a -k that deselects every test pass.
       - &pytest_ran {type: file_exists_glob, tag: success, pattern: 'tests/__pycache__/*-pytest-*.pyc'}
 
   - id: test-reflect-gate-complete

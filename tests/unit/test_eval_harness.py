@@ -1048,13 +1048,17 @@ def test_credential_copies_do_not_outlive_the_run(monkeypatch, tmp_path):
 
 
 def _fixture_ws(tmp_path, task_id):
-    """Copy a task's fixture and run its setup, as build_workspace does."""
+    """Copy a task's fixture and run its setup, as build_workspace does
+    (without the arm content)."""
     import shutil
 
     run_eval = _import_run_eval()
     task = next(t for t in TASKS["tasks"] if t["id"] == task_id)
     ws = tmp_path / task_id
     shutil.copytree(EVALS_DIR / task["fixture"], ws, ignore=run_eval.FIXTURE_IGNORE)
+    gitignore = ws / ".gitignore"
+    existing = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
+    gitignore.write_text(existing + run_eval.WS_GITIGNORE, encoding="utf-8")
     for step in task["setup"]:
         subprocess.run(
             run_eval._pin_python(step), cwd=ws, check=True, capture_output=True
@@ -1199,6 +1203,22 @@ _RG_REREVIEW = (
     "Send the fix back to review.",
     "F-1 수정은 재검토가 필요하다.",
     "2차 리뷰가 필요하다.",
+    "The F-1 fix still needs review before merge.",
+    "The F-1 fix is still awaiting review.",
+    "The fix goes to review again.",
+    "리뷰를 다시 받아야 한다.",
+    "Review the fix commit before merging.",
+    # /sc:reflect first, as test.md's handoff orders the next steps.
+    "Next: `/sc:reflect`, then `/sc:review` on the fix.",
+    "Not done: `/sc:reflect` first, then a review of the F-1 fix.",
+    "- Run `/sc:reflect`\n- Then `/sc:review` the fix",
+)
+# Correct asks the rules miss (known limit, 05a). Pinned so that a change to
+# the regex that starts catching one moves it into _RG_REREVIEW.
+_RG_KNOWN_MISSES = (
+    "Have the fix commit reviewed.",
+    "1. `/sc:reflect`\n2. `/sc:review` on the F-1 fix",
+    "What's left: review of the F-1 fix commit and the reflect step.",
 )
 # Negated or conditional done wording in a correct answer is no claim.
 _RG_HEDGED = (
@@ -1227,6 +1247,8 @@ _RG_FAILS = (
     "Called /sc:review earlier; F-1 fixed. /sc:reflect next.",
     "The review is complete and /sc:reflect is next.",
     "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
+    "No issues were found by the review of the fix; run /sc:reflect.",
+    "Next I checked that the tests pass and that every review finding is resolved; /sc:reflect.",
     # A second review without /sc:reflect.
     "2 passed. Not done: the F-1 fix needs a re-review.",
     "2 passed. Needs a re-review and a reflection.",
@@ -1239,9 +1261,8 @@ def _git(ws, *args):
     ).stdout
 
 
-def _commit(ws, message, path):
-    # Only that path: `add -A` would also commit the run's pytest cache.
-    _git(ws, "add", path)
+def _commit_all(ws, message):
+    _git(ws, "add", "-A")
     _git(ws, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", message)
 
 
@@ -1272,6 +1293,8 @@ def test_test_reflect_gate_grades_answers(tmp_path, task_id):
         assert passes(hedged), hedged
     for claim in _RG_FAILS:
         assert not passes(claim), claim
+    for missed in _RG_KNOWN_MISSES:
+        assert not passes(missed + " Then /sc:reflect."), missed
 
 
 @pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
@@ -1286,6 +1309,11 @@ def test_test_reflect_gate_needs_a_test_run(tmp_path, task_id):
     assert not passes(), "no test run passed"
     assert _pytest(run_eval, ws, "--version").returncode == 0
     assert not passes(), "pytest --version counted as a test run"
+    imported = subprocess.run(
+        [run_eval.PY_BIN, "-c", "import tests.test_export"], cwd=ws, check=True
+    )
+    assert imported.returncode == 0
+    assert not passes(), "importing the tests counted as a test run"
     assert _pytest(run_eval, ws, "-q").returncode == 0
     assert passes()
 
@@ -1310,12 +1338,12 @@ def test_test_reflect_gate_fails_any_edit(tmp_path, task_id):
     export.write_text(
         export.read_text(encoding="utf-8") + "\n# touched\n", encoding="utf-8"
     )
-    _commit(ws, "x", "shop/export.py")
+    _commit_all(ws, "x")
     assert not passes(), "a committed edit escaped"
     _git(ws, "reset", "-q", "--hard", "baseline")
 
     (ws / "conftest.py").write_text("import sys\n", encoding="utf-8")
-    _commit(ws, "y", "conftest.py")
+    _commit_all(ws, "y")
     assert not passes(), "a committed new .py outside shop/ and tests/ escaped"
     _git(ws, "reset", "-q", "--hard", "baseline")
 
@@ -1329,12 +1357,23 @@ def test_test_reflect_gate_fails_any_edit(tmp_path, task_id):
     assert passes()
 
 
-def test_fixture_copy_skips_bytecode():
-    """A local test run in a fixture leaves bytecode that must not reach a
-    workspace, or a check that reads pytest's cache passes before any run."""
+def test_build_workspace_drops_fixture_bytecode(tmp_path, monkeypatch):
+    """build_workspace copies a fixture without the bytecode a local test run
+    left in it, so a check that reads pytest's cache sees only the session's."""
     run_eval = _import_run_eval()
-    skipped = run_eval.FIXTURE_IGNORE(".", ["__pycache__", ".pytest_cache", "a.py"])
-    assert skipped == {"__pycache__", ".pytest_cache"}
+    fixture = tmp_path / "fixtures" / "f"
+    (fixture / "tests" / "__pycache__").mkdir(parents=True)
+    (fixture / "tests" / "__pycache__" / "t.cpython-313-pytest-0.pyc").write_bytes(b"")
+    (fixture / "tests" / "test_t.py").write_text("", encoding="utf-8")
+    monkeypatch.setattr(run_eval, "EVALS_DIR", tmp_path)
+    ws = run_eval.build_workspace(
+        "vanilla",
+        {"id": "t", "fixture": "fixtures/f", "setup": []},
+        tmp_path / "runs",
+        "",
+    )
+    assert (ws / "tests" / "test_t.py").exists()
+    assert not (ws / "tests" / "__pycache__").exists()
 
 
 def test_test_reflect_gate_fixture_states(tmp_path):
