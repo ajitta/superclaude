@@ -145,12 +145,26 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] Step 5: 프로브 3번(`--runs-dir C:/sc-evals/rrg-fix2-<n>`)
 - [x] Commit Phase 6: `fix(core,review,test,evals): review round 2 — terminating stop rule, /sc:review carries the re-review, wave-off classes in the grader`
 
+## Phase 7: 3차 리뷰 반영 (one commit)
+
+발견과 처리는 [06-review](./06-review.md) 3차 표에 있다. N1·N2(흘려 넘김 check를 뺀다)와 N8(받아들임)은 소유자 결정이다.
+
+**Files:** Modify: `src/superclaude/core/rules/RULES_DOCS.md`, `src/superclaude/commands/review.md`, `src/superclaude/commands/test.md`, `README.md`, `CHANGELOG.md`, `evals/tasks.yaml`, `tests/unit/test_eval_harness.py`, `tests/unit/test_docs_ssot_guards.py`
+
+- [x] Step 1: 종료 조건을 round 결과에 묶는다(N3), `review.md`에 Suggestions 구절과 `--through` 예외(N4, N5), `test.md` 범위(N11), README `/sc:reflect` 행(N12)
+- [x] Step 2: `output_not_regex`를 빼고 한계를 주석으로, 테스트 실행 정규식(N9). 채점 테스트: 조건부 답 두 개 통과, 테스트 실행 여섯 경우
+- [x] Step 3: drift test에 종료 조건, `test.md` 재리뷰 구절, bug·refactor 체인(N7). `uv run pytest tests/unit/test_eval_harness.py -k "test_reflect_gate or all_check_types" -q` → 2 passed; `uv run pytest tests/unit/test_docs_ssot_guards.py tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_description_overlap.py -q` → 1102 passed
+- [x] Step 4: 프로브 3번(`--runs-dir C:/sc-evals/rrg-fix3-<n>`), 저장된 run 다시 채점
+- [x] Commit Phase 7: `fix(core,review,test,evals): review round 3 — stop rule tied to a round's result, mention-only probe, real pytest run`
+
 ## Integration (커밋 아님)
 
-- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42에서 각각 3789 passed, 12 skipped, 나머지 통과. 마지막 커밋 뒤 한 번 더 돌려 `Result:`에 적는다
+- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42, 68112487에서 각각 3789 passed, 12 skipped, 나머지 통과
+- [ ] 마지막 커밋 뒤 전체 suite를 다시 돌려 `Result:`에 적는다
 - [x] `/sc:review --scope branch` 1차(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다): [06-review](./06-review.md)
 - [x] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 봤다: [06-review](./06-review.md) 2차
-- [ ] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 본다. Critical·Important가 없거나 소유자가 받아들이면 멈춘다
+- [x] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 봤다: [06-review](./06-review.md) 3차
+- [ ] 4차 리뷰(소유자 결정): Phase 7의 바뀐 문구와 채점을 1–3차 발견을 수용 기준으로 본다
 - [ ] `/sc:reflect`로 Goal과 Proof 대비 판정
 - [ ] 계획 `status: complete`와 `Result:` 줄, README `phase: complete`
 - [ ] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다
@@ -166,6 +180,8 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 5 뒤(바뀐 `test.md`·RULES_DOCS 문구, `C:/sc-evals/rrg-fix-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점한 값이다(`run_eval.py` exit 0).
 - Phase 6 채점(2차 리뷰의 흘려 넘김·완료 주장 class, `'*.py'` scope, 실제 pytest 실행)으로 저장된 열두 run을 다시 채점했다: before·after 여섯 번 6/7, body·fix 여섯 번 7/7. 좋은 답의 오탐은 없다.
 - Phase 6 뒤(`review.md` 한 줄, 종료 조건, `test.md` 범위, `C:/sc-evals/rrg-fix2-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점(`run_eval.py` exit 0).
+- Phase 7 채점(6 check: reflect / 재리뷰 / `'*.py'` 그대로 / 새 .py 없음 / phase 그대로 / pytest 실행)으로 저장된 열다섯 run을 다시 채점했다: before·after 여섯 번 5/6(reflect만 n), body·fix·fix2 아홉 번 6/6.
+- Phase 7 뒤(종료 조건 문구, `review.md`·`test.md` 문구, `C:/sc-evals/rrg-fix3-1..3`, 이 컴퓨터): 세 번 모두 6/6, 하네스가 run 때 채점(`run_eval.py` exit 0).
 
 ## Deviations
 
@@ -174,10 +190,13 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
 - Phase 4 측정 뒤 재리뷰 정규식에 `\bno review\b[^.\n]{0,20}\bafter\b`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
 - Phase 5를 더했다(1차 리뷰 반영). 테스트 실행 check는 출력 정규식에서 `transcript_regex` `pytest`로 바꿨다. 범위가 넓어진 곳: README bug·refactor 체인, `verifier.md` 설명 한 구절, RULES_DOCS의 `--through` 예외(소유자 결정, [06-review](./06-review.md) I-4).
+- Phase 7을 더했다(3차 리뷰 반영). 흘려 넘김·완료 주장 check는 소유자 결정으로 뺐다. Phase 5·6에서 그 check에 맞춰 적은 채점 테스트 단계는 Phase 7에서 바뀌었다.
 - Phase 6을 더했다(2차 리뷰 반영). 범위가 넓어진 곳: `review.md` Process 단계 한 줄(소유자 결정, 2차 N-1)과 README `/sc:reflect` 행.
 
 ## Risks
 
+- 받아들인 위험(3차 N8, 소유자 결정): `/sc:reflect -> done`의 "고친 것은 다시 리뷰" 괄호는 `/sc:reflect` 세션에 로드되지 않고 `reflect.md`도 싣지 않는다. reflect 뒤의 수정은 `/sc:review`를 거칠 때 `review.md`가 규칙을 직접 싣는다.
+- 받아들인 한계(3차 N1·N2, 소유자 결정): 프로브는 언급만 본다. 두 단계를 이름만 대고 흘려 넘기는 답도 통과한다.
 - 가장 위험한 단계: 프로브 채점(Task 1.2). 정규식이 느슨하면 "review 완료"를 재리뷰로 잘못 셀 수 있고, 엄격하면 맞는 답을 놓친다. Task 1.1의 채점 테스트에 맞는 답과 틀린 답을 모두 넣어 막는다. 실제 출력을 본 뒤 정규식을 바꾸면 Deviations에 적고 채점 테스트도 같이 고친다.
 - 재리뷰 줄은 RULES_DOCS에 있고, `/sc:test`만 돌리는 세션에는 로드되지 않는다. 프로브의 재리뷰 check는 바뀌지 않을 수 있다. 그 경우 결과를 소유자에게 보고만 한다(`test.md` 본문에 한 줄 더하기, `context_loader` 트리거 추가 등은 범위 밖).
 - `core/`와 command 본문이 바뀐다. 다음 릴리스는 `make canary-gates`와 `make canary-commands`가 모두 필요하다(`Makefile` release). 이 프로브는 `/sc:test`를 부르므로 canary-commands가 고른다.

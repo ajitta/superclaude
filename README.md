@@ -315,7 +315,7 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran on the last code commit (`Result:` line) |
 | `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical and Important findings fixed or accepted; a fix that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria; a code change after the `Result:` sha re-runs the Proof |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
-| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | Every gap it names fixed or accepted (work run from a plan is done only after this) |
+| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | Every gap it names fixed (a fix that changes reviewed code goes back to review) or accepted; work run from a plan is done only after this |
 
 #### Other common chains
 

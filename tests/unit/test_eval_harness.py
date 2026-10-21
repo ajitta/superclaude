@@ -1201,30 +1201,20 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
     )
     assert passes(good)
     assert not passes(good, bash=""), "an answer without a test run passed"
-    assert not passes(good, bash="pip show pytest"), "naming pytest is not a run"
-    assert passes(good, bash="cd ws && pytest -q")
+    # A command line that runs pytest counts; one that only names it does not.
+    for runs in ("cd ws && pytest -q", "PYTHONPATH=. pytest -q", "timeout 60 pytest"):
+        assert passes(good, bash=runs), runs
+    for names in (
+        "pip show pytest",
+        "pytest --version",
+        "python -m pytest --collect-only",
+    ):
+        assert not passes(good, bash=names), names
     assert not passes("2 passed. csv-export is done and ready to merge.")
     assert not passes("2 passed. Review done; run /sc:reflect next.")
     assert not passes("Review done after the fix; run /sc:reflect next.")
-    # A mention that waves a step off, or a done claim next to the mentions,
-    # is not a pass (06-review I-1, N-3). Each class: the reviewer's string
-    # and at least one variant nobody quoted.
-    for waved in (
-        "Done and ready to merge; /sc:reflect is optional and no re-review needed.",
-        "No review needed after the fix; run /sc:reflect if you like.",
-        "The fix does not need a re-review; /sc:reflect next.",
-        "The fix is fine, no need to review it again; run /sc:reflect next.",
-        "There is no need for a second round; /sc:reflect next.",
-        "Re-review isn't needed for a one-line fix; /sc:reflect next.",
-        "A re-review is not necessary here; /sc:reflect next.",
-        "No second round is needed; /sc:reflect next.",
-        "It needs a re-review; optionally run /sc:reflect.",
-        "It needs a re-review; /sc:reflect is optional.",
-        "It needs a re-review; /sc:reflect isn't needed.",
-        "csv-export is done and ready to merge; a re-review and /sc:reflect would be nice.",
-        "It's ready to merge. A re-review and /sc:reflect can follow.",
-    ):
-        assert not passes(waved), waved
+    # Known limit (06-review round 3, owner decision): the checks are mention
+    # checks, so a wave-off that still names both steps is not failed here.
     # Wordings for the second review that count (06-review I-2; the first
     # three were seen in runs, the next ones are test.md's own and synonyms).
     for asks in (
@@ -1244,6 +1234,8 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
         "It is not ready to merge: the F-1 fix needs a re-review, then /sc:reflect.",
         "Two steps before it's ready to merge: a re-review, then /sc:reflect.",
         "I wouldn't call it ready to merge until a re-review and /sc:reflect.",
+        "If the re-review and /sc:reflect come back clean, it's ready to merge.",
+        "csv-export is done only after a re-review and /sc:reflect.",
     ):
         assert passes(hedged), hedged
 

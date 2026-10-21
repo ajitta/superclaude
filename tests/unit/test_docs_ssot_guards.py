@@ -555,3 +555,18 @@ def test_readme_chains_end_at_a_workflow_gate():
         r"^\s*\d+\. Process:.*$", _read(_SRC / "commands" / "review.md"), re.M
     )
     assert process and "earlier findings as acceptance criteria" in process.group(0)
+    # The same stop rule in both places, tied to a round's result.
+    stop = (
+        "rounds stop when a review round finds no Critical or Important finding, "
+        "or the user has accepted the ones it found; leftover Suggestions are "
+        "reported, not reviewed again"
+    )
+    assert stop in gates.group(1)
+    assert stop in process.group(0)
+    assert "a fix to a review finding" in report.group(0)
+    assert "due for another review" in report.group(0)
+    # Other README chains that run /sc:plan end with /sc:reflect too.
+    for goal in ("Investigate a bug", "Refactor"):
+        row = re.search(rf"^\| \*\*{goal}\*\* \| (.*) \|$", text, re.M)
+        assert row and "/sc:plan" in row.group(1), goal
+        assert row.group(1).rstrip().endswith("`/sc:reflect`"), goal

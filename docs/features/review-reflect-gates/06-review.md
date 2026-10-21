@@ -58,3 +58,25 @@ Critical 없음. 아래는 발견과 처리다. "반영"은 이 브랜치의 다
 | N-15 | CHANGELOG가 프로브의 실패 조건을 덜 적는다 | 반영 |
 | N-16 | fixture 리뷰가 "Major"를 쓴다 | 반영: "Important" |
 | N-18 | 분석 문서 절 순서가 B, D, C | 반영 |
+
+## 3차 (2026-10-21, `68112487`, `self-review` 에이전트, 새 세션)
+
+1·2차 발견을 G1–G12 수용 기준(결함과 확인 방법)으로, 소유자 결정을 D1–D6으로 줬다. 리뷰어는 shell이 없어 정규식을 손으로 따라갔다.
+
+판정: G2, G3, G5, G6, G10, G11 충족. G4·G7·G8·G9는 충족하되 아래 Suggestion이 남았다. G1·G12 일부.
+
+| ID | 발견 | 처리 |
+|---|---|---|
+| N1 | 완료 주장 정규식이 맞는 조건부 답("If both come back clean, it's ready to merge", "csv-export is done only after /sc:reflect")을 실패시킨다 | 소유자 결정: 흘려 넘김·완료 주장 check(`output_not_regex`)를 뺐다. 프로브는 언급 check만 하고, 흘려 넘기는 답이 통과하는 것은 알려진 한계로 `tasks.yaml` 주석과 CHANGELOG에 적었다. 두 조건부 답을 통과로 고정 |
+| N2 | 흘려 넘김 class가 여전히 샌다("doesn't need to be re-reviewed", "No need for /sc:reflect"), 한 대안은 영영 맞지 않는다 | N1과 같은 결정으로 check가 없어졌다 |
+| N3 | 종료 조건의 "open"이 모호하다. 작성자는 고친 순간 닫혔다고 읽어 재리뷰를 건너뛸 수 있다 | 반영: "a review round finds no Critical or Important finding, or the user has accepted the ones it found"(RULES_DOCS와 `review.md` 같은 문장) |
+| N4 | `review.md`에 `--through` 예외가 없다 | 반영: `review.md` 끝에 괄호로 |
+| N5 | CHANGELOG가 `review.md`에 없는 "leftover Suggestions…"를 `review.md`의 말로 적는다 | 반영: `review.md`에 그 구절을 넣었다 |
+| N6 | 체크된 suite 상자 안에 할 일이 있고 68112487 run 인용이 없다 | 반영: 68112487 run(3789 passed, 12 skipped)을 적고 남은 일은 따로 뺐다 |
+| N7 | drift test가 `test.md` 재리뷰 구절, 두 곳의 종료 조건, bug·refactor 체인을 고정하지 않는다 | 반영 |
+| N8 | `/sc:reflect -> done`의 재리뷰 괄호가 `/sc:reflect` 세션에 로드되지 않는다 | 소유자 결정: 받아들임. reflect 뒤 수정은 `/sc:review`를 거치고, `review.md`가 규칙을 직접 싣는다. 계획 Risks에 적었다 |
+| N9 | 테스트 실행 정규식이 `PYTHONPATH=. pytest`, `timeout 60 pytest`를 놓치고 `pytest --version`, `--collect-only`를 센다 | 반영: pytest가 든 명령 줄 중 `pip`, `--version`, `--collect-only`가 없는 것. 여섯 경우를 고정 |
+| N10 | 굽은 따옴표로 흘려 넘김이 샌다 | N1 결정으로 해당 없음 |
+| N11 | "No need to edit code; it needs a re-review"가 실패할 수 있다. `test.md`가 게이트보다 넓다 | 앞은 N1 결정으로 해당 없음. 뒤는 반영: "that changed reviewed code or shipped content" |
+| N12 | README `/sc:reflect` 행에 재리뷰 괄호가 없다 | 반영 |
+| (범위 밖) | `review.md` handoff가 4개(규칙은 2-3개) | 이 브랜치 전부터다. 손대지 않았다 |
