@@ -1,6 +1,6 @@
 ---
-status: implementing
-revised: 2026-10-21
+status: complete
+revised: 2026-10-22
 ---
 
 # review·reflect 게이트 Implementation Plan
@@ -183,13 +183,13 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 ## Integration (커밋 아님)
 
 - [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42, 68112487, 69ad177c에서 각각 3789 passed, 12 skipped, 나머지 통과
-- [x] 마지막 커밋 뒤 전체 suite를 다시 돌려 `Result:`에 적는다(0f6a3bf8)
+- [x] 마지막 커밋 뒤 전체 suite를 다시 돌려 `Result:`에 적는다(3b968d05)
 - [x] `/sc:review --scope branch` 1차(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다): [06-review](./06-review.md)
 - [x] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 봤다: [06-review](./06-review.md) 2차
 - [x] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 봤다: [06-review](./06-review.md) 3차
 - [x] 4차 리뷰(소유자 결정): Phase 7의 바뀐 문구와 채점을 1–3차 발견을 수용 기준으로 봤다: [06-review](./06-review.md) 4차. Phase 8 뒤 round는 소유자가 멈췄다(남은 것은 테스트·프로브·drift test로 확인)
 - [x] `/sc:reflect`로 Goal과 Proof 대비 판정(2026-10-21, `--type completion`): reflect 부분은 충족(`/sc:test`만 도는 세션에서 0/6 → 15/15, sonnet). 재리뷰 부분은 규칙과 drift test로만 확인했고 어느 프로브도 `review.md` 줄을 재지 않는다. 소유자가 이 빈틈을 받아들였다. 다른 빈틈(`/sc:reflect` 세션에 재리뷰 괄호 없음, 언급만 보는 프로브, `--through` Report 목록, 분석 문서 D)은 이미 받아들였거나 후속이다
-- [ ] 계획 `status: complete`와 README `phase: complete`: 소유자가 완료를 정할 때까지 `implementing`(2026-10-21 소유자 결정). `Result:` 줄은 적었다
+- [x] 계획 `status: complete`와 README `phase: complete`: 소유자가 정했다(2026-10-22, 독립 검증이 Critical·Important 없이 끝나면 complete)
 - [x] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다. 소유자 답(2026-10-21): 브랜치만 push, 병합은 나중
 
 ## Measurements
@@ -233,4 +233,6 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 
 Earlier result (before Phase 4): 75d2addc — `uv run pytest` 3789 passed, 12 skipped (exit 0); lint, format, typecheck clean; drift test passed; `test-reflect-gate` `/sc:reflect` 0/3 after the change (baseline 0/3), so the third Proof item is red. Status stays `implementing` until the owner decides.
 
-Result: 0f6a3bf8 — `uv run pytest` 3789 passed, 12 skipped (exit 0); make lint, ruff format --check, make typecheck clean; drift test 1 passed; `test-reflect-gate` `/sc:reflect` 15/15 after the Report-step line (0/6 before), last 3 runs on 0f6a3bf8's text 6/6 each.
+Earlier result (before the independent verifications): 0f6a3bf8 — `uv run pytest` 3789 passed, 12 skipped (exit 0); make lint, ruff format --check, make typecheck clean; drift test 1 passed; `test-reflect-gate` `/sc:reflect` 15/15 after the Report-step line (0/6 before), last 3 runs on 0f6a3bf8's text 6/6 each.
+
+Result: 3b968d05 — `uv run pytest` 3819 passed, 3 skipped (exit 0, Linux); make lint, ruff format --check, make typecheck clean; drift and probe-grading tests pass; `/sc:reflect` named 15/15 after the Report-step line (0/6 before, Windows) and 15/15 on Linux; both probe variants pass every check in 3 runs each on 56da83a1 (sonnet, low), 15 saved runs regraded under 3b968d05's checks all pass

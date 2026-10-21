@@ -1,6 +1,6 @@
 ---
-status: implementing
-revised: 2026-10-21
+status: complete
+revised: 2026-10-22
 ---
 
 # review·reflect 게이트 측정
