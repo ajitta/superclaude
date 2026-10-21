@@ -15,7 +15,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ### Fixed
 
-- Shell-command timeouts now stop the whole command. The test run after an edit (`test_runner_hook`, 120 s) and `/sc:auto-improve`'s eval and smoke commands killed only the shell when time ran out: on Windows the command it started kept running and the call waited for it to finish, so a hung test or eval never timed out; on Linux and macOS the call returned but the command was left running in the background. They now kill every process the command started.
+- Shell-command timeouts now stop the whole command. The test run after an edit (`test_runner_hook`) and `/sc:auto-improve`'s eval and smoke commands killed only the shell when time ran out: on Windows the command it started kept running and the call waited for it to finish, so a hung test or eval never timed out; on Linux and macOS the call returned but the command was left running in the background. They now kill the shell and the processes it started; a process that detaches into its own session (`setsid`) is out of reach, and the call then returns up to 5 s after the timeout.
+- On Linux and macOS these commands now run in their own session, so a signal to the caller's process group no longer reaches them directly. Ctrl-C, SIGTERM and SIGHUP to the caller (the auto-improve coordinator, the test hook) still stop them: the caller kills the command first. `kill -9` on the caller leaves the command running, as before. The test hook's own limit is now 110 s, under the hook's 120 s `timeout` in `hooks.json`; with equal values Claude Code ended the hook first and the command's own timeout never ran.
 
 ## [4.34.1] - 2026-10-20
 
