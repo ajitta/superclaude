@@ -1,6 +1,6 @@
 ---
 status: draft
-revised: 2026-10-20
+revised: 2026-10-21
 ---
 
 # 남은 작업 (2026-10-20, v4.34.0 이후)
@@ -82,6 +82,9 @@ v4.32.1로 N1–N6을 릴리스했다. 남은 것은 측정과 보류 항목이�
 - [x] Windows 설치를 최신 릴리스로 맞춘다(`superclaude doctor --scope <s>` → `make sync-*`). 소유자가 Windows 세션에서 v4.34.1로 맞췄다(2026-10-21).
 - [ ] `docs/features/docs-ssot-audit/06-verify.md`가 약 29 KB로 Read 가드(30,000바이트)에 가깝다. 다음에 크게 덧붙일 때 `06b-…`로 나눈다.
 - [ ] Windows에서 `0xC0000409` 중단이 다시 나오면 `git revert 3e64dc82`를 하고, `tests/unit/scripts/parallel_ab/`를 동시 부하에서 bisect한다(AGENTS.md Tests).
+- [ ] 독립 검증 06b의 남은 Suggestion·nit(소유자 결정 2026-10-21: 그 코드를 다음에 건드리는 라운드에서 함께). 트리거와 할 일([06b](../features/session-memory-multi-machine/06b-verify-fixes.md) 1·3–6번):
+  - `utils.run_shell`을 다음에 고칠 때: 정리 경로에서 신호를 막는다(`pthread_sigmask` 또는 두 `except`를 하나로). 처리기 복원·메인 스레드 확인·호출자가 정한 처리기 유지에 테스트를 더한다.
+  - `cmd-load-sync-behind`·`cmd-load-other-host`·`cmd-save-host-record` 채점기를 다음에 고칠 때: 06b 4–6번의 사례를 `test_eval_harness.py` 고정 사례에 더하고 정규식을 넓힌다.
 
 ## 남겨 둔 알려진 한계
 

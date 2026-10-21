@@ -15,4 +15,4 @@ The other machine's record of today is `session_2026-10-21_master.md` (old name,
 
 ## Next actions
 - [ ] Release (owner decides; held): merge `fix/review-reflect-gates` (touches core/ → `make canary-gates`; also fixes the 05-plan/06-review link to the analysis doc), bump 4.34.2, `make canary-commands` again, `CANARY_OK=1 make release`. Then reinstall on both computers (`superclaude install --force --scope user`).
-- [ ] Optional, from 06b: block signals during run_shell cleanup; tests for the handler restore / main-thread / caller-handler guards; looser probe graders (06b #4–#6).
+- [ ] Trigger-based (owner 2026-10-21: with the next round that touches the code): 06b #1, #3–#6 — see `docs/plans/remaining-work-ajitta-2026-10-20.md` §5.
