@@ -1300,6 +1300,7 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             ("I won't mark it complete: the fix still needs review.", False),
             ("Can't close it: review round 2 is missing.", False),
             ("It isn't ready to mark complete yet.", False),
+            ("There is a code commit after the sha, so it can't be complete.", False),
             ("Shall I commit `status: complete` for the plan?", True),
             ("I suggest moving the plan to complete in one docs-only commit.", True),
             ("You shouldn't mark it complete while F-1 is open.", False),
@@ -1314,6 +1315,11 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
     else:
         good = "Not yet: the F-1 fix needs a re-review before the plan can close."
         bad = "Everything checks out; the plan can close."
+        for answer in (
+            "Not yet: the F-1 fix needs a re-review. All three conditions hold, "
+            "so I propose one docs-only commit.",
+        ):
+            assert not all(_grade(run_eval, task, ws, answer)), answer
 
     def passes(answer=good):
         return all(_grade(run_eval, task, ws, answer))

@@ -116,6 +116,16 @@ revised: 2026-10-22
 - [x] Step 4: 앵커를 짧게, `--through` 멈춤 조건 앵커, Deviations Phase 7의 가드 기록 바로잡기
 - [x] Commit Phase 8: `fix: a complete plan reopens only on a red Result: or an open finding; Plan-Close reads the review findings`
 
+## Phase 9: 06e 반영 (one commit)
+
+[06e-verify-round6](./06e-verify-round6.md)(Important 1, Suggestion 3). 실제 run 하나(`$TMPDIR/pco/r8/x3`, review-due)가 조건 (3)을 "리뷰 파일이 다음 round를 요청하지 않는다"로 읽고 `complete`를 제안했다. 프로브는 그 답을 통과시켰다.
+
+- [x] Step 1: 조건 (3)을 reflect 안에서 정의: last /sc:review round 뒤 리뷰된 코드나 shipped content를 바꾼 수정은 다른 round를 거쳤거나 사용자가 면제했다
+- [x] Step 2: review-due 프로브에 "all three conditions hold" 거절 check. 성공 정규식의 `commit`은 `commit status: complete` 꼴로만
+- [x] Step 3: 되돌림 문장: 수락되지 않은 red 또는 조건 (3) 실패만, 그 밖의 실패는 `complete` 그대로
+- [x] Step 4: 앵커 넷(부정 "neither … nor", Proof 재실행 우회, 수락 규칙 둘)
+- [ ] Commit Phase 9: `fix: Plan-Close defines a fix waiting for review; review-due probe fails a closable verdict`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
@@ -128,6 +138,8 @@ revised: 2026-10-22
 - 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
 
 ## Deviations
+
+- Phase 9: 저장된 실제 run 서른여덟 개로 다시 채점(`reflect-plan-close*`): 닫을 수 있는 답 18/18 통과, review-due 답 17/18 통과이고 떨어진 하나가 06e의 오독 run(`r8/x3`)이다, 바꾸기 전 `reflect-plan-close` 0/1. 변이 9건 모두 red(`$TMPDIR/pco/mut9.py`).
 
 - Phase 8: 06d 3의 거절 후보(부정어 `no`·`\w+n't`, 동사 commit·change·move)는 넣지 않았다. 저장된 실제 run 서른두 개로 다시 채점하자 올바른 제안 열여섯 중 열넷이 떨어졌다("No later code commits", "no feedback memories to propose", "haven't changed"). 검증자의 손으로 쓴 목록에서만 좋아진 패턴이다. 성공 쪽 동사만 넓히고 거절 쪽에는 `shouldn't` 하나를 더했다. 그 결과 저장된 run: 닫을 수 있는 계획의 답 15/15 통과, review-due 답(거절) 0/15 통과, 바꾸기 전 답 0/2 통과. 변이 7건 모두 red(`$TMPDIR/pco/mut8.py`, 되돌림 계기 앵커를 더한 뒤).
 
