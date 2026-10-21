@@ -10,8 +10,8 @@ description: Load session context from the project memory folder (.claude/memori
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Sync: the branch has an upstream (`git rev-parse --abbrev-ref @{u}`) → `git fetch --quiet`, then `git rev-list --count HEAD..@{u}`; behind → tell the user the count and ask `[y/n]` before `git pull --ff-only`, and wait for the answer; no upstream, fetch fails or the pull stops → say so in one line and go on with the files on disk
-  2. Load (memory folder): Glob .claude/memories/*.md → Read learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the current branch's records of the newest date among session_*_[branch-slug].md, one per machine — the part between the date and `_[branch-slug]` names the machine, and an empty part marks a record from before machine names; read each and say which machine wrote it (slugs per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
+  1. Sync: quote every upstream ref as below (PowerShell reads a bare one as a hashtable); the branch has an upstream (`git rev-parse --abbrev-ref '@{u}'`) → `git -c credential.interactive=never fetch --quiet` with credential prompts off (`GIT_TERMINAL_PROMPT=0`; PowerShell: `$env:GIT_TERMINAL_PROMPT=0`), then `git rev-list --count 'HEAD..@{u}'`; behind → tell the user the count and ask `[y/n]` before `git pull --ff-only`, and wait for the answer; the pull stops because the branch diverged → say so and name `git pull --rebase` without running it; no upstream, fetch fails or the pull stops → say so in one line and go on with the files on disk
+  2. Load (memory folder): Glob .claude/memories/*.md → Read learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the current branch's records of the newest date among session_*_[branch-slug].md, one per machine — the part between the date and `_[branch-slug]` names the machine, and an empty part marks a record from before machine names; read each, keep it only when its `branch:` line names the current branch (a branch slug may hold `_`, so the filename alone can misread machine and branch), and say which machine wrote it (slugs per /sc:save <storage>); none → the newest session_* of any branch, reported as the branch its `branch:` line names; folder absent → skip
   3. Load (auto memory): MEMORY.md is already in context (Claude Code loads it); Read a memory file it points to only when that pointer bears on the session's work
   4. Discover: project structure and requirements (Glob/Grep/Read)
   5. Activate: project context and workflow preparation
@@ -34,7 +34,7 @@ description: Load session context from the project memory folder (.claude/memori
   - Glob/Read: memory folder, auto memory and project file analysis
   - Grep: project file analysis
   - Write: checkpoint creation
-  - Bash: git fetch in the Sync step; git pull only after the user's yes
+  - Bash: git rev-parse, fetch and rev-list in the Sync step; git pull only after the user's yes
   </tools>
 
   <examples>

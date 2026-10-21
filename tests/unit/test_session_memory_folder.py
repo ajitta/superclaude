@@ -88,22 +88,72 @@ def test_load_starts_with_a_sync_step_that_asks_before_pulling() -> None:
     # the other machine's state from before its last push.
     step = _first_flow_step(LOAD)
     assert step.startswith("1. Sync:"), step
-    for token in ("git fetch", "git pull --ff-only", "[y/n]"):
+    # GIT_TERMINAL_PROMPT=0: a fetch waiting on a credential prompt would hang
+    # every /sc:load and /sc:save until the shell tool timed out.
+    for token in (
+        "fetch --quiet",
+        "git pull --ff-only",
+        "[y/n]",
+        "GIT_TERMINAL_PROMPT=0",
+    ):
         assert token in step, f"load.md Sync step lacks {token!r}"
 
 
+# An unquoted @{u} is a hashtable literal to PowerShell: the command fails to
+# parse, which the Sync step would read as "no upstream" and skip the pull
+# check. Quoted, it works in PowerShell and in a POSIX shell alike.
+_UNQUOTED_UPSTREAM = re.compile(r"(?<!['.])@\{u\}")
+
+
+@pytest.mark.parametrize(
+    ("path", "label"),
+    [(LOAD, "Sync"), (SAVE, "Share")],
+    ids=["load-sync", "save-share"],
+)
+def test_upstream_ref_is_quoted(path: Path, label: str) -> None:
+    step = _flow_step(path, label)
+    assert "@{u}" in step, f"{path.name} {label} step names no upstream ref"
+    assert not _UNQUOTED_UPSTREAM.search(step), step
+
+
 def test_save_starts_with_the_load_sync_step() -> None:
-    # One definition: save points at load's Sync step instead of restating it.
+    # One definition: save points at load's Sync step instead of restating it,
+    # and names the installed file, since /sc:save may run without /sc:load.
     step = _first_flow_step(SAVE)
     assert step.startswith("1. Sync:"), step
     assert "the /sc:load Sync step" in step, step
+    assert "commands/sc/load.md" in step, step
 
 
 def test_save_offers_to_share_and_never_pushes_unasked() -> None:
     step = _flow_step(SAVE, "Share")
     assert step, "save.md has no Share step"
-    for token in ("[y/n]", "git push", "memory files only"):
+    for token in ("git push", "memory files only", "only those files"):
         assert token in step, f"save.md Share step lacks {token!r}"
+    # One yes for the commit, a second one for the push.
+    assert step.count("[y/n]") >= 2, step
+    # `git commit -- <files>` keeps whatever else was staged out of the commit.
+    assert "-- <files>" in step, step
+
+
+def test_share_runs_after_every_step_that_writes() -> None:
+    # Checkpoint and Validate still write or fix memory files; a Share before
+    # them commits and pushes an incomplete, unvalidated set.
+    flow = _read(SAVE).split("<flow>", 1)[1].split("</flow>", 1)[0]
+    top = [ln.strip() for ln in flow.splitlines() if re.match(r"^\s*\d+\.\s", ln)]
+    assert top[-1].startswith(f"{len(top)}. Share:"), top[-1]
+
+
+def test_save_never_edits_another_machines_record() -> None:
+    assert "a record another machine wrote is never edited" in _flow_step(
+        SAVE, "Persist (memory folder)"
+    )
+
+
+def test_load_takes_the_branch_from_the_record_header() -> None:
+    # A branch slug may hold `_` (`fix_x`), so the filename alone can misread
+    # machine and branch; the `branch:` first line settles it.
+    assert "`branch:` line" in _flow_step(LOAD, LOAD_MEMORY_STEP)
 
 
 @pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])
