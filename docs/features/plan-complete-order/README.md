@@ -24,4 +24,5 @@ related: ../../analysis/review-reflect-gate-gap-ajitta-2026-10-21.md
 - [06c-verify-round4.md](./06c-verify-round4.md): 리뷰 round 4, 조건부 통과(Important 1)
 - [06d-verify-round5.md](./06d-verify-round5.md): 리뷰 round 5, 조건부 통과(Important 1)
 - [06e-verify-round6.md](./06e-verify-round6.md): 리뷰 round 6, 조건부 통과(Important 1)
+- [06f-verify-round7.md](./06f-verify-round7.md): 리뷰 round 7, 조건부 통과(Important 1, 510108c6에서 이미 고침)
 - 누더기 감사: [patchwork-audit-ajitta-2026-10-22](../../analysis/patchwork-audit-ajitta-2026-10-22.md)

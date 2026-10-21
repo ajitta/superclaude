@@ -126,6 +126,15 @@ revised: 2026-10-22
 - [x] Step 4: 앵커 넷(부정 "neither … nor", Proof 재실행 우회, 수락 규칙 둘)
 - [x] Commit Phase 9: `fix: Plan-Close defines a fix waiting for review; review-due probe fails a closable verdict`
 
+## Phase 10: 06f 반영 (one commit)
+
+[06f-verify-round7](./06f-verify-round7.md)(Important 1, Suggestion 3). Important(조건문 "once all three hold"를 거절로 채점)와 Suggestion 3(목록 꼴 제안)은 510108c6이 이미 고쳤다. 06f의 문장 첫머리 정규식 대신 조건 낱말 lookbehind를 썼고, 저장된 run 마흔여덟 개로 쟀다(Deviations).
+
+- [x] Step 1: Plan-Close (3)을 글자 그대로 성립하게: "has had a /sc:review round after it, or the user waived that round"
+- [x] Step 2: Plan-Close 앵커 셋(Proof를 다시 돌리지 않음, 리뷰 대기 수정의 회송, "all three hold")
+- [x] Step 3: Phase 9 Deviations의 review-due 수치는 510108c6의 재채점(22/23)으로 대체
+- [ ] Commit Phase 10: `fix: Plan-Close condition 3 reads literally; anchors for its routing`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
