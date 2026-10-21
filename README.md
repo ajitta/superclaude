@@ -313,7 +313,7 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` Load step stops on a spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
 | `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran on the last code commit (`Result:` line) |
-| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical findings fixed; a code change after the `Result:` sha re-runs the Proof |
+| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical findings fixed; a fix that changes reviewed code is reviewed again, with the earlier findings as acceptance criteria; a code change after the `Result:` sha re-runs the Proof |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
 | `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | — |
 
@@ -321,10 +321,10 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 
 | Goal | Chain |
 |------|-------|
-| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` |
+| **Investigate a bug** | `/sc:troubleshoot` → `/sc:analyze --focus <domain>` → `/sc:plan` → `/sc:implement --plan` → `/sc:test` → `/sc:reflect` |
 | **Performance work** | `/sc:analyze --focus perf --scope module` → `/sc:improve --loop --focus perf` → `/sc:test` |
 | **Security audit** | `/sc:analyze --focus security` → `/sc:review` → `/sc:improve --focus security` |
-| **Refactor** | `/sc:analyze --focus quality` → `/sc:plan` → `/sc:improve --loop` → `/sc:test` |
+| **Refactor** | `/sc:analyze --focus quality` → `/sc:plan` → `/sc:improve --loop` → `/sc:test` → `/sc:reflect` |
 | **External research** | `/sc:research --depth deep --tavily --c7` → `/sc:reflect` |
 | **Codebase onboarding** | `/sc:load` → `/sc:index-repo` → `/sc:explain` |
 | **Strategy / market** | `/sc:business-panel` → `/sc:reflect` |

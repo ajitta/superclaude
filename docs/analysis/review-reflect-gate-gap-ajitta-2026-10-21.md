@@ -5,7 +5,7 @@ revised: 2026-10-21
 
 # review·reflect가 빠진 원인과 후속 작업
 
-2026-10-21 session-memory-multi-machine 작업에서 두 단계가 빠졌다. 반영한 수정 커밋은 다시 리뷰하지 않았고, `/sc:reflect`는 한 번도 돌지 않았다. 소유자가 원인을 물었고, 이 문서는 원인과 근거, 새 브랜치에서 할 후속 작업을 적는다. 후속 작업은 아직 하지 않았다.
+2026-10-21 session-memory-multi-machine 작업에서 두 단계가 빠졌다. 반영한 수정 커밋은 다시 리뷰하지 않았고, `/sc:reflect`는 한 번도 돌지 않았다. 소유자가 원인을 물었고, 이 문서는 원인과 근거, 새 브랜치에서 할 후속 작업을 적는다. 후속 작업의 진행은 각 항목에 적었다.
 
 ## 무엇이 빠졌나
 
@@ -39,7 +39,7 @@ revised: 2026-10-21
 
 ### B. 규칙과 문서 맞추기 — 결정됨 (2026-10-21), 진행: [review-reflect-gates](../features/review-reflect-gates/README.md)
 
-소유자는 ★(a), 재리뷰 줄, canary 프로브를 골랐다. RULES_DOCS가 `/sc:test`에서 로드되지 않는 것(`context_loader.py:191`)을 확인한 뒤 `test.md` handoff의 (b)도 더했다. 릴리스는 보류한다. 아래는 결정 전 선택지다. ★는 추천이었다.
+소유자는 ★(a), 재리뷰 줄, canary 프로브를 골랐다. RULES_DOCS가 `/sc:test`에서 로드되지 않는 것(`context_loader.py:191`)을 확인한 뒤 `test.md` handoff의 (b)도 더했다. handoff만으로는 `/sc:test` 세션의 답이 바뀌지 않아(0/3), 소유자가 `test.md` Report 단계 한 줄을 더 골랐다(3/3). 리뷰 1차 뒤에는 `/sc:intent --through`가 한 번의 수정 round를 유지하는 예외를 게이트에 두기로 했다. 릴리스는 보류한다. 아래는 결정 전 선택지다. ★는 추천이었다.
 
 - reflect를 어디에 둘지:
   - ★(a) RULES_DOCS `workflow_gates`에 `/sc:test -> /sc:reflect (Medium, Large)` 같은 게이트를 넣어 README 표와 맞춘다.
@@ -47,6 +47,10 @@ revised: 2026-10-21
   - (c) README 표에서 reflect를 선택 단계로 내린다.
 - 반영 뒤 재리뷰: `workflow_gates`에 "리뷰 뒤 shipped 내용을 바꾼 수정은 다시 리뷰한다"는 줄을 넣을지 정한다. 넣는다면 `/sc:review`의 재리뷰가 이전 발견을 수용 기준으로 받는다는 점도 같이 적는다.
 - `core/`가 바뀌면 다음 릴리스는 `make canary-gates`가 필요하다(AGENTS.md). 이 실패를 막는 canary 프로브를 `evals/tasks.yaml`에 더할지도 정한다(AGENTS.md: 행동 실패를 기록한 gotcha·insight에는 프로브를 더한다).
+
+### D. 계획 `complete`와 reflect의 순서 (후속, 미착수)
+
+`/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
 
 ### C. 메모리 고치기
 

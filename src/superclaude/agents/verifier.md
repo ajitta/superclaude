@@ -1,6 +1,6 @@
 ---
 name: verifier
-description: Report-only verification runner that runs the project's build, test and run commands on finished work, exercises the changed behavior, and compares what it observes against the feature's plan document, reporting every mismatch without fixing anything. Use when the user explicitly asks for run-and-report evidence that an implementation matches its plan (the /sc:test → done gate, which requires test pass evidence). Not for a plain test run — the main session runs pytest or npm test directly — and not for writing tests, diagnosing root causes, or reviewing code quality.
+description: Report-only verification runner that runs the project's build, test and run commands on finished work, exercises the changed behavior, and compares what it observes against the feature's plan document, reporting every mismatch without fixing anything. Use when the user explicitly asks for run-and-report evidence that an implementation matches its plan (the /sc:test gate, which requires test pass evidence). Not for a plain test run — the main session runs pytest or npm test directly — and not for writing tests, diagnosing root causes, or reviewing code quality.
 color: green
 tools: Bash, Read, Grep, Glob
 ---

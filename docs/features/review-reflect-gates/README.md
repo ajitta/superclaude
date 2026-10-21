@@ -15,13 +15,15 @@ README 작업 크기 표의 Medium·Large 체인은 `/sc:reflect`로 끝나는�
 
 - reflect 게이트는 RULES_DOCS `workflow_gates`에 둔다.
 - 리뷰 뒤 리뷰된 코드나 shipped 내용을 바꾼 수정은 다시 리뷰한다는 줄을 넣는다.
-- RULES_DOCS는 `/sc:test`에서 로드되지 않으므로(`context_loader.py:191`) `test.md` handoff에도 `/sc:reflect`를 넣는다.
+- RULES_DOCS는 `/sc:test`에서 로드되지 않으므로(`context_loader.py:191`) `test.md` handoff에도 `/sc:reflect`를 넣는다. handoff만으로 답이 바뀌지 않아(0/3) `test.md` Report 단계에 한 줄을 더한다.
+- 리뷰 1차 뒤: `/sc:intent --through`는 한 번의 수정 round를 유지하는 예외를 게이트에 둔다(`intent.md`는 그대로). 계획 `complete`가 reflect보다 먼저 오는 문제는 이 기능 밖의 후속 항목이다(분석 문서 D).
 - 이 실패를 재는 canary 프로브를 더한다.
 - 릴리스는 보류한다. 이 기능은 master 병합까지만 한다.
 
 ## Documents
 
 - [05-plan.md](./05-plan.md): implementation plan
+- [06-review.md](./06-review.md): branch review rounds
 
 ## 릴리스 뒤
 

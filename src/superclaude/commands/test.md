@@ -14,7 +14,7 @@ description: Execute tests with coverage analysis and quality reporting. On requ
   2. Configure: Environment + execution params
   3. Execute: Run + real-time progress
   4. Analyze: Coverage reports + failure diagnostics
-  5. Report: Generate outputs per flags; when the tested work ran from a plan document (a feature folder's `05-plan.md`), say it is not done until /sc:reflect has run, and name any fix committed after the last review round as due for another review
+  5. Report: Generate outputs per flags; when the tested work ran from a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan), say it is not done until /sc:reflect has run, and name any fix committed after the last review round as due for another review
   6. Verify: when the user asks for independent evidence, dispatch the verifier (the Agent entry in the tools section) and attach its report to the output
   </flow>
 

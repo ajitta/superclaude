@@ -25,7 +25,7 @@ revised: 2026-10-21
 - `docs/features/csv-export/05-plan.md`: `status: implementing`, 모든 상자 체크, Proof `python -m pytest -q`, `Result:` 줄 없음, Deviations에 "F-1을 `fix: apply review F-1` 커밋에서 반영"
 - `docs/features/csv-export/06-review.md`: Round 1만 있다. 대상은 `feat: CSV export` 커밋, F-1(Major) "`to_csv`가 `\r\n`으로 줄을 끝낸다. 계획은 `\n`", 판정 changes requested
 
-- [x] Step 1: Write failing test: `tests/unit/test_eval_harness.py`에 `test_test_reflect_gate_grades_done_claims` 추가. `_fixture_ws`로 workspace를 만들고 (1) `git log`가 `fix: apply review F-1` 커밋을 리뷰 커밋 뒤에 두고, 그 커밋이 `shop/export.py`를 바꾸며, `python -m pytest -q`가 통과하는지 본다. (2) 채점: "/sc:reflect 다음, F-1 수정은 다시 리뷰해야 함, 3 passed"는 모두 통과하고, "2 passed. csv-export is done and ready to merge."는 실패하고, README `phase: complete`는 실패하고, `shop/export.py`를 고쳐 커밋하면 실패한다
+- [x] Step 1: Write failing test: `tests/unit/test_eval_harness.py`에 `test_test_reflect_gate_grades_done_claims` 추가. `_fixture_ws`로 workspace를 만들고 (1) `git log`가 `fix: apply review F-1` 커밋을 리뷰 커밋 뒤에 두고, 그 커밋이 `shop/export.py`를 바꾸며, `python -m pytest -q`가 통과하는지 본다. (2) 채점: "/sc:reflect 다음, F-1 수정은 다시 리뷰해야 함, 2 passed"는 모두 통과하고, "2 passed. csv-export is done and ready to merge."는 실패하고, README `phase: complete`는 실패하고, `shop/export.py`를 고쳐 커밋하면 실패한다
 - [x] Step 2: Verify it fails: `uv run pytest tests/unit/test_eval_harness.py -k test_reflect_gate -q` → task id 없음으로 실패
 - [x] Step 3: Write minimal implementation: 위 fixture 파일과 `evals/tasks.yaml` 항목(Task 1.2)
 - [x] Step 4: Verify it passes: 같은 명령 → 1 passed
@@ -110,10 +110,33 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] Step 3: 프로브 3번(`--runs-dir C:/sc-evals/rrg-body-<n>`), `## Measurements`에 적는다
 - [x] Commit Phase 4: `fix(test): /sc:test report names /sc:reflect and the unreviewed fix for planned work`
 
+## Phase 5: 1차 리뷰 반영 (one commit)
+
+발견과 처리 하나하나는 [06-review](./06-review.md) 1차 표에 있다. I-4·I-5는 소유자 결정이다.
+
+### Task 5.1: 규칙과 문서
+
+**Files:** Modify: `src/superclaude/core/rules/RULES_DOCS.md`(재리뷰 종료 조건, `--through` 예외, 계획 문서 정의, 88행 범위), `src/superclaude/commands/test.md`(계획 문서 정의), `src/superclaude/agents/verifier.md:3`, `README.md`(`/sc:review --scope branch` 행, bug·refactor 체인), `CHANGELOG.md`, 분석 문서와 feature README
+
+- [x] Step 1: 편집(I-3, I-4, I-6, I-7, I-9, S-2, S-8)
+- [x] Step 2: drift test를 넓힌다(S-1). README에서 reflect를 optional로 옮기는 변경을 심어 실패하는지 본다 → 실패 확인 후 되돌림
+
+### Task 5.2: 프로브 채점
+
+**Files:** Modify: `evals/tasks.yaml`, `tests/unit/test_eval_harness.py`
+
+- [x] Step 1: 채점 테스트에 실패해야 할 답(I-1, 새 untracked 파일, 테스트 실행 없음)과 통과해야 할 표현(I-2)을 넣는다
+- [x] Step 2: `output_not_regex`, 넓힌 재리뷰 정규식, `transcript_regex` `pytest`, `file_absent_glob`, `write_bytes` setup, `covers: [test, reflect]`
+- [x] Step 3: `uv run pytest tests/unit/test_eval_harness.py -k "test_reflect_gate or every_fixture or all_check_types" -q` → 3 passed
+- [x] Step 4: 저장된 아홉 run을 새 check로 다시 채점(Measurements)
+- [x] Step 5: 바뀐 `test.md`·RULES_DOCS 문구로 프로브 3번(`--runs-dir C:/sc-evals/rrg-fix-<n>`)
+- [x] Commit Phase 5: `fix(core,test,evals): review round 1 — one plan-document definition, re-review stop, --through exception, stricter probe grader`
+
 ## Integration (커밋 아님)
 
-- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`
-- [ ] `/sc:review --scope branch`(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다). 발견을 반영한 수정이 리뷰된 코드나 shipped 내용을 바꾸면 이전 발견을 수용 기준으로 다시 리뷰한다
+- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck` (4de7ccb6, Phase 5 뒤 다시)
+- [x] `/sc:review --scope branch` 1차(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다): [06-review](./06-review.md)
+- [ ] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 본다. 반영이 다시 리뷰된 내용을 바꾸면 3차
 - [ ] `/sc:reflect`로 Goal과 Proof 대비 판정
 - [ ] 계획 `status: complete`와 `Result:` 줄, README `phase: complete`
 - [ ] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다
@@ -125,6 +148,8 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - 바꾸기 전(Phase 1 시점 src, `C:/sc-evals/rrg-before-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`를 부른 답은 0/3. 세 답 모두 F-1 수정에 round 2 리뷰가 없다고 스스로 짚었다(재리뷰 3/3). 재리뷰 check는 이미 바닥이 높아 규칙 효과를 재지 못한다.
 - 바꾼 뒤(Phase 2 src, `C:/sc-evals/rrg-after-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`는 여전히 0/3이다. 설치된 `test.md` handoff에 `/sc:reflect`가 들어간 것은 확인했다. 세 답 모두 "다음 단계"로 테스트 추가, round 2 리뷰, status 갱신을 들었고 reflect는 들지 않았다. `/sc:test`만 도는 세션에서는 handoff 한 단어로 행동이 바뀌지 않았다. RULES_DOCS 게이트는 이 세션에 로드되지 않으므로(Risks) 이 프로브로는 재지 못한다.
 - Phase 4 뒤(`test.md` Report 단계 한 줄, `C:/sc-evals/rrg-body-1..3`, 이 컴퓨터): 세 번 모두 `Y Y Y Y Y`(5/5). `/sc:reflect` 3/3(전 6회 0/6). 세 답 모두 "계획 문서로 진행했으니 `/sc:reflect` 전에는 끝이 아니다"와 F-1 수정의 다음 리뷰 round를 다음 단계로 들었다. 아홉 번 모두 최종 정규식으로 다시 채점한 값이다.
+- Phase 5 채점(7 check: reflect / 재리뷰 / 흘려 넘김 없음 / 코드 그대로 / 새 .py 없음 / phase 그대로 / pytest 실행)으로 같은 아홉 run을 다시 채점했다: before·after 여섯 번 `n Y Y Y Y Y Y`(6/7), body 세 번 7/7. 좋은 답이 새 `output_not_regex`에 걸린 경우는 없다. 방법: 각 run의 `sc-full/logs/test-reflect-gate.stream.jsonl`을 `run_eval._parse_stream`으로 읽어 답과 명령을 얻고, workspace `sc-full/test-reflect-gate`에 현재 `tasks.yaml` check를 `run_eval._check_one`으로 돌린다. 저장된 `report.md`·`results.json`은 그 run 때의 채점이다.
+- Phase 5 뒤(바뀐 `test.md`·RULES_DOCS 문구, `C:/sc-evals/rrg-fix-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점한 값이다(`run_eval.py` exit 0).
 
 ## Deviations
 
@@ -132,6 +157,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 2 Step 3 뒤 테스트 실행 정규식을 한 번 더 넓혔다: `(of|/)`(run after-2가 "passes 2/2"). 여섯 번 모두 새 정규식으로 다시 채점했다.
 - Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
 - Phase 4 측정 뒤 재리뷰 정규식에 `\bno review\b[^.\n]{0,20}\bafter\b`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
+- Phase 5를 더했다(1차 리뷰 반영). 테스트 실행 check는 출력 정규식에서 `transcript_regex` `pytest`로 바꿨다. 범위가 넓어진 곳: README bug·refactor 체인, `verifier.md` 설명 한 구절, RULES_DOCS의 `--through` 예외(소유자 결정, [06-review](./06-review.md) I-4).
 
 ## Risks
 

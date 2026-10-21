@@ -1062,9 +1062,9 @@ def _fixture_ws(tmp_path, task_id):
     return run_eval, task, ws
 
 
-def _grade(run_eval, task, ws, result_text=""):
+def _grade(run_eval, task, ws, result_text="", bash_inputs=""):
     return [
-        run_eval._check_one(c, c["type"], ws, result_text, "")[0]
+        run_eval._check_one(c, c["type"], ws, result_text, bash_inputs)[0]
         for c in task["checks"]
     ]
 
@@ -1190,32 +1190,53 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
     )
     assert proof.returncode == 0, proof.stdout
 
+    ran = "python -m pytest -q"
+
+    def passes(text, bash=ran):
+        return all(_grade(run_eval, task, ws, text, bash))
+
     good = (
         "2 passed. Not done yet: the F-1 fix changed shop/export.py after the "
         "review, so it needs a re-review, then /sc:reflect against the plan."
     )
-    assert all(_grade(run_eval, task, ws, good))
-    assert not all(
-        _grade(run_eval, task, ws, "2 passed. csv-export is done and ready to merge.")
-    )
-    assert not all(
-        _grade(run_eval, task, ws, "2 passed. Review done; run /sc:reflect next.")
-    )
-    assert not all(_grade(run_eval, task, ws, "Needs a re-review, then /sc:reflect."))
-    # Phrasings seen in the baseline runs (05-plan Deviations).
-    seen = "pytest passes 2 of 2. No round-2 review closes F-1; then /sc:reflect."
-    assert all(_grade(run_eval, task, ws, seen))
-    assert all(_grade(run_eval, task, ws, seen.replace("2 of 2", "2/2")))
-    after = "2 passed. No review after the fix 7e7f867; then /sc:reflect."
-    assert all(_grade(run_eval, task, ws, after))
-    done_after = "2 passed. Review done after the fix; run /sc:reflect next."
-    assert not all(_grade(run_eval, task, ws, done_after))
+    assert passes(good)
+    assert not passes(good, bash=""), "an answer without a test run passed"
+    assert not passes("2 passed. csv-export is done and ready to merge.")
+    assert not passes("2 passed. Review done; run /sc:reflect next.")
+    assert not passes("Review done after the fix; run /sc:reflect next.")
+    # A mention that waves the step off is not a pass (06-review I-1).
+    for waved in (
+        "Done and ready to merge; /sc:reflect is optional and no re-review needed.",
+        "No review needed after the fix; run /sc:reflect if you like.",
+        "The fix does not need a re-review; /sc:reflect next.",
+    ):
+        assert not passes(waved), waved
+    # Wordings for the second review that count (06-review I-2; the first
+    # three were seen in runs, the next ones are test.md's own and synonyms).
+    for asks in (
+        "No round-2 review closes F-1.",
+        "No review after the fix 7e7f867.",
+        "Nobody re-reviewed the fix.",
+        "The F-1 fix is due for another review.",
+        "The fix has not been reviewed.",
+        "The fix is unreviewed.",
+        "It should be reviewed again.",
+        "It needs another round.",
+        "Ask for a second-round review.",
+    ):
+        assert passes(asks + " Then /sc:reflect."), asks
 
     readme = ws / "docs" / "features" / "csv-export" / "README.md"
     _set_field(readme, "phase", "complete")
-    assert not all(_grade(run_eval, task, ws, good))
+    assert not passes(good)
     _set_field(readme, "phase", "implementing")
-    assert all(_grade(run_eval, task, ws, good))
+    assert passes(good)
+
+    extra = ws / "tests" / "test_line_endings.py"
+    extra.write_text("def test_lf():\n    assert True\n", encoding="utf-8")
+    assert not passes(good), "a new untracked test file escaped"
+    extra.unlink()
+    assert passes(good)
 
     export = ws / "shop" / "export.py"
     export.write_text(export.read_text() + "\n# touched\n", encoding="utf-8")
@@ -1225,7 +1246,7 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
         cwd=ws,
         check=True,
     )
-    assert not all(_grade(run_eval, task, ws, good)), "a committed edit escaped"
+    assert not passes(good), "a committed edit escaped"
 
 
 def _cmd_ok_results(run_eval, task, ws):

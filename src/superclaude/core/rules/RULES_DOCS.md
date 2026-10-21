@@ -83,8 +83,8 @@ Examples:
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list
     /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; the Proof ran on the last code commit (`Result:` line)
-    /sc:review -> fix -> /sc:review: a fix to a review finding that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria (the review packet in RULES.md Intent Propagation); rounds stop when what is left can be checked mechanically (tests, grading, canary)
-    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (the Medium and Large chains) goes to /sc:reflect; other work is done here
-    /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that changes reviewed code goes back to review, above) or accepted by the user
+    /sc:review -> fix -> /sc:review: a fix to a review finding that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria (the review packet in RULES.md Intent Propagation); rounds stop when no Critical or Important finding is open or the user has accepted it, and what is left can be checked by running something (tests, linters, evals). A `/sc:intent --through` run keeps its single fix round and names the fix that went unreviewed in its Report
+    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
+    /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that changes reviewed code or shipped content goes back to review, above) or accepted by the user
   </workflow_gates>
 </component>

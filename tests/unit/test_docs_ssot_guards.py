@@ -532,8 +532,15 @@ def test_readme_chains_end_at_a_workflow_gate():
     targets |= set(re.findall(r"\|\s*(/sc:[a-z-]+)", gates.group(1)))
     missing = sorted(chain_cmds - targets - {"/sc:intent"})
     assert not missing, f"README chain commands no workflow gate leads to: {missing}"
+    # The other direction: the gates send planned work to /sc:reflect, so both
+    # chains keep it outside their "(optional: ...)" part.
+    for tier, chain in rows:
+        assert "`/sc:reflect`" in re.sub(r"\(.*?\)", "", chain), tier
+    assert re.search(r"->\s*/sc:review: a fix to a review finding", gates.group(1))
 
-    handoff = re.search(
-        r'<handoff next="([^"]*)"', _read(_SRC / "commands" / "test.md")
-    )
+    # RULES_DOCS does not load on /sc:test, so test.md carries the gate itself.
+    test_md = _read(_SRC / "commands" / "test.md")
+    handoff = re.search(r'<handoff next="([^"]*)"', test_md)
     assert handoff and "/sc:reflect" in handoff.group(1).split(), handoff
+    report = re.search(r"^\s*\d+\. Report:.*$", test_md, re.M)
+    assert report and "/sc:reflect" in report.group(0), report
