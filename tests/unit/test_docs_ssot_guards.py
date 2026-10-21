@@ -536,6 +536,7 @@ _GATE_ANCHORS = {
     "rules": [
         "only when every task checkbox is checked",
         "no commit after that line's sha changes code",
+        "a Critical or Important finding in its work sets a `complete` plan back to `implementing`",
         "the user sets `complete` at the /sc:reflect Plan-Close step",
         "back to `implementing`",
     ],
@@ -557,21 +558,23 @@ _GATE_ANCHORS = {
     "implement Integrate": [
         "never sets the plan (index) or the README `complete`",
         "Plan-Close",
-        "back to `implementing`",
+        "sets it back to `implementing`",
         "rewrites `Result:`",
         "back to /sc:review",
         "even when its Proof is green",
         "single fix round",
     ],
     "implement Load": [
-        "has a code commit after it goes straight to the Integrate step's Proof re-run"
+        "is missing or has a code commit after its sha goes straight to the "
+        "Integrate step's Proof re-run"
     ],
     "reflect Plan-Close": [
         "every task box is checked",
         "is green or marked accepted by the user",
         "no commit after its sha changes code",
-        "(3) no fix to a Critical or Important review finding",
-        "an open box or a code commit after the `Result:` sha",
+        "(3) every Critical or Important review finding is fixed or accepted",
+        "an open box, a missing `Result:` line or a code commit after its sha",
+        "an open finding or a red `Result:` to the user",
         "another /sc:review round",
         "only when the user says yes",
         "in a feature folder",

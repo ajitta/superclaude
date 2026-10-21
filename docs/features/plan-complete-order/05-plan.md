@@ -96,6 +96,16 @@ revised: 2026-10-22
 - [x] Step 5: 재리뷰 채점 문장 규칙 주석 바로잡기, 규칙 3에 둘. 빈 줄, Deviations, README
 - [x] Commit Phase 6: `fix: one wording for Plan-Close condition 2 in every copy; --through review count; refusal guard`
 
+## Phase 7: 06c 반영 (one commit)
+
+[06c-verify-round4](./06c-verify-round4.md)(Important 1, Suggestion 5).
+
+- [x] Step 1: Plan-Close 조건 (3)이 열린 Critical·Important 발견도 본다(고쳤거나 사용자가 수락). 그 실패는 사용자에게. CHANGELOG도 같은 뜻으로
+- [x] Step 2: `Result:` 줄이 없는 상자 다 찬 계획: Plan-Close와 implement Load가 `/sc:implement --plan`의 Proof 재실행으로
+- [x] Step 3: 거절 guard에 "marked"·"setting"·"isn't". 재리뷰 채점 문장 넷. `--through` phase 파일 상태
+- [x] Step 4: 앵커는 바뀐 절과 되돌림 동사까지만. 약화어 목록은 늘리지 않는다(Deviations)
+- [ ] Commit Phase 7: `fix: Plan-Close waits for open review findings; a plan with no Result: line goes back to implement`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
@@ -108,6 +118,8 @@ revised: 2026-10-22
 - 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
 
 ## Deviations
+
+- Phase 7: 06c 4의 약화어 열세 개와 앵커 여섯은 넣지 않았다. 가드는 규칙의 삭제, 흔한 약화어, 되돌림 동사의 부정을 잡는다. 문맥에 따른 약화("usually", "should")와 조건 덧붙임은 낱말 목록으로는 끝이 없고, round마다 검증자의 예를 목록에 더하는 것이 감사가 걷어낸 덧댐이다. 그 몫은 canary probe다.
 
 - Phase 6: 06b가 제안한 거절 guard는 저장된 올바른 답 하나("did not re-run it, as the Plan-Close step says")를 거절로 읽었다. "Plan-Close"의 "Close"를 동사로 본 탓이다. 하이픈 뒤 낱말은 빼고, 그 답을 채점 테스트에 넣었다. 저장된 `reflect-plan-close` run 열 개를 다시 채점: 바꾼 뒤 9/9 통과, 바꾸기 전 1/1 실패. 변이 10건 모두 red(`$TMPDIR/pco/mut6.py`).
 

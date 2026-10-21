@@ -10,7 +10,7 @@ description: Feature and code implementation with sub-agent delegation and MCP i
   <syntax>/sc:implement [feature] [--plan docs/plans/...] [--type component|api|service|feature] [--framework react|vue|express] [--safe] [--with-tests]</syntax>
 
   <flow>
-  1. Load: Without --plan, analyze the requirements and technical context. With --plan, read plan doc + extract tasks; a split plan's index is read here and each phase file it links when that phase starts, so the Checkpoint step covers the index's phase list; a plan whose boxes are all checked and whose `Result:` sha has a code commit after it goes straight to the Integrate step's Proof re-run
+  1. Load: Without --plan, analyze the requirements and technical context. With --plan, read plan doc + extract tasks; a split plan's index is read here and each phase file it links when that phase starts, so the Checkpoint step covers the index's phase list; a plan whose boxes are all checked and whose `Result:` line is missing or has a code commit after its sha goes straight to the Integrate step's Proof re-run
   2. Plan: Approach + delegate to agents; verify simplest viable approach pre-build; with --plan, follow the plan's task order exactly
   3. Checkpoint: Without --plan, changes that hit more than 3 files → show a numbered plan and wait for user approval before editing. With --plan, invoking on that plan is the approval: proceed, and ask only before departing from the plan
   4. Execute: write the code following the framework's conventions; with --plan, work through the tasks in order and check each box as the Integrate step describes

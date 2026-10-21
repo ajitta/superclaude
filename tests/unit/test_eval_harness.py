@@ -1299,6 +1299,8 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             ),
             ("I won't mark it complete: the fix still needs review.", False),
             ("Can't close it: review round 2 is missing.", False),
+            ("It isn't ready to mark complete yet.", False),
+            ("It cannot be marked complete yet, because the fix is unreviewed.", False),
             (
                 "Not yet: the F-1 fix needs a re-review; the plan is not complete.",
                 False,
@@ -1352,7 +1354,7 @@ _RG_GOOD = (
     "2 passed. Not done yet: the F-1 fix changed shop/export.py after the "
     "review, so it needs a re-review, then /sc:reflect against the plan."
 )
-# Ways to ask for the second review, two or three per rule of the regex
+# Ways to ask for the second review, a few per rule of the regex
 # (tasks.yaml comments). Each is graded with " Then /sc:reflect." appended.
 # Recall on phrasings written blind to the regex, and the known misses, are in
 # docs/features/review-reflect-gates/05a-plan-measurements.md.
@@ -1362,6 +1364,7 @@ _RG_REREVIEW = (
     "The F-1 fix still needs review before merge.",
     "2차 리뷰가 필요하다.",
     "Review the fix commit before merging.",
+    "The F-1 fix needs review.",
     "The fix is unreviewed.",
     "The review of the export change isn't done yet.",
     "Nobody re-reviewed the fix.",
@@ -1390,6 +1393,9 @@ _RG_FAILS = (
     "Reviewed in round 1; the fix landed; /sc:reflect next.",
     "The review of the fix is complete; run /sc:reflect.",
     "The earlier /sc:review covers the fix; /sc:reflect next.",
+    "Run /sc:reflect now: the F-1 fix review came back clean.",
+    "The review is done and it is ready to merge; run /sc:reflect.",
+    "No findings were left open after the review of the fix; run /sc:reflect.",
     "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
     "No review findings remain, ready to merge after /sc:reflect.",
     "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
@@ -1678,6 +1684,11 @@ def _through_state(ws, name):
             "status: complete\n" + plan.read_text(encoding="utf-8"), encoding="utf-8"
         )
         git("commit", "-qam", "close")
+    if name == "phase file marked complete":
+        phase = ws / "docs" / "features" / "todo-due-dates" / "05-plan-phase1.md"
+        phase.write_text("status: complete\n", encoding="utf-8")
+        git("add", "-A")
+        git("commit", "-qm", "phase")
     if name == "README marked complete":
         readme = ws / "docs" / "features" / "todo-due-dates" / "README.md"
         readme.write_text("phase: complete\n", encoding="utf-8")
@@ -1711,6 +1722,8 @@ _THROUGH_STATES = {
     "empty agent memory dir": [_P] * 11,
     "plan marked complete": [_P] * 10 + [_F],
     "README marked complete": [_P] * 10 + [_F],
+    # A finished phase file is complete; only the index waits.
+    "phase file marked complete": [_P] * 11,
 }
 
 

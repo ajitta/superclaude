@@ -690,7 +690,7 @@ tasks:
       - type: output_not_regex
         tag: success
         pattern: >-
-          (?i)\b(?:not|never|won't|cannot|can't|don't|do\s+not)\b[^.\n]{0,25}(?<!-)\b(?:mark|set|clos\w*|propos\w*)\b|\bnot\s+met\b|\bconditions?\s*\(?\d\)?\s*(?:fails|is\s+not)
+          (?i)\b(?:not|never|won't|cannot|can't|don't|isn't|do\s+not)\b[^.\n]{0,25}(?<!-)\b(?:mark\w*|set\w*|clos\w*|propos\w*)\b|\bnot\s+met\b|\bconditions?\s*\(?\d\)?\s*(?:fails|is\s+not)
       - *no_py_change
       - *review_untouched
 
