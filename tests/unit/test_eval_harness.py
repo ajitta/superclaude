@@ -1271,6 +1271,11 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
                 True,
             ),
             ("All conditions hold; want me to close the plan?", True),
+            (
+                "Proposal: one docs-only commit that sets `05-plan.md` to "
+                "`status: complete` and the README to `phase: complete`.",
+                True,
+            ),
             ("Recommend closing out the plan in one docs-only commit.", True),
             (
                 "Not yet: the F-1 fix needs a re-review; the plan is not complete.",

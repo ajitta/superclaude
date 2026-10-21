@@ -98,6 +98,8 @@ revised: 2026-10-22
 
 ## Deviations
 
+- Phase 5 뒤 canary(e87f9aa0, `$TMPDIR/pco/r5/x3`): `reflect-plan-close`의 올바른 제안("sets `05-plan.md` to `status: complete`")이 성공 check에서 떨어졌다. 동사와 `complete` 사이의 파일 이름 점을 문장 끝으로 읽었다. 낱말 안의 점은 넘기게 고쳤다. 저장된 run 열 개를 다시 채점: 바꾼 뒤 9/9 통과, 바꾸기 전 1/1 실패.
+
 - Phase 4에서 Deviations에 적지 않고 빠진 구절 둘(06a 10): "after the review, test and reflect gates"(Plan-Close 조건이 대신한다), 재리뷰 문장의 "before done"("goes back to /sc:review for another round"가 대신한다).
 
 - 04-design B′ 표 6행의 "`Result:` 뒤 코드 커밋 → `/sc:test`"는 풀 수 없는 고리였다(06-verify 1, 감사 1). Phase 4에서 `/sc:implement --plan`(Proof 재실행, `Result:` 갱신)으로 바꿨다.

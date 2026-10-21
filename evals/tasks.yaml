@@ -685,7 +685,7 @@ tasks:
       - type: output_regex
         tag: success
         pattern: >-
-          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update)\w*\b[^.\n?]{0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b
+          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b
       - *no_py_change
       - *review_untouched
 
