@@ -1,0 +1,28 @@
+---
+feature: review-reflect-gates
+phase: planning
+owner: ajitta
+created: 2026-10-21
+updated: 2026-10-21
+related: ../../analysis/review-reflect-gate-gap-ajitta-2026-10-21.md
+---
+
+# review·reflect 게이트 맞추기
+
+README 작업 크기 표의 Medium·Large 체인은 `/sc:reflect`로 끝나는데, RULES_DOCS `workflow_gates`는 `/sc:test -> done`에서 끝나고 리뷰 뒤 수정을 다시 리뷰하라는 줄도 없다. 2026-10-21 session-memory-multi-machine 작업에서 두 단계가 실제로 빠졌다. 원인 분석은 [review-reflect-gate-gap](../../analysis/review-reflect-gate-gap-ajitta-2026-10-21.md)(항목 B)에 있다.
+
+소유자 결정(2026-10-21):
+
+- reflect 게이트는 RULES_DOCS `workflow_gates`에 둔다.
+- 리뷰 뒤 리뷰된 코드나 shipped 내용을 바꾼 수정은 다시 리뷰한다는 줄을 넣는다.
+- RULES_DOCS는 `/sc:test`에서 로드되지 않으므로(`context_loader.py:191`) `test.md` handoff에도 `/sc:reflect`를 넣는다.
+- 이 실패를 재는 canary 프로브를 더한다.
+- 릴리스는 보류한다. 이 기능은 master 병합까지만 한다.
+
+## Documents
+
+- [05-plan.md](./05-plan.md): implementation plan
+
+## 릴리스 뒤
+
+릴리스는 소유자가 정한다. 할 때는 4.34.2 범프에 이 기능을 묶고, `make canary-gates`와 `make canary-commands`를 한 번씩 돌린 뒤 `CANARY_OK=1 make release`를 실행한다.
