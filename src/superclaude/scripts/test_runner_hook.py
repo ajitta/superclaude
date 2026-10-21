@@ -16,7 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from superclaude.utils import read_hook_input
+from superclaude.utils import read_hook_input, run_shell
 
 # File extensions that should trigger test runs
 SOURCE_EXTENSIONS = {
@@ -212,14 +212,7 @@ def main() -> None:
             return
         test_cmd, cwd = detected
 
-        result = subprocess.run(
-            test_cmd,
-            shell=True,
-            cwd=cwd,
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
+        result = run_shell(test_cmd, timeout=120, cwd=cwd)
 
         file_name = Path(file_path).name
 

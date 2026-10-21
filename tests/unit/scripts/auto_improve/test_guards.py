@@ -103,7 +103,7 @@ def test_smoke_gate_fallback_uses_configured_timeout():
     """
     g = SmokeGate(smoke_cmd=None, eval_cmd="eval", timeout=45)
     with patch(
-        "superclaude.scripts.auto_improve.guards.subprocess.run",
+        "superclaude.scripts.auto_improve.guards.run_shell",
         return_value=MagicMock(returncode=0),
     ) as run:
         assert g.check() is True

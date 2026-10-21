@@ -8,6 +8,10 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Fixed
+
+- Shell-command timeouts now stop the whole command. The test run after an edit (`test_runner_hook`, 120 s) and `/sc:auto-improve`'s eval and smoke commands killed only the shell when time ran out: on Windows the command it started kept running and the call waited for it to finish, so a hung test or eval never timed out; on Linux and macOS the call returned but the command was left running in the background. They now kill every process the command started.
+
 ## [4.34.1] - 2026-10-20
 
 ### Changed
