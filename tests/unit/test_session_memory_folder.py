@@ -142,8 +142,9 @@ def test_save_offers_to_share_and_never_pushes_unasked() -> None:
     # The pathspec on the commit itself keeps whatever else was staged out;
     # `git add -- <files>` alone would leave a bare `git commit` passing.
     assert re.search(r"git commit [^`]*-- <files>`", step), step
-    # A partial commit fails while a merge is in progress.
-    assert "merge in progress" in step, step
+    # Git refuses a partial commit during a merge, cherry-pick or revert.
+    for state in ("merge", "cherry-pick", "revert"):
+        assert state in step, f"save.md Share step names no {state} case"
 
 
 def test_share_runs_after_every_step_that_writes() -> None:
@@ -169,6 +170,8 @@ def test_load_takes_the_branch_from_the_record_header() -> None:
     newest_at = step.find("of the newest date")
     assert 0 <= filter_at < newest_at, step
     assert "reported as the branch its `branch:` line names" in step, step
+    # Filtering every day's record of the branch must not Read them whole.
+    assert "Grep `^branch:`" in step, step
 
 
 @pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])
