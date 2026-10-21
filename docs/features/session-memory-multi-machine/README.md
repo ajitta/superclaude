@@ -17,3 +17,12 @@ updated: 2026-10-21
 | File | Content |
 |---|---|
 | [05-plan.md](./05-plan.md) | 결정, 범위, Phase 0–4 작업, Proof |
+
+## 릴리스 뒤 (계획 밖)
+
+계획이 `complete`(리뷰 반영, Proof 통과)가 된 뒤에 한다. 릴리스 여부는 소유자가 정한다.
+
+- [ ] 릴리스: command 본문이 바뀌었으므로 `make release`는 `make canary-commands` 결과(또는 `CANARY_OK=1`)를 요구한다.
+- [ ] 두 컴퓨터 모두 `superclaude doctor --scope user` → 설치가 보고되면 `superclaude install --force --scope user`(gotcha `sync-scope-creates`).
+- [ ] 소유자 확인: 두 컴퓨터가 같은 날 master에서 `/sc:save` → `.claude/memories/`에 `session_<date>_<host>_master.md` 두 파일, 서로 `git pull` 시 충돌 없음.
+
