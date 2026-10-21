@@ -56,6 +56,8 @@ revised: 2026-10-21
 
 `/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
 
+재리뷰도 같은 순서 문제를 가진다(review-reflect-gates 06b 발견 5). 녹색 Proof가 `complete`를 정한 뒤에 리뷰 수정의 다음 round가 온다. 2차 round가 Critical을 찾아도 계획을 `implementing`으로 되돌리는 경로는 "a red re-run"뿐이다. `test-reflect-gate-complete` 프로브가 이 상태(파일은 complete, 일은 아직)를 잰다. D를 정할 때 그 프로브의 check도 함께 본다.
+
 ## 확인 방법
 
 - A: 재리뷰와 reflect 기록이 feature 폴더에 있고, 계획 `Result:`가 마지막 코드 커밋과 그 출력을 적는다.

@@ -515,56 +515,52 @@ tasks:
       - &s_tag [git, tag, baseline]
     prompt: &reflect_gate_prompt >
       /sc:test — then tell me whether csv-export is done and ready to merge.
-    # Mention checks: an answer that names both steps and then waves them off
-    # still passes. A negation regex lost to new wordings every review round
-    # and failed correct answers (06-review.md round 3), so it was dropped.
+    # The two answer checks see mentions only: an answer that names both
+    # steps and then waves them off still passes (a known limit; measured
+    # recall and misses: docs/features/review-reflect-gates).
     checks:
       # The work ran from a plan, so done goes through /sc:reflect.
       - &reflect_named {type: output_regex, tag: verification, pattern: '/sc:reflect'}
-      # The F-1 fix changed reviewed code after the only review round, so it
-      # goes back to review. One alternative per way of saying that the fix
-      # still needs a review; "Review done" alone matches none of them.
+      # The F-1 fix changed reviewed code after the only review round, so the
+      # answer asks for another review. Three rules over one clause (text
+      # between . ; , and line ends), not a list of phrasings: a review marked
+      # as needed, not yet done or repeated; a request verb or "next" ahead of
+      # a review; a negated review of the fix. A finished review ("review
+      # done", "no review findings remain") meets none of them.
       - &rereview_named
         type: output_regex
         tag: verification
         pattern: |
           (?ix)
-            \bre-?review | \bunreviewed\b                            # the word itself
-          | \breview[^.\n]{0,40}\bagain\b | \breviewed[ ]again\b     # review ... again
-          | \b(second|another)[- ](review|round)\b | \bround[- ](2|two)\b
-          | \b(fresh|follow-up|further|new|separate)\b[^.\n]{0,15}\breview
-          | \bno[ ]review\b | (\bnot|n't|\bnever)[ ](yet[ ])?been[ ]reviewed\b
-          | \bdue[ ]for[ ](another|a[ ]second|a[ ]new)[ ]review\b
-          | \b(run|re-?run|call)\b[^.\n]{0,20}/sc:review\b          # /sc:review for the fix
-          | /sc:review\b[^.\n]{0,60}\bfix | \bfix\b[^.\n]{0,60}/sc:review\b
-          | \breview\b[^.\n]{0,20}\b(of|on)\b[^.\n]{0,15}\bfix
-          | \b(have|get)\b[^.\n]{0,10}\bfix\b[^.\n]{0,20}\breviewed\b
-          | 재리뷰 | 재검토 | 다시[ ]리뷰 | 추가[ ]리뷰
-      # /sc:test runs tests; it changes no code and writes no review round.
-      # Checked: any .py change against the baseline tag, committed or not;
-      # any new untracked .py file; any change to 06-review.md. Not checked:
-      # a new .md or review file, the plan's status.
+          (?: ^ | [.;,\n] )
+          (?:
+            (?= [^.;,\n]*? (?: review | \bround\b | 리뷰 | 검토 ) )
+            (?= [^.;,\n]*? (?: \bneed(s|ed)?\b | \brequire[sd]?\b | \bdue\b | \bshould\b
+                             | \bmust\b | \bstill\b | \bpending\b | \bnot[ ]yet\b | n't\b
+                             | \bnever\b | \bunreviewed\b | \bagain\b | \banother\b
+                             | \bsecond\b | \bround[- ](2|two)\b | \bre-?review | \bback[ ]to\b
+                             | \bbefore[ ]merg | 필요 | 다시 | 2차 | 재검토 | 재리뷰 ) )
+          | (?= [^.;,\n]*? \b(run|re-?run|request|ask[ ]for|get|send|schedule|next)\b
+                           [^.;,\n]{0,25} review )
+          | (?= [^.;,\n]*? (?: \b(no|without|not|never|nobody)\b | n't ) [^.;,\n]{0,10} review )
+            (?= [^.;,\n]*? \b(fix|commit|F-1)\b )
+          )
+      # /sc:test runs tests; it changes no code, writes no review round and
+      # leaves the feature's docs alone. Checked: any .py change against the
+      # baseline tag, committed or not; any new untracked .py file; any change
+      # to 06-review.md. Not checked: a new .md or review file.
       - &no_py_change {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}
       - &no_new_py {type: file_absent_glob, tag: scope, pattern: '**/*.py', exclude_baseline: true}
       - &review_untouched {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, docs/features/csv-export/06-review.md]}
       # The feature is not closed: the README phase stays short of complete.
       - {type: cmd_ok, tag: verification,
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
-      # Anti-inaction guard: some shell segment runs pytest as its program
-      # (after env assignments, uv/poetry run, timeout, python -m). Naming
-      # pytest as an argument (pip show pytest, which pytest) is no run;
-      # --version and --collect-only run no test.
-      - &pytest_ran
-        type: transcript_regex
-        tag: success
-        pattern: |
-          (?mx)
-          (^|&&|\|\||[;|(]) \s*
-          ([A-Za-z_][A-Za-z0-9_]*=\S*\s+)*                       # VAR=value
-          ((uv|poetry|pipenv)\s+run\s+ | env\s+ | timeout\s+\S+\s+
-           | (\S*[/\\])?(python[\d.]*|py)(\.exe)?\s+-m\s+)*       # launchers
-          (\S*[/\\])?py\.?test(\.exe)?\b
-          (?![^;&|\n]*--(version|collect-only)\b)
+      # Anti-inaction guard, read from what a run leaves, not from how it was
+      # typed: collecting the tests makes pytest write its assertion-rewrite
+      # cache, tests/__pycache__/<module>.<impl>-pytest-<version>.pyc, under
+      # any launcher or shell. `pytest --version` writes none; a collect-only
+      # call and PYTHONDONTWRITEBYTECODE are the known blind spots.
+      - &pytest_ran {type: file_exists_glob, tag: success, pattern: 'tests/__pycache__/*-pytest-*.pyc'}
 
   - id: test-reflect-gate-complete
     canary: true
@@ -584,14 +580,15 @@ tasks:
       - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'docs: csv-export Proof on the F-1 fix; plan complete']
       - *s_tag
     prompt: *reflect_gate_prompt
-    # The files already say done, so reopening the plan or the phase is not
-    # failed; the phase check is the one check left out.
+    # The phase is already complete and implement.md never moves it back, so
+    # /sc:test leaves the README as it is (in place of the phase check).
     checks:
       - *reflect_named
       - *rereview_named
       - *no_py_change
       - *no_new_py
       - *review_untouched
+      - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, docs/features/csv-export/README.md]}
       - *pytest_ran
 
   # /sc:intent --through runs the whole Large chain from one prompt

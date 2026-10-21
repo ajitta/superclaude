@@ -28,6 +28,7 @@ README 작업 크기 표의 Medium·Large 체인은 `/sc:reflect`로 끝나는�
 - [05a-plan-measurements.md](./05a-plan-measurements.md): probe measurements (moved out of the plan)
 - [06-review.md](./06-review.md): branch review rounds
 - [06a-verify-independent.md](./06a-verify-independent.md): independent verification of 81776c29 (headless opus, Linux)
+- [06b-verify-fixes.md](./06b-verify-fixes.md): second independent verification, of the 06a fixes (4223ed1d)
 
 ## 릴리스 뒤
 

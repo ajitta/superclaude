@@ -115,3 +115,19 @@ M18(README review 행의 "a code change after the `Result:` sha re-runs the Proo
 - README `/sc:review --scope branch` 행의 Proof 재실행 구절은 base부터 어떤 테스트도 고정하지 않는다(M18).
 - 06a가 남긴 두 항목은 그대로다. `_parse_stream`이 subagent의 tool_use를 구분하는지(`run_eval.py:342-404`, 미확인)와 `exclude_baseline`이 setup baseline이 아니라 HEAD를 뺀다는 것이다.
 - 분석 문서 D(`complete`가 `/sc:test`·`/sc:reflect`·재리뷰보다 먼저 온다)는 발견 5로 더 분명해졌다. D를 정할 때 implement.md의 상태 전이와 두 번째 변형의 check를 함께 다룬다.
+
+## 반영 (2026-10-21, claude-box, Phase 10)
+
+| # | 처리 |
+|---|---|
+| 1 | 반영: 재리뷰 check를 표현 목록에서 한 절(. ; , 줄 끝 사이)에 대한 세 규칙으로 바꿨다. (1) 필요·미완·반복 표지(need, due, should, still, not yet, n't, never, again, another, second, round 2, back to, before merg, 필요, 다시, 2차)가 붙은 리뷰, (2) 리뷰 앞의 요청 동사나 "next", (3) fix·commit·F-1이 있는 절의 부정된 리뷰(no, without, not, never, nobody). 넓은 세 대안(`no review`, `/sc:review…fix`, `review of/on…fix`)은 없어졌다. 규칙을 고정한 뒤 정규식을 보지 않고 쓴 표현(headless sonnet, 도구 없음, 30+29)으로 한 번 쟀다: 81776c29 11/30·0/29, 4223ed1d 20/30·1/29, 지금 25/30·0/29. 이 보고서의 표현 36개로는 18/20·1/16이다(규칙 3을 넓힐 때 봤으므로 held-out이 아니다). 놓친 표현은 [05a](./05a-plan-measurements.md)에 알려진 한계로 적었다. 위 완료 답 9개와 쉼표·"next" 경우 둘을 `_RG_FAILS`에 넣었다 |
+| 2 | 반영 (b): 명령 모양 대신 결과를 본다. `file_exists_glob: tests/__pycache__/*-pytest-*.pyc`(pytest assertion-rewrite 캐시). launcher 목록과 pip 예외가 없어졌다. `run_eval.build_workspace`와 단위 테스트의 fixture 복사는 `__pycache__`·`.pytest_cache`를 뺀다(`FIXTURE_IGNORE`). 단위 테스트는 실제 pytest를 돌려 본다: 실행 전 실패, `--version` 뒤 실패, `-q` 뒤 통과. 저장된 Linux run 아홉 개 모두 그 파일이 있고 통과한다. 남은 한계: collect-only 호출, `PYTHONDONTWRITEBYTECODE` |
+| 3 | 반영: `_GATE_PHRASES`가 조각 대신 각 곳의 규칙 문장 전체를 고정한다(계획 문서 정의가 gates에, `review.md` 범위, `test.md` 시점, `/sc:reflect -> done` 괄호, "with no claim that they are fixed", README reflect 행). M1–M8 모두 red |
+| 4 | 반영: 1의 완료 답, 2의 실제 실행 경우. 구분자·launcher 테스트는 2로 필요 없어졌다. `read_text`에 `encoding="utf-8"` |
+| 5 | 반영: `implement.md` 구절을 Proof 문장 뒤 독립 문장으로("…for another round before done, even when its Proof is green"). `complete`가 재리뷰보다 먼저 오는 것은 분석 문서 D에 적었다 |
+| 6 | 반영: complete 변형에 `git diff --quiet baseline -- docs/features/csv-export/README.md`. 주석은 implement.md의 "never moves back"을 이유로 든다 |
+| 7 | 반영: 리뷰 이력을 말하던 주석(`tasks.yaml`, 두 테스트 파일)을 규칙 한 줄과 feature 폴더 링크로 바꿨다 |
+| 8 | 반영: D18은 drift test가 shipped 내용 어디에도 폐기된 `/sc:test -> done`(또는 `→`) 이름이 없는지 본다. F-6 recall 손실은 2로 해소. F-11 뒷부분: gotcha `plan-docs-on-branch`는 소유자 결정(2026-10-21)을 출처로 들고, master의 1407a138은 그 결정 전 커밋이다 |
+| M18, 이 브랜치 밖 | 손대지 않았다 |
+
+Mutation(반영 뒤, 메모리의 원본으로 되돌림, `git diff --stat`이 mutation 전과 같다): M1–M8, D1, D6, D8, D10, D18, F-9 이전 문구, "even when its Proof is green" 삭제, 재리뷰 규칙 1에 "next" 추가, 규칙 2 삭제, 규칙 3 삭제, 규칙 3의 fix 조건 삭제, 쉼표 절 분리 삭제, `/sc:reflect` check 삭제, pytest glob을 `tests/**`로, `FIXTURE_IGNORE`에서 `__pycache__` 삭제, complete 변형의 README check 삭제, `06-review.md` check 삭제. 25건 모두 red다.

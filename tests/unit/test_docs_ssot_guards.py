@@ -521,27 +521,68 @@ _STOP_RULE = (
     "or the user has accepted the ones it found unfixed or waived the review "
     "of their fix; leftover Suggestions are reported, not reviewed again"
 )
-_FIX_SCOPE = "fix to a Critical or Important review finding"
+_FIX_SCOPE = (
+    "fix to a Critical or Important review finding that changes reviewed code "
+    "or shipped content"
+)
+# Whole rule sentences, so a weakened word in any of them fails.
 _GATE_PHRASES = [
-    ("gates", f"/sc:review -> fix -> /sc:review: a {_FIX_SCOPE}"),
-    ("gates", "with the earlier findings as acceptance criteria"),
+    (
+        "gates",
+        f"/sc:review -> fix -> /sc:review: a {_FIX_SCOPE} is reviewed again, "
+        "with the earlier findings as acceptance criteria",
+    ),
     ("gates", _STOP_RULE),
-    ("gates", "its /sc:test step names the fix that went unreviewed"),
-    ("gates", "`docs/plans/` plan) goes to /sc:reflect; other work is done here"),
-    ("gates", "/sc:reflect -> done: every gap /sc:reflect names is fixed"),
-    ("test Report", _PLAN_DOC),
-    ("test Report", "say it is not done until /sc:reflect has run"),
-    ("test Report", f"name a {_FIX_SCOPE}"),
-    ("test Report", "due for another review, which /sc:reflect does not replace"),
-    ("review Process", "comes back for another round"),
-    ("review Process", "earlier findings as acceptance criteria"),
+    (
+        "gates",
+        "A `/sc:intent --through` run keeps its single fix round; its /sc:test "
+        "step names the fix that went unreviewed",
+    ),
+    (
+        "gates",
+        f"Work run from {_PLAN_DOC} goes to /sc:reflect; other work is done here",
+    ),
+    (
+        "gates",
+        "/sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that "
+        "changes reviewed code or shipped content goes back to review, above) or "
+        "accepted by the user",
+    ),
+    (
+        "test Report",
+        f"when the tested work ran from {_PLAN_DOC}, say it is not done until "
+        "/sc:reflect has run",
+    ),
+    (
+        "test Report",
+        "name a fix to a Critical or Important review finding that changed "
+        "reviewed code or shipped content after the last review round as due for "
+        "another review, which /sc:reflect does not replace",
+    ),
+    (
+        "review Process",
+        "A fix to a Critical or Important finding that changes reviewed code or "
+        "shipped content comes back for another round, which gets the earlier "
+        "findings as acceptance criteria with no claim that they are fixed",
+    ),
     ("review Process", _STOP_RULE),
-    ("review Process", "`/sc:intent --through` run keeps its single fix round"),
-    ("implement Integrate", f"a {_FIX_SCOPE} that changes reviewed code or shipped"),
-    ("implement Integrate", "also goes back to /sc:review for another round"),
-    ("README review row", "is reviewed again, with the earlier findings"),
-    ("README reflect row", "shipped content goes back to review"),
-    ("README reflect row", "work run from a plan is done only after this"),
+    ("review Process", "(a `/sc:intent --through` run keeps its single fix round)"),
+    (
+        "implement Integrate",
+        f"A {_FIX_SCOPE} also goes back to /sc:review for another round before "
+        "done, even when its Proof is green",
+    ),
+    (
+        "README review row",
+        "a fix to one that changes reviewed code or shipped content is reviewed "
+        "again, with the earlier findings as acceptance criteria",
+    ),
+    (
+        "README reflect row",
+        "Every gap it names fixed (a fix that changes reviewed code or shipped "
+        "content goes back to review) or accepted; work run from a plan is done "
+        "only after this",
+    ),
 ]
 
 
@@ -572,9 +613,8 @@ def _gate_texts() -> dict[str, str]:
 
 @pytest.mark.parametrize(("where", "phrase"), _GATE_PHRASES)
 def test_review_reflect_gate_wording(where, phrase):
-    """Each place that carries the review-reflect gates keeps its wording
-    (docs/features/review-reflect-gates; weakening any of these went
-    unnoticed in the independent verification's mutation checks, 06a F-4)."""
+    """Each place that carries the review-reflect gates keeps its rule
+    sentence (docs/features/review-reflect-gates)."""
     assert phrase in _gate_texts()[where]
 
 
@@ -602,6 +642,13 @@ def test_readme_chains_end_at_a_workflow_gate():
         r'<handoff next="([^"]*)"', _read(_SRC / "commands" / "test.md")
     )
     assert handoff and handoff.group(1).split()[0] == "/sc:reflect", handoff
+    # The retired "/sc:test -> done" gate is named nowhere in shipped content.
+    retired = [
+        str(p.relative_to(_SRC))
+        for p in _SRC.rglob("*.md")
+        if re.search(r"/sc:test\s*(->|→)\s*done", _read(p))
+    ]
+    assert not retired, f"retired /sc:test -> done gate named in: {retired}"
     # Other README chains that run /sc:plan end with /sc:reflect too.
     for goal in ("Investigate a bug", "Refactor"):
         row = re.search(rf"^\| \*\*{goal}\*\* \| (.*) \|$", text, re.M)

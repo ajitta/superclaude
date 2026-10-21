@@ -171,7 +171,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 
 ## Phase 9: 독립 검증 반영 (one commit)
 
-소유자 결정(2026-10-21): 권고안 모두, 그리고 반복된 리뷰 round를 통과하려고 들어간 덧댐·예외·중복을 정리한다. 발견별 처리는 [06a](./06a-verify-independent.md) 반영 표에 있다.
+소유자 결정(2026-10-21): 권고안 모두와 리뷰 round용 덧댐·중복 정리. 처리는 [06a](./06a-verify-independent.md) 반영 표.
 
 - [x] Step 1: shipped 문구: `implement.md` Integrate(F-1), `test.md` Report, 종료 조건(F-9), `--through` 문장(F-8)
 - [x] Step 2: 프로브: 의미 묶음별 verbose 재리뷰 정규식(F-2), pytest가 프로그램인 명령 조각(F-6), `06-review.md` 그대로(F-10), YAML anchor를 나눠 쓰는 두 번째 변형 `test-reflect-gate-complete`(F-3)
@@ -179,8 +179,17 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] Step 4: 문서: Measurements를 [05a](./05a-plan-measurements.md)로, 합계 15/15(F-7, F-11), Deviations 순서, gotcha 출처
 - [x] Step 5: 영역 테스트 통과, 저장된 Linux run 세 개를 새 check로 다시 채점 → 7/7
 - [x] Commit Phase 9: `fix(implement,test,review,core,evals): independent verification — implement carries the re-review, probe variants, grader and guards cleaned up`
-- [ ] Step 6: `make canary-commands`(BASE=4fd32d90)와 두 reflect 프로브 3회씩, 05a에 적는다
-- [ ] Step 7: 두 번째 독립 검증(headless opus)이 Phase 9 수정을 본다
+- [x] Step 6: `make canary-commands`(BASE=4fd32d90)와 두 reflect 프로브 3회씩: 모두 통과(05a)
+- [x] Step 7: 두 번째 독립 검증: [06b](./06b-verify-fixes.md), 조건부 통과, Important 2
+
+## Phase 10: 두 번째 독립 검증 반영 (one commit)
+
+06b Important 1·2: Phase 9의 두 정규식도 덧댐이었다. 처리는 [06b](./06b-verify-fixes.md) 반영 표, 측정은 [05a](./05a-plan-measurements.md).
+
+- [x] Step 1: 재리뷰 check는 한 절에 대한 세 규칙, 테스트 실행 check는 pytest 캐시 파일, complete 변형은 README 그대로, `implement.md` 구절은 독립 문장, drift test는 규칙 문장 전체
+- [x] Step 2: mutation 25건 모두 red, 영역 테스트 통과, 저장된 run 아홉 개 통과
+- [x] Commit Phase 10: `fix(implement,evals,test): second verification — rule-based re-review grader, pytest run read from its cache, whole-sentence guards`
+- [ ] Step 3: canary 다시, 전체 suite, CI
 
 ## Integration (커밋 아님)
 
@@ -209,6 +218,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 7을 더했다(3차 리뷰 반영). 흘려 넘김·완료 주장 check는 소유자 결정으로 뺐다. Phase 5·6에서 그 check에 맞춰 적은 채점 테스트 단계는 Phase 7에서 바뀌었다.
 - Phase 8을 더했다(4차 리뷰 반영). 재리뷰 범위를 Critical·Important 발견에 대한 수정으로 좁혔다(소유자 결정, 4차 N-1).
 - Phase 9를 더했다(독립 검증 반영, 소유자 결정). 범위가 넓어진 곳: `implement.md` Integrate 한 구절과 두 번째 프로브 변형. 채점 정규식과 테스트는 고친 것만 덧붙이지 않고 구조를 바꿨다(소유자 지시: 반복 시험 통과용 덧댐·예외·중복 정리).
+- Phase 10을 더했다(06b 반영). 두 채점 check의 방식이 바뀌었다.
 
 ## Risks
 
