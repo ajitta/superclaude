@@ -20,7 +20,7 @@ description: Save session context to the committed project memory folder (.claud
   6. Checkpoint: recovery points + progress tracking
   7. Validate: data integrity + no duplicates across stores
   8. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
-  9. Share: the .claude/memories/ files this save wrote are uncommitted → list them and ask `[y/n]` to commit only those files: `git add -- <files>`, then `git commit -m "docs: session memory — <topic>" -- <files>`, so nothing else already staged goes in; detached HEAD → no commit offer, say why; yes, and the branch has an upstream, is not behind it, and `git diff --name-only '@{u}'...HEAD` lists memory files only → ask `[y/n]` again before `git push`; otherwise commit only and say the push is left to the user; no → leave the files uncommitted
+  9. Share: the .claude/memories/ files this save wrote are uncommitted → list them and ask `[y/n]` to commit only those files: `git add -- <files>`, then `git commit -m "docs: session memory — <topic>" -- <files>`, so nothing else already staged goes in; detached HEAD or a merge in progress → no commit offer, say why; yes, and the branch has an upstream, is not behind it, and `git diff --name-only '@{u}...HEAD'` lists memory files only → ask `[y/n]` again before `git push`; otherwise commit only and say the push is left to the user; no → leave the files uncommitted
   </flow>
 
   <flags>
@@ -59,7 +59,7 @@ Every type also saves its durable facts to auto memory as memory files, unless a
   - Write/Edit: memory folder + auto memory persistence
   - Glob: list memory files
   - Read: verify both stores
-  - Bash: `hostname` and read-only git (branch, rev-parse, rev-list, diff) for the record name and the Sync and Share steps; fetch in the Sync step; pull, commit and push only after the user's yes
+  - Bash: `hostname` and read-only git (branch, status, rev-parse, rev-list, diff) for the record name and the Sync and Share steps; fetch in the Sync step; pull, add, commit and push only after the user's yes
   </tools>
 
   <examples>

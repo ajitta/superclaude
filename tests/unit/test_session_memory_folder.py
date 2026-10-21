@@ -88,21 +88,24 @@ def test_load_starts_with_a_sync_step_that_asks_before_pulling() -> None:
     # the other machine's state from before its last push.
     step = _first_flow_step(LOAD)
     assert step.startswith("1. Sync:"), step
-    # GIT_TERMINAL_PROMPT=0: a fetch waiting on a credential prompt would hang
-    # every /sc:load and /sc:save until the shell tool timed out.
+    # Prompts off in both shells: a fetch waiting on a credential prompt would
+    # hang every /sc:load and /sc:save until the shell tool timed out.
     for token in (
         "fetch --quiet",
         "git pull --ff-only",
         "[y/n]",
-        "GIT_TERMINAL_PROMPT=0",
+        "`GIT_TERMINAL_PROMPT=0`",
+        "`$env:GIT_TERMINAL_PROMPT=0`",
+        "credential.interactive=never",
     ):
         assert token in step, f"load.md Sync step lacks {token!r}"
 
 
-# An unquoted @{u} is a hashtable literal to PowerShell: the command fails to
-# parse, which the Sync step would read as "no upstream" and skip the pull
-# check. Quoted, it works in PowerShell and in a POSIX shell alike.
-_UNQUOTED_UPSTREAM = re.compile(r"(?<!['.])@\{u\}")
+# A bare @{u} is a hashtable literal to PowerShell, and a partly quoted
+# '@{u}'...HEAD reaches git as two arguments (usage error, exit 129; seen
+# 2026-10-21). Only a whole argument in single quotes works in PowerShell and
+# a POSIX shell alike.
+_QUOTED_UPSTREAM_ARG = re.compile(r"'[^'\s]*@\{u\}[^'\s]*'(?=[\s`;)]|$)")
 
 
 @pytest.mark.parametrize(
@@ -113,7 +116,11 @@ _UNQUOTED_UPSTREAM = re.compile(r"(?<!['.])@\{u\}")
 def test_upstream_ref_is_quoted(path: Path, label: str) -> None:
     step = _flow_step(path, label)
     assert "@{u}" in step, f"{path.name} {label} step names no upstream ref"
-    assert not _UNQUOTED_UPSTREAM.search(step), step
+    quoted = len(_QUOTED_UPSTREAM_ARG.findall(step))
+    assert quoted == step.count("@{u}"), (
+        f"{path.name} {label}: {step.count('@{u}')} upstream refs, "
+        f"{quoted} quoted as a whole argument"
+    )
 
 
 def test_save_starts_with_the_load_sync_step() -> None:
@@ -132,8 +139,11 @@ def test_save_offers_to_share_and_never_pushes_unasked() -> None:
         assert token in step, f"save.md Share step lacks {token!r}"
     # One yes for the commit, a second one for the push.
     assert step.count("[y/n]") >= 2, step
-    # `git commit -- <files>` keeps whatever else was staged out of the commit.
-    assert "-- <files>" in step, step
+    # The pathspec on the commit itself keeps whatever else was staged out;
+    # `git add -- <files>` alone would leave a bare `git commit` passing.
+    assert re.search(r"git commit [^`]*-- <files>`", step), step
+    # A partial commit fails while a merge is in progress.
+    assert "merge in progress" in step, step
 
 
 def test_share_runs_after_every_step_that_writes() -> None:
@@ -152,8 +162,13 @@ def test_save_never_edits_another_machines_record() -> None:
 
 def test_load_takes_the_branch_from_the_record_header() -> None:
     # A branch slug may hold `_` (`fix_x`), so the filename alone can misread
-    # machine and branch; the `branch:` first line settles it.
-    assert "`branch:` line" in _flow_step(LOAD, LOAD_MEMORY_STEP)
+    # machine and branch; the `branch:` first line settles it, both before the
+    # newest date is chosen and in the any-branch fallback.
+    step = _flow_step(LOAD, LOAD_MEMORY_STEP)
+    filter_at = step.find("whose `branch:` line names the current branch")
+    newest_at = step.find("of the newest date")
+    assert 0 <= filter_at < newest_at, step
+    assert "reported as the branch its `branch:` line names" in step, step
 
 
 @pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])
