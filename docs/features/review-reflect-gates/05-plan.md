@@ -91,15 +91,15 @@ revised: 2026-10-21
 
 **Files:** Modify: `CHANGELOG.md`(`## [Unreleased]` `### Changed`), `docs/analysis/review-reflect-gate-gap-ajitta-2026-10-21.md`(B 상자와 결정, `status`, `revised`), `docs/features/review-reflect-gates/README.md`(`phase`, `updated`)
 
-- [ ] Step 1: CHANGELOG 한 항목: 계획 문서로 진행한 작업은 `/sc:test` 뒤 `/sc:reflect`로 가고, 리뷰 뒤 리뷰된 코드나 shipped 내용을 바꾼 수정은 다시 리뷰받는다. `/sc:test`의 다음 단계 목록에 `/sc:reflect`가 들어갔다. contributor용: `test-reflect-gate` 프로브
-- [ ] Step 2: 분석 문서 B를 결정과 이 feature 링크로 갱신
-- [ ] Step 3: auto memory `release-needs-complete-plan`이 RULES_DOCS `workflow_gates`를 가리키게 고친다(repo 밖, 커밋 없음)
-- [ ] Step 4: 검사(문서만, 실행 없음): 세 파일을 다시 읽는다. `uv run pytest tests/unit/test_docs_ssot_guards.py -q` → 통과
-- [ ] Commit Phase 3: `docs: review-reflect-gates — CHANGELOG, analysis item B decided`
+- [x] Step 1: CHANGELOG 한 항목: 계획 문서로 진행한 작업은 `/sc:test` 뒤 `/sc:reflect`로 가고, 리뷰 뒤 리뷰된 코드나 shipped 내용을 바꾼 수정은 다시 리뷰받는다. `/sc:test`의 다음 단계 목록에 `/sc:reflect`가 들어갔다. contributor용: `test-reflect-gate` 프로브
+- [x] Step 2: 분석 문서 B를 결정과 이 feature 링크로 갱신
+- [x] Step 3: auto memory `release-needs-complete-plan`이 RULES_DOCS `workflow_gates`를 가리키게 고친다(repo 밖, 커밋 없음)
+- [x] Step 4: 검사(문서만, 실행 없음): 세 파일을 다시 읽는다. `uv run pytest tests/unit/test_docs_ssot_guards.py -q` → 통과
+- [x] Commit Phase 3: `docs: review-reflect-gates — CHANGELOG, analysis item B decided`
 
 ## Integration (커밋 아님)
 
-- [ ] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`
+- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`
 - [ ] `/sc:review --scope branch`(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다). 발견을 반영한 수정이 리뷰된 코드나 shipped 내용을 바꾸면 이전 발견을 수용 기준으로 다시 리뷰한다
 - [ ] `/sc:reflect`로 Goal과 Proof 대비 판정
 - [ ] 계획 `status: complete`와 `Result:` 줄, README `phase: complete`
@@ -137,3 +137,5 @@ revised: 2026-10-21
 - `uv run pytest` → exit 0, 실패 0
 - `uv run pytest tests/unit/test_docs_ssot_guards.py -k chains -q` → 1 passed
 - `test-reflect-gate` 3회: `/sc:reflect` check가 바꾸기 전보다 많이 통과한다. 수치는 `## Measurements`
+
+Result: 75d2addc — `uv run pytest` 3789 passed, 12 skipped (exit 0); lint, format, typecheck clean; drift test passed; `test-reflect-gate` `/sc:reflect` 0/3 after the change (baseline 0/3), so the third Proof item is red. Status stays `implementing` until the owner decides.
