@@ -132,11 +132,25 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] Step 5: 바뀐 `test.md`·RULES_DOCS 문구로 프로브 3번(`--runs-dir C:/sc-evals/rrg-fix-<n>`)
 - [x] Commit Phase 5: `fix(core,test,evals): review round 1 — one plan-document definition, re-review stop, --through exception, stricter probe grader`
 
+## Phase 6: 2차 리뷰 반영 (one commit)
+
+발견과 처리는 [06-review](./06-review.md) 2차 표에 있다. N-1은 소유자 결정이다(`review.md` 한 줄).
+
+**Files:** Modify: `src/superclaude/core/rules/RULES_DOCS.md`(종료 조건), `src/superclaude/commands/review.md`(Process 단계), `src/superclaude/commands/test.md`(Report 단계 범위), `README.md`(review·reflect 행), `CHANGELOG.md`, `evals/tasks.yaml`, `evals/fixtures/test-reflect-gate/docs/features/csv-export/06-review.md`, `tests/unit/test_eval_harness.py`, `tests/unit/test_docs_ssot_guards.py`, 분석 문서
+
+- [x] Step 1: 채점 테스트에 class별 실패 답(인용 + 인용되지 않은 변형), 부정·조건 표현의 통과 답, `pip show pytest`, 커밋된 루트 `conftest.py`를 넣는다
+- [x] Step 2: `output_not_regex`를 class 단위로 넓히고, scope check를 `'*.py'` 기준으로, 테스트 실행 check를 실제 실행만으로
+- [x] Step 3: `uv run pytest tests/unit/test_eval_harness.py -k test_reflect_gate -q` → 1 passed; 저장된 열두 run을 다시 채점 → 좋은 답의 오탐 없음(Measurements)
+- [x] Step 4: 규칙 문구(RULES_DOCS 종료 조건, `review.md` 한 줄, `test.md` 범위), README, CHANGELOG. `uv run pytest tests/unit/test_docs_ssot_guards.py tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_description_overlap.py -q` → 1102 passed
+- [x] Step 5: 프로브 3번(`--runs-dir C:/sc-evals/rrg-fix2-<n>`)
+- [x] Commit Phase 6: `fix(core,review,test,evals): review round 2 — terminating stop rule, /sc:review carries the re-review, wave-off classes in the grader`
+
 ## Integration (커밋 아님)
 
-- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck` (4de7ccb6, Phase 5 뒤 다시)
+- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42에서 각각 3789 passed, 12 skipped, 나머지 통과. 마지막 커밋 뒤 한 번 더 돌려 `Result:`에 적는다
 - [x] `/sc:review --scope branch` 1차(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다): [06-review](./06-review.md)
-- [ ] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 본다. 반영이 다시 리뷰된 내용을 바꾸면 3차
+- [x] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 봤다: [06-review](./06-review.md) 2차
+- [ ] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 본다. Critical·Important가 없거나 소유자가 받아들이면 멈춘다
 - [ ] `/sc:reflect`로 Goal과 Proof 대비 판정
 - [ ] 계획 `status: complete`와 `Result:` 줄, README `phase: complete`
 - [ ] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다
@@ -150,6 +164,8 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 4 뒤(`test.md` Report 단계 한 줄, `C:/sc-evals/rrg-body-1..3`, 이 컴퓨터): 세 번 모두 `Y Y Y Y Y`(5/5). `/sc:reflect` 3/3(전 6회 0/6). 세 답 모두 "계획 문서로 진행했으니 `/sc:reflect` 전에는 끝이 아니다"와 F-1 수정의 다음 리뷰 round를 다음 단계로 들었다. 아홉 번 모두 최종 정규식으로 다시 채점한 값이다.
 - Phase 5 채점(7 check: reflect / 재리뷰 / 흘려 넘김 없음 / 코드 그대로 / 새 .py 없음 / phase 그대로 / pytest 실행)으로 같은 아홉 run을 다시 채점했다: before·after 여섯 번 `n Y Y Y Y Y Y`(6/7), body 세 번 7/7. 좋은 답이 새 `output_not_regex`에 걸린 경우는 없다. 방법: 각 run의 `sc-full/logs/test-reflect-gate.stream.jsonl`을 `run_eval._parse_stream`으로 읽어 답과 명령을 얻고, workspace `sc-full/test-reflect-gate`에 현재 `tasks.yaml` check를 `run_eval._check_one`으로 돌린다. 저장된 `report.md`·`results.json`은 그 run 때의 채점이다.
 - Phase 5 뒤(바뀐 `test.md`·RULES_DOCS 문구, `C:/sc-evals/rrg-fix-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점한 값이다(`run_eval.py` exit 0).
+- Phase 6 채점(2차 리뷰의 흘려 넘김·완료 주장 class, `'*.py'` scope, 실제 pytest 실행)으로 저장된 열두 run을 다시 채점했다: before·after 여섯 번 6/7, body·fix 여섯 번 7/7. 좋은 답의 오탐은 없다.
+- Phase 6 뒤(`review.md` 한 줄, 종료 조건, `test.md` 범위, `C:/sc-evals/rrg-fix2-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점(`run_eval.py` exit 0).
 
 ## Deviations
 
@@ -158,6 +174,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
 - Phase 4 측정 뒤 재리뷰 정규식에 `\bno review\b[^.\n]{0,20}\bafter\b`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
 - Phase 5를 더했다(1차 리뷰 반영). 테스트 실행 check는 출력 정규식에서 `transcript_regex` `pytest`로 바꿨다. 범위가 넓어진 곳: README bug·refactor 체인, `verifier.md` 설명 한 구절, RULES_DOCS의 `--through` 예외(소유자 결정, [06-review](./06-review.md) I-4).
+- Phase 6을 더했다(2차 리뷰 반영). 범위가 넓어진 곳: `review.md` Process 단계 한 줄(소유자 결정, 2차 N-1)과 README `/sc:reflect` 행.
 
 ## Risks
 

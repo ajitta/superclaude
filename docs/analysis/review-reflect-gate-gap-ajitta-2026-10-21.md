@@ -48,13 +48,13 @@ revised: 2026-10-21
 - 반영 뒤 재리뷰: `workflow_gates`에 "리뷰 뒤 shipped 내용을 바꾼 수정은 다시 리뷰한다"는 줄을 넣을지 정한다. 넣는다면 `/sc:review`의 재리뷰가 이전 발견을 수용 기준으로 받는다는 점도 같이 적는다.
 - `core/`가 바뀌면 다음 릴리스는 `make canary-gates`가 필요하다(AGENTS.md). 이 실패를 막는 canary 프로브를 `evals/tasks.yaml`에 더할지도 정한다(AGENTS.md: 행동 실패를 기록한 gotcha·insight에는 프로브를 더한다).
 
-### D. 계획 `complete`와 reflect의 순서 (후속, 미착수)
-
-`/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
-
 ### C. 메모리 고치기
 
 - [x] auto memory `release-needs-complete-plan`에 "반영한 수정은 다시 리뷰한다, reflect는 체인의 단계다"를 더했다(2026-10-21). B의 결정이 나오면 그 규칙을 가리키게 한다.
+
+### D. 계획 `complete`와 reflect의 순서 (후속, 미착수)
+
+`/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
 
 ## 확인 방법
 

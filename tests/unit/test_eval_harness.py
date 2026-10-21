@@ -1201,14 +1201,28 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
     )
     assert passes(good)
     assert not passes(good, bash=""), "an answer without a test run passed"
+    assert not passes(good, bash="pip show pytest"), "naming pytest is not a run"
+    assert passes(good, bash="cd ws && pytest -q")
     assert not passes("2 passed. csv-export is done and ready to merge.")
     assert not passes("2 passed. Review done; run /sc:reflect next.")
     assert not passes("Review done after the fix; run /sc:reflect next.")
-    # A mention that waves the step off is not a pass (06-review I-1).
+    # A mention that waves a step off, or a done claim next to the mentions,
+    # is not a pass (06-review I-1, N-3). Each class: the reviewer's string
+    # and at least one variant nobody quoted.
     for waved in (
         "Done and ready to merge; /sc:reflect is optional and no re-review needed.",
         "No review needed after the fix; run /sc:reflect if you like.",
         "The fix does not need a re-review; /sc:reflect next.",
+        "The fix is fine, no need to review it again; run /sc:reflect next.",
+        "There is no need for a second round; /sc:reflect next.",
+        "Re-review isn't needed for a one-line fix; /sc:reflect next.",
+        "A re-review is not necessary here; /sc:reflect next.",
+        "No second round is needed; /sc:reflect next.",
+        "It needs a re-review; optionally run /sc:reflect.",
+        "It needs a re-review; /sc:reflect is optional.",
+        "It needs a re-review; /sc:reflect isn't needed.",
+        "csv-export is done and ready to merge; a re-review and /sc:reflect would be nice.",
+        "It's ready to merge. A re-review and /sc:reflect can follow.",
     ):
         assert not passes(waved), waved
     # Wordings for the second review that count (06-review I-2; the first
@@ -1225,6 +1239,13 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
         "Ask for a second-round review.",
     ):
         assert passes(asks + " Then /sc:reflect."), asks
+    # Negated or conditional done wording in a correct answer is not a claim.
+    for hedged in (
+        "It is not ready to merge: the F-1 fix needs a re-review, then /sc:reflect.",
+        "Two steps before it's ready to merge: a re-review, then /sc:reflect.",
+        "I wouldn't call it ready to merge until a re-review and /sc:reflect.",
+    ):
+        assert passes(hedged), hedged
 
     readme = ws / "docs" / "features" / "csv-export" / "README.md"
     _set_field(readme, "phase", "complete")
@@ -1247,6 +1268,17 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
         check=True,
     )
     assert not passes(good), "a committed edit escaped"
+    subprocess.run(["git", "reset", "-q", "--hard", "baseline"], cwd=ws, check=True)
+    assert passes(good)
+
+    (ws / "conftest.py").write_text("import sys\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "y"],
+        cwd=ws,
+        check=True,
+    )
+    assert not passes(good), "a committed new .py outside shop/ and tests/ escaped"
 
 
 def _cmd_ok_results(run_eval, task, ws):

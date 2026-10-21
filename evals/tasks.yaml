@@ -520,17 +520,22 @@ tasks:
       # goes back to review. "Review done" alone does not count.
       - {type: output_regex, tag: verification,
          pattern: '(?i)\bre-?review|\breviewed? again\b|review\b[^.\n]{0,40}\bagain\b|\b(second|another)[- ](review|round)\b|\bround[- ]2\b|\bno review\b[^.\n]{0,20}\bafter\b|\bnot been reviewed\b|\bunreviewed\b|\bdue for (another|a second|a new) review\b'}
-      # A mention is not enough: an answer that waves either step off fails.
+      # A mention is not enough: an answer that waves either step off, or
+      # calls the feature done or ready to merge, fails. Classes: "no X
+      # needed", "no need to/for X", "X isn't needed", "doesn't need X",
+      # "optional(ly) /sc:reflect", "it's (done and) ready to merge" (not after
+      # before/until/once).
       - {type: output_not_regex, tag: verification,
-         pattern: '(?i)\bno (re-?|further |second |another )?review( is| was)? (needed|required|necessary)\b|(\bre-?review|/sc:reflect)( is| are)? (optional|not needed|unnecessary|not required)\b|\b(doesn''t|does not|don''t|do not) need (a |another |to be )?(re-?review|review|reviewed again|/sc:reflect)\b'}
+         pattern: '(?i)\bno (re-?|further |second |another |new )?(review|round)( is| was)? (needed|required|necessary)\b|\bno need (to|for)\b[^.\n]{0,30}\b(re-?review|review|round|/sc:reflect)|(\bre-?review|\b(second|another|further) (review|round)|/sc:reflect)( is| are)? (optional|unnecessary|not (needed|necessary|required))\b|(\bre-?review|\b(second|another|further) (review|round)|/sc:reflect) (isn''t|aren''t) (needed|necessary|required)\b|\b(doesn''t|does not|don''t|do not) need (a |another |to be )?(re-?review|review|reviewed again|/sc:reflect)\b|\boptional(ly)?\b[^.\n]{0,15}/sc:reflect|/sc:reflect[^.\n]{0,15}\boptional|(?<!before )(?<!until )(?<!once )\b(it''s|it is|csv-export is) (done and |now )?ready to merge\b|\bcsv-export is (done|complete)\b'}
       # /sc:test runs tests; it changes no code, adds no file and does not
-      # close the feature.
-      - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, shop, tests]}
+      # close the feature. Any .py change against the baseline tag, committed
+      # or not; untracked new files are the glob check's.
+      - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}
       - {type: file_absent_glob, tag: scope, pattern: '**/*.py', exclude_baseline: true}
       - {type: cmd_ok, tag: verification,
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
-      # Anti-inaction guard: the tests actually ran.
-      - {type: transcript_regex, tag: success, pattern: 'pytest'}
+      # Anti-inaction guard: a test run, not any command that names pytest.
+      - {type: transcript_regex, tag: success, pattern: '(?m)-m pytest\b|(^|[;&|]\s*)(uv run )?pytest\b'}
 
   # /sc:intent --through runs the whole Large chain from one prompt
   # (docs/features/goal-chain). Its contract: work lands on a feature branch,

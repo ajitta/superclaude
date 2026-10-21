@@ -544,3 +544,14 @@ def test_readme_chains_end_at_a_workflow_gate():
     assert handoff and "/sc:reflect" in handoff.group(1).split(), handoff
     report = re.search(r"^\s*\d+\. Report:.*$", test_md, re.M)
     assert report and "/sc:reflect" in report.group(0), report
+    # One definition of "plan document" in both places that carry the gate.
+    plan_doc = (
+        "a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan)"
+    )
+    assert plan_doc in report.group(0)
+    assert plan_doc in gates.group(1)
+    # Nor does RULES_DOCS load on /sc:review, so review.md carries the re-review.
+    process = re.search(
+        r"^\s*\d+\. Process:.*$", _read(_SRC / "commands" / "review.md"), re.M
+    )
+    assert process and "earlier findings as acceptance criteria" in process.group(0)

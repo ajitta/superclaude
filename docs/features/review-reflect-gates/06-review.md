@@ -31,3 +31,30 @@ Critical 없음. 아래는 발견과 처리다. "반영"은 이 브랜치의 다
 | S-7 | 다시 채점한 수치를 저장된 `report.md`로는 재현할 수 없다 | 반영: Measurements에 방법(각 run의 `sc-full/logs/*.stream.jsonl`을 `run_eval._parse_stream`으로 읽고 현재 check로 채점)을 적었다 |
 | S-8 | 계획 28행 "3 passed"(테스트는 2개), 분석 문서 8행 "후속 작업은 아직 하지 않았다", 결정 기록에 Phase 4가 없다 | 반영 |
 | S-9 | `test.md:17`이 게이트를 다시 말한다(로딩 때문에 의도), 두 곳을 묶는 테스트가 없다 | S-1의 Report 줄 확인으로 묶었다 |
+
+## 2차 (2026-10-21, `90301a42`, `self-review` 에이전트, 새 세션)
+
+리뷰어에게는 1차 발견을 결함과 확인 방법으로만 줬고, 고쳤다는 주장과 이 표의 처리 칸은 증거로 쓰지 말라고 했다. 소유자 결정(I-4 예외, I-5 후속)은 결정으로만 전했다. 리뷰어는 shell이 없어 pytest를 돌리지 않았다.
+
+1차 판정: I-2, I-3, I-7, I-9, S-2–S-8 고쳐짐. I-4·I-5는 결정대로. I-1, I-6 일부. I-8은 Phase 5 뒤 suite 출력이 계획에 인용되지 않음.
+
+| ID | 발견 | 처리 |
+|---|---|---|
+| I-1·N-3 | 다른 표현의 흘려 넘김("no need to review it again", "re-review isn't needed", "No second round is needed", "optionally run /sc:reflect")과 두 단계를 언급하면서 "done and ready to merge"라 하는 답이 통과한다. 고친 쪽이 리뷰어가 인용한 문자열만 고정한다 | 반영: `output_not_regex`를 표현 class 단위로 넓혔다(no X needed, no need to/for X, X isn't needed, doesn't need X, optional(ly) /sc:reflect, it's ready to merge). class마다 인용 문자열과 인용되지 않은 변형을 실패로, "not ready to merge"·"before it's ready to merge" 같은 부정·조건 표현을 통과로 고정 |
+| I-6·N-2·N-17 | 종료 조건 끝의 "and what is left can be checked by running something"이 다시 끝없는 round를 만든다. "it"이 단수 | 반영: "the user has accepted the ones left; leftover Suggestions are reported, not reviewed again" |
+| N-1 | 재리뷰 규칙이 수정이 일어나는 `/sc:review`·`/sc:implement` 세션에 로드되지 않는다 | 소유자 결정: `review.md` Process 단계에 한 줄. drift test가 그 줄을 고정 |
+| I-8 | Phase 5 뒤 전체 suite 출력이 계획에 없다 | 반영: 90301a42에서 돈 suite(3789 passed, 12 skipped, lint·format·typecheck 통과)를 계획에 적고, 마지막 커밋 뒤 다시 돌려 `Result:`에 적는다 |
+| N-4 | 게이트가 `--through` Report에 리뷰받지 않은 수정을 적는다고 하지만 `intent.md` Report 목록에 그 항목이 없다 | 받아들임: `intent.md`를 그대로 두는 것이 소유자 결정이다. 게이트는 `/sc:intent`에서 로드되므로 그 세션에서는 읽힌다 |
+| N-5 | README `/sc:review --scope branch` 행이 "reviewed code"만, "Critical findings fixed"만 말하고, `/sc:reflect` 행이 "—" | 반영 |
+| N-6 | `test.md`가 "any fix"로 게이트보다 넓다 | 반영: "a fix to a review finding" |
+| N-7 | drift test가 계획 문서 정의가 같은지, 재리뷰 줄의 수용 기준 구절을 고정하지 않는다 | 반영: 두 곳의 계획 문서 정의가 같은 문자열인지, `review.md` Process 줄의 "earlier findings as acceptance criteria"를 본다 |
+| N-8 | reflect만 흘려 넘기는 답이 따로 고정되지 않았다 | 반영: "It needs a re-review; /sc:reflect is optional" 등 세 개 |
+| N-9 | "No review was required for the test-only change, but…"처럼 맞는 답이 실패할 수 있다 | 받아들임: 저장된 열두 run에서 오탐은 없다. 표현에 기대는 채점의 한계로 남긴다 |
+| N-10 | `exclude_baseline`은 HEAD 기준이라 shop·tests 밖에 커밋된 새 .py(루트 conftest.py)가 빠진다 | 반영: scope check를 `git diff --quiet baseline -- '*.py'`로. 루트 conftest.py 커밋을 실패로 고정 |
+| N-11 | `pytest`가 들어간 아무 명령(`pip show pytest`)이 테스트 실행으로 셈된다 | 반영: `-m pytest` 또는 명령 시작·구분자 뒤의 `pytest`만. `pip show pytest`를 실패로 고정 |
+| N-12 | 단위 테스트가 하네스의 workspace 준비(.gitignore, `.claude` 설치)를 거치지 않는다 | 받아들임: 리뷰어가 읽은 대로 설치 파일은 setup의 `git add -A` 전에 들어가 baseline에 포함된다. 하네스 채점 7/7과 맞다 |
+| N-13 | README "End of branch" 체인에 reflect가 없다 | 받아들임: 계획 문서와 무관한 일반 체인이다. 게이트가 계획 문서로 진행한 작업을 다룬다 |
+| N-14 | "shipped content"가 이 repo 말이다 | 받아들임: 사용자 프로젝트에서도 "배포되는 내용"으로 읽힌다 |
+| N-15 | CHANGELOG가 프로브의 실패 조건을 덜 적는다 | 반영 |
+| N-16 | fixture 리뷰가 "Major"를 쓴다 | 반영: "Important" |
+| N-18 | 분석 문서 절 순서가 B, D, C | 반영 |
