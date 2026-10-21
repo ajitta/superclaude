@@ -583,6 +583,47 @@ _GATE_PHRASES = [
         "content goes back to review) or accepted; work run from a plan is done "
         "only after this",
     ),
+    # A plan becomes complete on the user's yes to /sc:reflect, not on a green
+    # Proof (docs/features/plan-complete-order).
+    (
+        "implement Integrate",
+        "The plan stays `implementing`: /sc:implement never sets it `complete`; "
+        "the user does, on the /sc:reflect Plan-Close proposal, after the review, "
+        "test and reflect gates",
+    ),
+    (
+        "implement Integrate",
+        "a red re-run, or a Critical or Important finding in this plan's work, "
+        "sets a `complete` plan back to `implementing`",
+    ),
+    (
+        "reflect Plan-Close",
+        "(1) every task box is checked and the `## Proof` footer carries a "
+        "`Result:` line from a green run, or with the user's recorded acceptance, "
+        "naming the last commit that changed code; (2) no commit after that sha "
+        "changes code; (3) no fix to a Critical or Important review finding waits "
+        "for another review round",
+    ),
+    ("reflect Plan-Close", "and write it only when the user says yes"),
+    ("intent Run", "reflect's Persist and Plan-Close → propose, write nothing"),
+    (
+        "intent Report",
+        "the steps left to the user (setting the plan `complete`, merge, push)",
+    ),
+    (
+        "gates",
+        "the plan (index) reaches `complete` here, on the user's yes to the "
+        "/sc:reflect Plan-Close proposal",
+    ),
+    (
+        "rules",
+        "the status is set on the user's yes to the /sc:reflect Plan-Close proposal",
+    ),
+    ("README implement row", "the plan stays `implementing`"),
+    (
+        "README reflect row",
+        "it proposes marking the plan `complete`, which you confirm",
+    ),
 ]
 
 
@@ -590,19 +631,23 @@ def _gate_texts() -> dict[str, str]:
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
     gates = re.search(r"<workflow_gates>(.*?)</workflow_gates>", rules, re.S)
     assert gates, "RULES_DOCS.md has no <workflow_gates>"
-    texts = {"gates": gates.group(1)}
+    texts = {"gates": gates.group(1), "rules": rules}
     for name, step in (
         ("test", "Report"),
         ("review", "Process"),
         ("implement", "Integrate"),
+        ("reflect", "Plan-Close"),
+        ("intent", "Run"),
+        ("intent", "Report"),
     ):
         body = _read(_SRC / "commands" / f"{name}.md")
-        line = re.search(rf"^\s*\d+\. {step}:.*$", body, re.M)
+        line = re.search(rf"^\s*\d+(?:\.\d+)?\. {step}(?: \([^)]*\))?:.*$", body, re.M)
         assert line, f"{name}.md has no {step} step"
         texts[f"{name} {step}"] = line.group(0)
     readme = _read(_README)
     for name, row in (
         ("review", "/sc:review --scope branch"),
+        ("implement", "/sc:implement --plan"),
         ("reflect", "/sc:reflect"),
     ):
         line = re.search(rf"^\| `{re.escape(row)}` \|.*$", readme, re.M)

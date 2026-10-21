@@ -55,7 +55,7 @@ Frontmatter rules:
   Feature README: {feature, phase, owner, created, updated, related?}. Phase enum: intent | discovery | design | planning | implementing | complete | abandoned
   Phase doc (inside feature folder): {status, revised} — new docs start `status: draft` (00-intent: `approved-for-plan`, written only after its Approve step or a `/sc:intent --through` request), `revised: <today>`
   Standalone specs/+plans/: {status, revised}
-  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`) and, for the plan (index), its `## Proof` footer carries a `Result:` line naming the last commit that changed code, from a green run or with the user's recorded acceptance (/sc:implement Integrate step); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
+  Plan docs (feature or standalone): `status: complete` only when every task checkbox is checked (a task dropped by decision: `- [x] ~~task~~`) and, for the plan (index), its `## Proof` footer carries a `Result:` line naming the last commit that changed code, from a green run or with the user's recorded acceptance (/sc:implement Integrate step writes the line; the status is set on the user's yes to the /sc:reflect Plan-Close proposal); departures from the plan, drops included, go under `## Deviations` in the same commit as the code that departed
   Standalone research/+analysis/: optional {status, revised}
   Reports/ADRs: none
 Status enum (per-doc): draft | review | approved-for-plan | implementing | complete | deprecated
@@ -85,6 +85,6 @@ Examples:
     /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; the Proof ran on the last code commit (`Result:` line)
     /sc:review -> fix -> /sc:review: a fix to a Critical or Important review finding that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria (the review packet in RULES.md Intent Propagation); rounds stop when a review round finds no Critical or Important finding, or the user has accepted the ones it found unfixed or waived the review of their fix; leftover Suggestions are reported, not reviewed again. A `/sc:intent --through` run keeps its single fix round; its /sc:test step names the fix that went unreviewed
     /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
-    /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that changes reviewed code or shipped content goes back to review, above) or accepted by the user
+    /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that changes reviewed code or shipped content goes back to review, above) or accepted by the user; the plan (index) reaches `complete` here, on the user's yes to the /sc:reflect Plan-Close proposal
   </workflow_gates>
 </component>

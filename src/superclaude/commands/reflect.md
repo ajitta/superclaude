@@ -16,6 +16,7 @@ description: Reflect on and validate a multi-step task — surface assumptions, 
     2.5. Misunderstanding-Audit: spot moments user intent misread this session. Each: what trigger misread, what actual intent, what rule stop it. List the ones not yet stored as proposed feedback memories for the Persist step.
   3. Reflect: weigh done-criteria
     3.5. Gotchas-Gardening: if `.claude/rules/gotchas/` exist, check: (a) files with `# Last reviewed:` older 90 days → warn, (b) `paths:` glob match zero files in project → warn stale pattern, (c) gotcha entries cite identifiers not in codebase → warn maybe stale.
+    3.6. Plan-Close: when the work ran from a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan) whose plan (index) is `status: implementing`, check three conditions in the plan file and `git log`, without re-running its Proof: (1) every task box is checked and the `## Proof` footer carries a `Result:` line from a green run, or with the user's recorded acceptance, naming the last commit that changed code; (2) no commit after that sha changes code; (3) no fix to a Critical or Important review finding waits for another review round. All three hold → propose setting the plan `status: complete` and the feature README `phase: complete` in one docs-only commit, and write it only when the user says yes. A code commit after the `Result:` sha → send the work to /sc:test first. Otherwise name the condition that fails; the plan stays `implementing`
   4. Persist: propose learnings and feedback memories for /sc:save; write them only when the user agrees
   </flow>
 
@@ -42,7 +43,7 @@ description: Reflect on and validate a multi-step task — surface assumptions, 
 
   <bounds>
     <does>full reflection, cross-session learning, qualitative rule-effectiveness analysis (misread audit and improvement narrative).</does>
-    <never>overrides completion status, bypasses integrity checks, or produces quantitative rule statistics (delegate those to /sc:analyze --focus rules).</never>
+    <never>sets a plan `complete` without the user's yes or with a Plan-Close condition unmet, bypasses integrity checks, or produces quantitative rule statistics (delegate those to /sc:analyze --focus rules).</never>
   </bounds>
 
   <handoff next="/sc:improve /sc:troubleshoot"/>
