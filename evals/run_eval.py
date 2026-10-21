@@ -527,7 +527,8 @@ def _check_one(
         return m is None, m.group(0) if m else ""
     if ctype == "skill_called":
         hits = [s for s in skills_called or [] if re.search(check["pattern"], s)]
-        return bool(hits), f"called={skills_called or []}"
+        ok = bool(hits) and len(hits) <= check.get("max", len(hits))
+        return ok, f"called={skills_called or []}"
     if ctype == "skill_not_called":
         hits = [s for s in skills_called or [] if re.search(check["pattern"], s)]
         return not hits, f"called={skills_called or []}"

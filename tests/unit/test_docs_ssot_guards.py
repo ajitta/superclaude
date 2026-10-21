@@ -530,8 +530,12 @@ _GATE_ANCHORS = {
         "/sc:reflect -> done",
         "on the user's yes to Plan-Close",
         "names the fix left unreviewed",
+        "or accepted by the user",
+        "no code commit follows the Proof's `Result:` sha",
     ],
     "rules": [
+        "only when every task checkbox is checked",
+        "no commit after that line's sha changes code",
         "the user sets `complete` at the /sc:reflect Plan-Close step",
         "back to `implementing`",
     ],
@@ -544,13 +548,14 @@ _GATE_ANCHORS = {
     "review Process": [
         "Critical or Important",
         "comes back for another round",
+        "the user accepts the open findings or waives the re-review",
         "acceptance criteria",
         "no Critical or Important finding",
         "Suggestions",
         "single fix round",
     ],
     "implement Integrate": [
-        "never sets",
+        "never sets the plan (index) or the README `complete`",
         "Plan-Close",
         "back to `implementing`",
         "rewrites `Result:`",
@@ -558,26 +563,35 @@ _GATE_ANCHORS = {
         "even when its Proof is green",
         "single fix round",
     ],
-    "implement Load": ["goes straight to the Integrate step's Proof re-run"],
+    "implement Load": [
+        "has a code commit after it goes straight to the Integrate step's Proof re-run"
+    ],
     "reflect Plan-Close": [
         "every task box is checked",
         "is green or marked accepted by the user",
         "no commit after its sha changes code",
+        "(3) no fix to a Critical or Important review finding",
+        "an open box or a code commit after the `Result:` sha",
         "another /sc:review round",
         "only when the user says yes",
         "in a feature folder",
         "/sc:implement --plan",
         "back to `implementing`",
     ],
-    "reflect bounds": ["without the user's yes"],
+    "reflect bounds": ["without the user's yes or with a Plan-Close condition unmet"],
     "intent Run": [
+        "ask nothing",
+        "Stop and report instead when a choice cannot be undone or reaches other people",
         "fix the Critical and Important ones once",
         "rewrite `Result:`",
         "Plan-Close → propose, write nothing",
         "leave the step Plan-Close names to the Report step",
     ],
     "intent Report": ["Plan-Close result", "setting the plan `complete`"],
-    "README implement row": ["stays `implementing`"],
+    "README implement row": [
+        "no code commit follows the plan's `Result:` sha",
+        "stays `implementing`",
+    ],
     "README review row": ["reviewed again", "acceptance criteria"],
     "README reflect row": ["done only after this", "which you confirm"],
     "README --through": ["leaves marking the plan complete"],
@@ -672,6 +686,16 @@ def test_readme_chains_end_at_a_workflow_gate():
         if re.search(r"/sc:test`?\s*(->|→)\s*done", _read(p))
     ]
     assert not retired, f"retired /sc:test -> done gate named in: {retired}"
+    # Plan-Close condition (2) is "no code commit after the Result: sha"; the
+    # older "Result: names the last code commit" wording contradicts it.
+    stale = [
+        str(p.relative_to(_SRC))
+        for p in _SRC.rglob("*.md")
+        if re.search(r"last (?:code commit|commit that changed code)", _read(p))
+    ]
+    if re.search(r"last (?:code commit|commit that changed code)", text):
+        stale.append("README.md")
+    assert not stale, f"old Result: wording in: {stale}"
     # Other README chains that run /sc:plan end with /sc:reflect too.
     for goal in ("Investigate a bug", "Refactor"):
         row = re.search(rf"^\| \*\*{goal}\*\* \| (.*) \|$", text, re.M)

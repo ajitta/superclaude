@@ -85,6 +85,17 @@ revised: 2026-10-22
 - [x] Step 5: review 포인터를 acceptance criteria 문장으로, RULES_DOCS:58 괄호를 문장으로, README `--through`와 intent Run의 `Result:`, 기록, `import re`
 - [x] Commit Phase 5: `fix: Plan-Close closes after a Proof re-run; honest proposal check; grading data guards each regex rule`
 
+## Phase 6: 06b 반영 (one commit)
+
+[06b-verify-round3](./06b-verify-round3.md)(Important 1, Suggestion 5).
+
+- [x] Step 1: Plan-Close 조건 (2)의 사본 넷(RULES_DOCS 상태 규칙과 implement 게이트, README implement 행, CHANGELOG)을 reflect와 같은 뜻으로. 옛 문구("last code commit")를 shipped 본문 전체에서 막는 가드
+- [x] Step 2: 앵커 아홉. `skill_called`에 `max`, `intent-through-*`는 `/sc:review` 두 번까지(저장된 run 열 개 모두 두 번)
+- [x] Step 3: `reflect-plan-close`: "propose … complete" 갈래, 거절 guard(`output_not_regex`), 채점 답 셋
+- [x] Step 4: Plan-Close가 실패 넷 모두에 단계를 준다. implement Load는 --plan 유무로 먼저 나눈다
+- [x] Step 5: 재리뷰 채점 문장 규칙 주석 바로잡기, 규칙 3에 둘. 빈 줄, Deviations, README
+- [ ] Commit Phase 6: `fix: one wording for Plan-Close condition 2 in every copy; --through review count; refusal guard`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
@@ -97,6 +108,11 @@ revised: 2026-10-22
 - 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
 
 ## Deviations
+
+- Phase 6: 06b가 제안한 거절 guard는 저장된 올바른 답 하나("did not re-run it, as the Plan-Close step says")를 거절로 읽었다. "Plan-Close"의 "Close"를 동사로 본 탓이다. 하이픈 뒤 낱말은 빼고, 그 답을 채점 테스트에 넣었다. 저장된 `reflect-plan-close` run 열 개를 다시 채점: 바꾼 뒤 9/9 통과, 바꾸기 전 1/1 실패. 변이 10건 모두 red(`$TMPDIR/pco/mut6.py`).
+
+- Phase 4: review의 "with no claim that they are fixed"를 지웠다. inline round에서는 `RULES.md` Intent Propagation 포인터만 남는다(06b 6).
+- Phase 5는 reflect의 조건 (2)만 바꾸고 같은 조건의 사본 넷을 그대로 두었다(06b 1). 규칙을 바꿀 때 사본을 함께 찾지 않은 탓이다. Phase 6에서 넷을 고치고 옛 문구 가드를 더했다.
 
 - Phase 5 뒤 canary(e87f9aa0, `$TMPDIR/pco/r5/x3`): `reflect-plan-close`의 올바른 제안("sets `05-plan.md` to `status: complete`")이 성공 check에서 떨어졌다. 동사와 `complete` 사이의 파일 이름 점을 문장 끝으로 읽었다. 낱말 안의 점은 넘기게 고쳤다. 저장된 run 열 개를 다시 채점: 바꾼 뒤 9/9 통과, 바꾸기 전 1/1 실패.
 

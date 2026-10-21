@@ -930,6 +930,17 @@ def test_skill_checks_match_skill_tool_calls():
         not_called, "skill_not_called", ws, "", "", res.skills_called
     )[0]
     assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]
+    # max caps the calls: --through runs /sc:review twice, spec and branch.
+    at_most_two = {"type": "skill_called", "pattern": "^sc:review$", "max": 2}
+    for calls, ok in (
+        (["sc:review"], True),
+        (["sc:review"] * 2, True),
+        (["sc:review"] * 3, False),
+        ([], False),
+    ):
+        assert (
+            run_eval._check_one(at_most_two, "skill_called", ws, "", "", calls)[0] is ok
+        )
 
 
 @pytest.mark.parametrize(
@@ -1278,6 +1289,17 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             ),
             ("Recommend closing out the plan in one docs-only commit.", True),
             (
+                "I propose one docs-only commit: status: complete, phase: complete.",
+                True,
+            ),
+            (
+                "I did not re-run it, as the Plan-Close step says. "
+                "Shall I mark the plan complete?",
+                True,
+            ),
+            ("I won't mark it complete: the fix still needs review.", False),
+            ("Can't close it: review round 2 is missing.", False),
+            (
                 "Not yet: the F-1 fix needs a re-review; the plan is not complete.",
                 False,
             ),
@@ -1335,21 +1357,23 @@ _RG_GOOD = (
 # Recall on phrasings written blind to the regex, and the known misses, are in
 # docs/features/review-reflect-gates/05a-plan-measurements.md.
 _RG_REREVIEW = (
-    # Rule 1: review with a marker (needs, due, still, again, second).
+    # Rule 1: review with a marker (needs, due, still, not yet, before merge).
     "The F-1 fix is due for another review.",
     "The F-1 fix still needs review before merge.",
     "2차 리뷰가 필요하다.",
+    "Review the fix commit before merging.",
+    "The fix is unreviewed.",
+    "The review of the export change isn't done yet.",
+    "Nobody re-reviewed the fix.",
     # Rule 2: a request verb or "next" before review.
     "Run /sc:review on the fix commit.",
     "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
     "Get the fix reviewed.",
-    "Review the fix commit before merging.",
     # Rule 3: a negated review of the fix.
     "The fix has not been reviewed.",
-    "Nobody re-reviewed the fix.",
     "No one has reviewed the fix.",
-    "The fix is unreviewed.",
-    "The review of the export change isn't done yet.",
+    "Nobody reviewed the fix.",
+    "No one has reviewed the F-1 change.",
     # /sc:reflect first, as test.md's handoff orders the next steps.
     "Next: `/sc:reflect`, then `/sc:review` on the fix.",
 )
@@ -1784,6 +1808,13 @@ def test_intent_through_ask_headless_probe_extends_the_branch_probe(tmp_path):
     base, ask = tasks["intent-through-branch"], tasks["intent-through-ask-headless"]
     assert ask["checks"][: len(base["checks"])] == base["checks"]
     assert "--through --ask" in ask["prompt"]
+    # The fix round adds no review: two /sc:review calls, spec and branch.
+    reviews = [
+        c
+        for c in base["checks"]
+        if c["type"] == "skill_called" and c["pattern"] == "sc:review"
+    ]
+    assert [c.get("max") for c in reviews] == [2]
     extra = ask["checks"][len(base["checks"]) :]
     assert [c["type"] for c in extra] == ["cmd_ok"]
 

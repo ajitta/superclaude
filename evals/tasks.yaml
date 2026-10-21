@@ -678,14 +678,19 @@ tasks:
       - *plan_not_complete
       - *readme_not_complete
       # The answer names `complete` as a status change: a `→ complete` edit,
-      # or a verb that marks, sets or closes the plan. It cannot tell a
-      # proposal from a refusal or a deferral ("I'm not proposing the
-      # `complete` commit" passes); the two status checks above are the
-      # guard. The /sc:reflect before Plan-Close named no such change.
+      # a verb that marks, sets or closes the plan, or a proposal; and it
+      # does not refuse one ("Plan-Close" is a name, not a verb). Refusals
+      # that use no negation still pass; the
+      # two status checks above are the guard. The /sc:reflect before
+      # Plan-Close named no such change.
       - type: output_regex
         tag: success
         pattern: >-
-          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b
+          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b|\bpropos\w*\b(?:[^.\n?]|\.(?=\S)){0,80}\bcomplete\b
+      - type: output_not_regex
+        tag: success
+        pattern: >-
+          (?i)\b(?:not|never|won't|cannot|can't|don't|do\s+not)\b[^.\n]{0,25}(?<!-)\b(?:mark|set|clos\w*|propos\w*)\b|\bnot\s+met\b|\bconditions?\s*\(?\d\)?\s*(?:fails|is\s+not)
       - *no_py_change
       - *review_untouched
 
@@ -843,7 +848,8 @@ tasks:
       # The chain ran its steps through the Skill tool.
       - {type: skill_called, tag: success, pattern: 'sc:brainstorm'}
       - {type: skill_called, tag: success, pattern: 'sc:implement'}
-      - {type: skill_called, tag: success, pattern: 'sc:review'}
+      # Two reviews, spec and branch: the fix round adds none.
+      - {type: skill_called, tag: success, pattern: 'sc:review', max: 2}
       - {type: skill_called, tag: success, pattern: 'sc:reflect'}
       # Nothing marked complete on the branch: the plan (index) and the
       # feature README wait for the user's yes to Plan-Close.
@@ -985,7 +991,8 @@ tasks:
       # The chain ran its steps through the Skill tool.
       - {type: skill_called, tag: success, pattern: 'sc:brainstorm'}
       - {type: skill_called, tag: success, pattern: 'sc:implement'}
-      - {type: skill_called, tag: success, pattern: 'sc:review'}
+      # Two reviews, spec and branch: the fix round adds none.
+      - {type: skill_called, tag: success, pattern: 'sc:review', max: 2}
       - {type: skill_called, tag: success, pattern: 'sc:reflect'}
       - *through_left_open
       # Headless there is no one to ask: no decision may be recorded as
