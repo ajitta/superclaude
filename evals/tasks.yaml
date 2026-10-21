@@ -677,13 +677,15 @@ tasks:
       # The plan and the feature stay as they are without the user's yes.
       - *plan_not_complete
       - *readme_not_complete
-      # The answer proposes closing the plan: a `→ complete` change, or a
-      # verb that marks, sets or closes it, not negated. A refusal ("the
-      # plan is not complete", "cannot mark it complete") fails.
+      # The answer names `complete` as a status change: a `→ complete` edit,
+      # or a verb that marks, sets or closes the plan. It cannot tell a
+      # proposal from a refusal or a deferral ("I'm not proposing the
+      # `complete` commit" passes); the two status checks above are the
+      # guard. The /sc:reflect before Plan-Close named no such change.
       - type: output_regex
         tag: success
         pattern: >-
-          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|(?<!not\s)(?<!cannot\s)(?<!can't\s)\b(?:mark|set|close|flip|update)\w*\b[^.\n?]{0,60}\bcomplete\b|\bclose\s(?:it|the\splan|csv-export)\b[^.\n]*\?
+          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update)\w*\b[^.\n?]{0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b
       - *no_py_change
       - *review_untouched
 

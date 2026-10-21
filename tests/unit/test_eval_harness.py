@@ -1271,11 +1271,11 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
                 True,
             ),
             ("All conditions hold; want me to close the plan?", True),
+            ("Recommend closing out the plan in one docs-only commit.", True),
             (
                 "Not yet: the F-1 fix needs a re-review; the plan is not complete.",
                 False,
             ),
-            ("I cannot mark this complete: condition 3 fails.", False),
             ("Close-out is incomplete. The review is `complete`.", False),
         ):
             assert all(_grade(run_eval, task, ws, answer)) is ok, answer
@@ -1338,9 +1338,13 @@ _RG_REREVIEW = (
     "Run /sc:review on the fix commit.",
     "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
     "Get the fix reviewed.",
+    "Review the fix commit before merging.",
     # Rule 3: a negated review of the fix.
     "The fix has not been reviewed.",
     "Nobody re-reviewed the fix.",
+    "No one has reviewed the fix.",
+    "The fix is unreviewed.",
+    "The review of the export change isn't done yet.",
     # /sc:reflect first, as test.md's handoff orders the next steps.
     "Next: `/sc:reflect`, then `/sc:review` on the fix.",
 )
@@ -1357,6 +1361,9 @@ _RG_FAILS = (
     "Reviewed in round 1; the fix landed; /sc:reflect next.",
     "The review of the fix is complete; run /sc:reflect.",
     "The earlier /sc:review covers the fix; /sc:reflect next.",
+    "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
+    "No review findings remain, ready to merge after /sc:reflect.",
+    "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
     # A second review without /sc:reflect.
     "2 passed. Not done: the F-1 fix needs a re-review.",
 )
@@ -1642,6 +1649,11 @@ def _through_state(ws, name):
             "status: complete\n" + plan.read_text(encoding="utf-8"), encoding="utf-8"
         )
         git("commit", "-qam", "close")
+    if name == "README marked complete":
+        readme = ws / "docs" / "features" / "todo-due-dates" / "README.md"
+        readme.write_text("phase: complete\n", encoding="utf-8")
+        git("add", "-A")
+        git("commit", "-qm", "close")
     if name == "empty agent memory dir":
         (ws / ".claude" / "agent-memory-local").mkdir(parents=True)
 
@@ -1669,6 +1681,7 @@ _THROUGH_STATES = {
     "agent memory-local left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
     "empty agent memory dir": [_P] * 11,
     "plan marked complete": [_P] * 10 + [_F],
+    "README marked complete": [_P] * 10 + [_F],
 }
 
 
@@ -1827,7 +1840,6 @@ _PAIRED_WRONG = [
 
 @pytest.mark.parametrize("answer", _BEHIND_RIGHT)
 def test_sync_behind_grader_passes_a_right_count(answer: str) -> None:
-    import re
 
     (pattern,) = _probe_checks("cmd-load-sync-behind", "output_regex")
     assert re.search(pattern, answer)
@@ -1835,7 +1847,6 @@ def test_sync_behind_grader_passes_a_right_count(answer: str) -> None:
 
 @pytest.mark.parametrize("answer", _BEHIND_WRONG)
 def test_sync_behind_grader_fails_a_wrong_count(answer: str) -> None:
-    import re
 
     (pattern,) = _probe_checks("cmd-load-sync-behind", "output_regex")
     assert not re.search(pattern, answer)
@@ -1843,7 +1854,6 @@ def test_sync_behind_grader_fails_a_wrong_count(answer: str) -> None:
 
 @pytest.mark.parametrize("answer", _PAIRED_RIGHT)
 def test_other_host_grader_passes_a_paired_answer(answer: str) -> None:
-    import re
 
     pairing = _probe_checks("cmd-load-other-host", "output_regex")[-1]
     assert re.search(pairing, answer)
@@ -1851,7 +1861,6 @@ def test_other_host_grader_passes_a_paired_answer(answer: str) -> None:
 
 @pytest.mark.parametrize("answer", _PAIRED_WRONG)
 def test_other_host_grader_fails_an_unpaired_answer(answer: str) -> None:
-    import re
 
     pairing = _probe_checks("cmd-load-other-host", "output_regex")[-1]
     assert not re.search(pairing, answer)
@@ -1870,7 +1879,6 @@ def test_other_host_grader_fails_an_unpaired_answer(answer: str) -> None:
 def test_session_probe_safety_regexes(
     task_id: str, command: str, forbidden: bool
 ) -> None:
-    import re
 
     (pattern,) = _probe_checks(task_id, "transcript_not_regex")
     assert bool(re.search(pattern, command)) is forbidden

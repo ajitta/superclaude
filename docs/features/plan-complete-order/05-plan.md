@@ -74,6 +74,17 @@ revised: 2026-10-22
 - [x] Step 6: 변이 16건 모두 red(`$TMPDIR/pco/mutate_clean.py`). 저장된 `reflect-plan-close` run을 새 check로 다시 채점: 바꾼 뒤 3/3 통과, 바꾸기 전 1/1 실패
 - [x] Commit Phase 4: `refactor: one statement per rule after the patchwork audit; Plan-Close sends to /sc:implement; --through left open`
 
+## Phase 5: 06a 반영 (one commit)
+
+[06a-verify-cleanup](./06a-verify-cleanup.md)(Important 3, Suggestion 7).
+
+- [x] Step 1: Plan-Close 조건 (2)를 "no commit after its sha changes code"로. implement Load에 상자가 다 찬 계획의 Proof 재실행 진입. phase 파일 문장을 "only when all its boxes are checked"로
+- [x] Step 2: `reflect-plan-close` check: 과적합한 부정 lookbehind를 빼고 주석을 실제 한계대로, `clos(?:e|ing)`
+- [x] Step 3: 재리뷰 채점 문장 일곱 개 복귀·추가(06a 3). `through_left_open`의 README 상태
+- [x] Step 4: 가드: 약화어 목록 확장, 앵커 다섯, `rules`는 Plan docs 줄만
+- [x] Step 5: review 포인터를 acceptance criteria 문장으로, RULES_DOCS:58 괄호를 문장으로, README `--through`와 intent Run의 `Result:`, 기록, `import re`
+- [ ] Commit Phase 5: `fix: Plan-Close closes after a Proof re-run; honest proposal check; grading data guards each regex rule`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
@@ -86,6 +97,8 @@ revised: 2026-10-22
 - 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
 
 ## Deviations
+
+- Phase 4에서 Deviations에 적지 않고 빠진 구절 둘(06a 10): "after the review, test and reflect gates"(Plan-Close 조건이 대신한다), 재리뷰 문장의 "before done"("goes back to /sc:review for another round"가 대신한다).
 
 - 04-design B′ 표 6행의 "`Result:` 뒤 코드 커밋 → `/sc:test`"는 풀 수 없는 고리였다(06-verify 1, 감사 1). Phase 4에서 `/sc:implement --plan`(Proof 재실행, `Result:` 갱신)으로 바꿨다.
 - 감사 재작성안의 implement 문장에서 "(linked from the phase file's header)", "`status: complete` with an open box is a defect", "before done is claimed again"이 빠졌다. 앞의 둘은 `test_plan_checklist.py`와 phase 파일 문장이 맡는다.

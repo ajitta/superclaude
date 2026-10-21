@@ -528,9 +528,13 @@ _GATE_ANCHORS = {
         "/sc:test -> /sc:reflect",
         "goes to /sc:reflect",
         "/sc:reflect -> done",
-        "Plan-Close",
+        "on the user's yes to Plan-Close",
+        "names the fix left unreviewed",
     ],
-    "rules": ["the user sets `complete` at the /sc:reflect Plan-Close step"],
+    "rules": [
+        "the user sets `complete` at the /sc:reflect Plan-Close step",
+        "back to `implementing`",
+    ],
     "test Report": [
         "not done until /sc:reflect",
         "Critical or Important",
@@ -540,7 +544,7 @@ _GATE_ANCHORS = {
     "review Process": [
         "Critical or Important",
         "comes back for another round",
-        "Intent Propagation",
+        "acceptance criteria",
         "no Critical or Important finding",
         "Suggestions",
         "single fix round",
@@ -554,9 +558,11 @@ _GATE_ANCHORS = {
         "even when its Proof is green",
         "single fix round",
     ],
+    "implement Load": ["goes straight to the Integrate step's Proof re-run"],
     "reflect Plan-Close": [
         "every task box is checked",
-        "last commit that changed code",
+        "is green or marked accepted by the user",
+        "no commit after its sha changes code",
         "another /sc:review round",
         "only when the user says yes",
         "in a feature folder",
@@ -565,6 +571,8 @@ _GATE_ANCHORS = {
     ],
     "reflect bounds": ["without the user's yes"],
     "intent Run": [
+        "fix the Critical and Important ones once",
+        "rewrite `Result:`",
         "Plan-Close → propose, write nothing",
         "leave the step Plan-Close names to the Report step",
     ],
@@ -574,17 +582,27 @@ _GATE_ANCHORS = {
     "README reflect row": ["done only after this", "which you confirm"],
     "README --through": ["leaves marking the plan complete"],
 }
-_SOFTENER = re.compile(r"\b(may|might|optionally|if needed|consider)\b", re.I)
+# Words that soften a rule into a suggestion. Added conditions and moved
+# clauses are left to the canary probes.
+_SOFTENER = re.compile(
+    r"\b(may|might|optionally|if needed|consider|could|ideally|where useful|"
+    r"where possible|if you like|preferably|try to|unless|need not|no longer|"
+    r"when convenient)\b",
+    re.I,
+)
 
 
 def _gate_texts() -> dict[str, str]:
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
     gates = re.search(r"<workflow_gates>(.*?)</workflow_gates>", rules, re.S)
     assert gates, "RULES_DOCS.md has no <workflow_gates>"
-    texts = {"gates": gates.group(1), "rules": rules}
+    plan_docs = re.search(r"^\s*Plan docs \(feature or standalone\):.*$", rules, re.M)
+    assert plan_docs, "RULES_DOCS.md has no Plan docs line"
+    texts = {"gates": gates.group(1), "rules": plan_docs.group(0)}
     for name, step in (
         ("test", "Report"),
         ("review", "Process"),
+        ("implement", "Load"),
         ("implement", "Integrate"),
         ("reflect", "Plan-Close"),
         ("intent", "Run"),
@@ -620,8 +638,7 @@ def test_review_reflect_gate_anchors(where):
     text = _gate_texts()[where]
     missing = [a for a in _GATE_ANCHORS[where] if a not in text]
     assert not missing, f"{where} lost {missing}"
-    if where != "rules":
-        assert not _SOFTENER.search(text), where
+    assert not _SOFTENER.search(text), where
 
 
 def test_readme_chains_end_at_a_workflow_gate():

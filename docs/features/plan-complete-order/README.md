@@ -18,3 +18,6 @@ related: ../../analysis/review-reflect-gate-gap-ajitta-2026-10-21.md
 - [04-design.md](./04-design.md): 설계안. 안 A·B·C와 권고, 확정안 B′
 - [04a-design-verify.md](./04a-design-verify.md): 설계안 독립 검증(opus high), 권고 수정
 - [05-plan.md](./05-plan.md): implementation plan
+- [06-verify.md](./06-verify.md): 구현 독립 검증(opus high), 조건부 통과
+- [06a-verify-cleanup.md](./06a-verify-cleanup.md): 누더기 감사 반영 뒤 독립 검증, 조건부 통과
+- 누더기 감사: [patchwork-audit-ajitta-2026-10-22](../../analysis/patchwork-audit-ajitta-2026-10-22.md)
