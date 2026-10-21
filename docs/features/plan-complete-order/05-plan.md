@@ -124,7 +124,7 @@ revised: 2026-10-22
 - [x] Step 2: review-due 프로브에 "all three conditions hold" 거절 check. 성공 정규식의 `commit`은 `commit status: complete` 꼴로만
 - [x] Step 3: 되돌림 문장: 수락되지 않은 red 또는 조건 (3) 실패만, 그 밖의 실패는 `complete` 그대로
 - [x] Step 4: 앵커 넷(부정 "neither … nor", Proof 재실행 우회, 수락 규칙 둘)
-- [ ] Commit Phase 9: `fix: Plan-Close defines a fix waiting for review; review-due probe fails a closable verdict`
+- [x] Commit Phase 9: `fix: Plan-Close defines a fix waiting for review; review-due probe fails a closable verdict`
 
 ## Integration (커밋 아님)
 
