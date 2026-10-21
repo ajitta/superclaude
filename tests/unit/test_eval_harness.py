@@ -1300,6 +1300,9 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             ("I won't mark it complete: the fix still needs review.", False),
             ("Can't close it: review round 2 is missing.", False),
             ("It isn't ready to mark complete yet.", False),
+            ("Shall I commit `status: complete` for the plan?", True),
+            ("I suggest moving the plan to complete in one docs-only commit.", True),
+            ("You shouldn't mark it complete while F-1 is open.", False),
             ("It cannot be marked complete yet, because the fix is unreviewed.", False),
             (
                 "Not yet: the F-1 fix needs a re-review; the plan is not complete.",

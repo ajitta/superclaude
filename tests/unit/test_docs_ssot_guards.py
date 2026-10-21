@@ -536,7 +536,7 @@ _GATE_ANCHORS = {
     "rules": [
         "only when every task checkbox is checked",
         "no commit after that line's sha changes code",
-        "a Critical or Important finding in its work sets a `complete` plan back to `implementing`",
+        "finding in its work sets a `complete` plan back",
         "the user sets `complete` at the /sc:reflect Plan-Close step",
         "back to `implementing`",
     ],
@@ -565,8 +565,8 @@ _GATE_ANCHORS = {
         "single fix round",
     ],
     "implement Load": [
-        "is missing or has a code commit after its sha goes straight to the "
-        "Integrate step's Proof re-run"
+        "is missing or has a code commit after its sha",
+        "Proof re-run",
     ],
     "reflect Plan-Close": [
         "every task box is checked",
@@ -575,6 +575,10 @@ _GATE_ANCHORS = {
         "(3) every Critical or Important review finding is fixed or accepted",
         "an open box, a missing `Result:` line or a code commit after its sha",
         "an open finding or a red `Result:` to the user",
+        "whose `Result:` is red or whose condition (3) fails",
+        "is proposed back to `implementing`",
+        "only needs the Proof re-run",
+        "the review findings and `git log`",
         "another /sc:review round",
         "only when the user says yes",
         "in a feature folder",
@@ -584,7 +588,9 @@ _GATE_ANCHORS = {
     "reflect bounds": ["without the user's yes or with a Plan-Close condition unmet"],
     "intent Run": [
         "ask nothing",
-        "Stop and report instead when a choice cannot be undone or reaches other people",
+        "Stop and report instead",
+        "cannot be undone or reaches other people",
+        "a red Proof remains after one fix round",
         "fix the Critical and Important ones once",
         "rewrite `Result:`",
         "Plan-Close → propose, write nothing",

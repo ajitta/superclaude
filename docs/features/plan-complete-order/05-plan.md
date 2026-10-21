@@ -106,6 +106,16 @@ revised: 2026-10-22
 - [x] Step 4: 앵커는 바뀐 절과 되돌림 동사까지만. 약화어 목록은 늘리지 않는다(Deviations)
 - [x] Commit Phase 7: `fix: Plan-Close waits for open review findings; a plan with no Result: line goes back to implement`
 
+## Phase 8: 06d 반영 (one commit)
+
+[06d-verify-round5](./06d-verify-round5.md)(Important 1, Suggestion 4).
+
+- [x] Step 1: `complete` 계획의 되돌림 계기를 사본과 같게: red `Result:` 또는 조건 (3) 실패. `Result:` 뒤 코드 커밋(다른 기능의 것 포함)은 Proof 재실행만
+- [x] Step 2: Plan-Close의 근거에 리뷰 발견. CHANGELOG의 조건 (3)을 reflect와 같은 뜻으로
+- [x] Step 3: `reflect-plan-close`: 제안 동사 commit·change·move, 부정어 `shouldn't`, 채점 답 셋, 주석
+- [x] Step 4: 앵커를 짧게, `--through` 멈춤 조건 앵커, Deviations Phase 7의 가드 기록 바로잡기
+- [ ] Commit Phase 8: `fix: a complete plan reopens only on a red Result: or an open finding; Plan-Close reads the review findings`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
@@ -119,7 +129,9 @@ revised: 2026-10-22
 
 ## Deviations
 
-- Phase 7: 06c 4의 약화어 열세 개와 앵커 여섯은 넣지 않았다. 가드는 규칙의 삭제, 흔한 약화어, 되돌림 동사의 부정을 잡는다. 문맥에 따른 약화("usually", "should")와 조건 덧붙임은 낱말 목록으로는 끝이 없고, round마다 검증자의 예를 목록에 더하는 것이 감사가 걷어낸 덧댐이다. 그 몫은 canary probe다.
+- Phase 8: 06d 3의 거절 후보(부정어 `no`·`\w+n't`, 동사 commit·change·move)는 넣지 않았다. 저장된 실제 run 서른두 개로 다시 채점하자 올바른 제안 열여섯 중 열넷이 떨어졌다("No later code commits", "no feedback memories to propose", "haven't changed"). 검증자의 손으로 쓴 목록에서만 좋아진 패턴이다. 성공 쪽 동사만 넓히고 거절 쪽에는 `shouldn't` 하나를 더했다. 그 결과 저장된 run: 닫을 수 있는 계획의 답 15/15 통과, review-due 답(거절) 0/15 통과, 바꾸기 전 답 0/2 통과. 변이 7건 모두 red(`$TMPDIR/pco/mut8.py`, 되돌림 계기 앵커를 더한 뒤).
+
+- Phase 7: 06c 4의 약화어 열세 개와 앵커 여섯은 넣지 않았다. 가드는 앵커가 있는 구절의 삭제, 목록 안 약화어, 되돌림 동사의 부정을 잡는다. 앵커 없는 절의 삭제는 잡지 않는다(06d M5, M12, M22). 문맥에 따른 약화("usually", "should")와 조건 덧붙임은 낱말 목록으로는 끝이 없고, round마다 검증자의 예를 목록에 더하는 것이 감사가 걷어낸 덧댐이다. 그 몫은 canary probe다.
 
 - Phase 6: 06b가 제안한 거절 guard는 저장된 올바른 답 하나("did not re-run it, as the Plan-Close step says")를 거절로 읽었다. "Plan-Close"의 "Close"를 동사로 본 탓이다. 하이픈 뒤 낱말은 빼고, 그 답을 채점 테스트에 넣었다. 저장된 `reflect-plan-close` run 열 개를 다시 채점: 바꾼 뒤 9/9 통과, 바꾸기 전 1/1 실패. 변이 10건 모두 red(`$TMPDIR/pco/mut6.py`).
 

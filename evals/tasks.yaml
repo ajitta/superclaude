@@ -680,17 +680,17 @@ tasks:
       # The answer names `complete` as a status change: a `→ complete` edit,
       # a verb that marks, sets or closes the plan, or a proposal; and it
       # does not refuse one ("Plan-Close" is a name, not a verb). Refusals
-      # that use no negation still pass; the
-      # two status checks above are the guard. The /sc:reflect before
-      # Plan-Close named no such change.
+      # worded without a listed negation ("rather than", "wait on") still
+      # pass; the two status checks above are the guard. The /sc:reflect
+      # before Plan-Close named no such change.
       - type: output_regex
         tag: success
         pattern: >-
-          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b|\bpropos\w*\b(?:[^.\n?]|\.(?=\S)){0,80}\bcomplete\b
+          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update|commit|chang|mov)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b|\bpropos\w*\b(?:[^.\n?]|\.(?=\S)){0,80}\bcomplete\b
       - type: output_not_regex
         tag: success
         pattern: >-
-          (?i)\b(?:not|never|won't|cannot|can't|don't|isn't|do\s+not)\b[^.\n]{0,25}(?<!-)\b(?:mark\w*|set\w*|clos\w*|propos\w*)\b|\bnot\s+met\b|\bconditions?\s*\(?\d\)?\s*(?:fails|is\s+not)
+          (?i)\b(?:not|never|won't|cannot|can't|don't|isn't|shouldn't|do\s+not)\b[^.\n]{0,25}(?<!-)\b(?:mark\w*|set\w*|clos\w*|propos\w*)\b|\bnot\s+met\b|\bconditions?\s*\(?\d\)?\s*(?:fails|is\s+not)
       - *no_py_change
       - *review_untouched
 
