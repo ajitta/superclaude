@@ -125,3 +125,16 @@ revised: 2026-10-21
 
 - Claude Code의 Bash 도구가 사용자 셸 rc를 다시 읽어서, 지운 변수를 되살리는지는 `claude`를 띄울 수 없어 확인하지 않았다.
 - 발견 1의 수정은 임시 편집으로만 확인했다.
+
+## 반영 (2026-10-21, claude-box, Phase 12)
+
+| # | 처리 |
+|---|---|
+| 1 (Important) | 반영: `run_eval.BYTECODE_ENV`(`PYTHONDONTWRITEBYTECODE`, `PYTHONPYCACHEPREFIX`, `PYTHONOPTIMIZE`) 하나를 프로브 세션과 단위 테스트의 `_pytest`·import 호출이 같이 쓴다. 세 변수를 각각 켠 셸에서 `test_eval_harness.py`가 통과한다(89 passed) |
+| 2 | 반영: `PYTHONOPTIMIZE`를 더했다. `test_probe_session_keeps_bytecode_on`이 기존 `fake_run` 꼴로 세션 env를 본다. 세 이름을 테스트가 직접 적어, 상수에서 하나를 빼도 red다 |
+| 3 | 반영: 규칙 2의 대상이 `review(?!ed)`다. "committed and then reviewed" 꼴의 서술은 요청이 아니다. 실패로 고정했다. heldout2·heldout3 값은 바뀌지 않았다 |
+| 목록·화살표 꼴 | 받아들임: 권고대로 정규식은 그대로 두고 05a의 miss 종류에 있다 |
+| 문서 | 반영: 05a에 heldout3 생성에서 뺀 문장 종류, 주석은 측정값(53–83%), 05-plan의 canary 표시는 "Phase 11·12는 command 본문을 바꾸지 않아 저장된 run을 다시 채점"으로 고쳤다 |
+| "표지마다 한 문장" | 정정: 06c 반영 표 5의 그 말은 과장이다. 표지 낱말 일곱(still, again, should, before merg, 다시 등)만 하나씩 지키고, 27개 대안 전부를 지키지는 않는다 |
+
+Mutation(메모리의 원본으로 되돌림): env pop 삭제, `BYTECODE_ENV`에서 `PYTHONOPTIMIZE` 삭제, 규칙 2의 `(?!ed)` 삭제. 3건 모두 red다.

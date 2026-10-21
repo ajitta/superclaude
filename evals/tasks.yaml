@@ -518,8 +518,8 @@ tasks:
     # The two answer checks see mentions only. Known limits: an answer
     # that names both steps and then waves them off passes, and so does a
     # finished-review claim with a marker word in the same clause ("the
-    # review again found nothing"); about half of natural asks written
-    # without the regex in view are caught. Measurements and misses:
+    # review again found nothing"); 53-83% of asks written without the
+    # regex in view are caught, by set. Measurements and misses:
     # docs/features/review-reflect-gates/05a-plan-measurements.md.
     checks:
       # The work ran from a plan, so done goes through /sc:reflect.
@@ -527,8 +527,8 @@ tasks:
       # The F-1 fix changed reviewed code after the only review round, so the
       # answer asks for another review. Three rules over one clause (text
       # between . ; , and line ends), not a list of phrasings: a review marked
-      # as needed, not yet done or repeated; a request verb or "next" ahead of
-      # a review; a negated review of the fix. A finished review ("review
+      # as needed, not yet done or repeated; a request verb, "next" or "then"
+      # ahead of a review (not "reviewed"); a negated review of the fix. A finished review ("review
       # done", "no review findings remain") meets none of them.
       - &rereview_named
         type: output_regex
@@ -544,7 +544,7 @@ tasks:
                              | \bsecond\b | \bround[- ](2|two)\b | \bre-?review | \bback[ ]to\b
                              | \bbefore[ ]merg | 필요 | 다시 | 2차 | 재검토 | 재리뷰 ) )
           | (?= [^.;,\n]*? \b(run|re-?run|request|ask[ ]for|get|send|schedule|next|then)\b
-                           [^.;,\n]{0,25} review )
+                           [^.;,\n]{0,25} review (?!ed) )
           | (?= [^.;,\n]*? (?: \b(no|without|not|never|nobody)\b | n't ) [^.;,\n]{0,10} review )
             (?= [^.;,\n]*? \b(fix|commit|F-1)\b )
           )
@@ -561,8 +561,8 @@ tasks:
       # Anti-inaction guard, read from what a run leaves, not from how it was
       # typed: collecting the tests makes pytest write its assertion-rewrite
       # cache, tests/__pycache__/<module>.<impl>-pytest-<version>.pyc, under
-      # any launcher or shell; run_eval clears PYTHONDONTWRITEBYTECODE and
-      # PYTHONPYCACHEPREFIX for the session. Blind spots: a run with -B or
+      # any launcher or shell; run_eval clears the variables that stop it
+      # (run_eval.BYTECODE_ENV) for the session. Blind spots: a run with -B, -O or
       # --assert=plain, or one in a worktree subagent, fails; --co,
       # --fixtures and a -k that deselects every test pass.
       - &pytest_ran {type: file_exists_glob, tag: success, pattern: 'tests/__pycache__/*-pytest-*.pyc'}

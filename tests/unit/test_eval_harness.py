@@ -6,6 +6,7 @@ rot silently — the same failure class the version-consistency suite closed.
 """
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -684,6 +685,30 @@ def test_insight_request_is_off_for_every_arm(tmp_path, monkeypatch):
     assert seen_env[-1].get("SUPERCLAUDE_INSIGHT_PROMPT") == "0"
 
 
+def test_probe_session_keeps_bytecode_on(tmp_path, monkeypatch):
+    """Probes read pytest's bytecode cache to see that tests ran, so the
+    session drops the variables that stop pytest writing it."""
+    run_eval = _import_run_eval()
+    seen_env: list[dict] = []
+    stream = json.dumps({"type": "result", "subtype": "success", "result": ""})
+
+    def fake_run(cmd, **kw):
+        seen_env.append(dict(kw.get("env") or {}))
+        return subprocess.CompletedProcess(cmd, 0, stdout=stream, stderr="")
+
+    monkeypatch.setattr(run_eval.subprocess, "run", fake_run)
+    stoppers = {"PYTHONDONTWRITEBYTECODE", "PYTHONPYCACHEPREFIX", "PYTHONOPTIMIZE"}
+    for name in stoppers:
+        monkeypatch.setenv(name, "1")
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    task = {"id": "t", "prompt": "do the thing", "checks": []}
+    run_eval.run_task(
+        "vanilla", task, ws, tmp_path / "cfg", tmp_path / "logs", "claude", "m", {}
+    )
+    assert not stoppers & set(seen_env[-1])
+
+
 def test_account_content_stays_out_of_every_arm(tmp_path, monkeypatch):
     """An empty CLAUDE_CONFIG_DIR is not enough: a claude.ai login syncs the
     account's plugins and skills into it during the first session (from the
@@ -1247,6 +1272,7 @@ _RG_FAILS = (
     "Called /sc:review earlier; F-1 fixed. /sc:reflect next.",
     "The review is complete and /sc:reflect is next.",
     "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
+    "The fix was committed and then reviewed; /sc:reflect next.",
     "No issues were found by the review of the fix; run /sc:reflect.",
     "Next I checked that the tests pass and that every review finding is resolved; /sc:reflect.",
     # A second review without /sc:reflect.
@@ -1266,12 +1292,19 @@ def _commit_all(ws, message):
     _git(ws, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", message)
 
 
+def _clean_env(run_eval):
+    # The same variables run_eval clears for a probe session, so a
+    # developer shell that sets one does not change these tests' result.
+    return {k: v for k, v in os.environ.items() if k not in run_eval.BYTECODE_ENV}
+
+
 def _pytest(run_eval, ws, *args):
     return subprocess.run(
         [run_eval.PY_BIN, "-m", "pytest", *args, "-p", "no:cacheprovider"],
         cwd=ws,
         capture_output=True,
         text=True,
+        env=_clean_env(run_eval),
     )
 
 
@@ -1310,7 +1343,10 @@ def test_test_reflect_gate_needs_a_test_run(tmp_path, task_id):
     assert _pytest(run_eval, ws, "--version").returncode == 0
     assert not passes(), "pytest --version counted as a test run"
     imported = subprocess.run(
-        [run_eval.PY_BIN, "-c", "import tests.test_export"], cwd=ws, check=True
+        [run_eval.PY_BIN, "-c", "import tests.test_export"],
+        cwd=ws,
+        check=True,
+        env=_clean_env(run_eval),
     )
     assert imported.returncode == 0
     assert not passes(), "importing the tests counted as a test run"

@@ -172,6 +172,10 @@ def _credentials_file() -> Path | None:
 # ── arm construction ─────────────────────────────────────────────────────────
 
 
+# Environment that stops pytest writing tests/__pycache__/*-pytest-*.pyc:
+# no bytecode, bytecode under another root, or .pyo names under -O.
+BYTECODE_ENV = ("PYTHONDONTWRITEBYTECODE", "PYTHONPYCACHEPREFIX", "PYTHONOPTIMIZE")
+
 # A fixture is copied without the bytecode and caches a local test run may
 # have left in it, so a check that reads what a run writes (pytest's
 # assertion-rewrite cache) sees only what the task's own session wrote.
@@ -307,8 +311,9 @@ def run_task(
     # the config dir holds; same for every arm, still not the arm's content.
     env["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
     # Probes read pytest's bytecode cache to see that tests ran; an operator
-    # shell that turns bytecode off or moves it would fail them every run.
-    for name in ("PYTHONDONTWRITEBYTECODE", "PYTHONPYCACHEPREFIX"):
+    # shell that turns bytecode off, moves it or renames it would fail them
+    # every run.
+    for name in BYTECODE_ENV:
         env.pop(name, None)
 
     started = time.monotonic()
