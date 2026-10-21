@@ -25,6 +25,7 @@ README 작업 크기 표의 Medium·Large 체인은 `/sc:reflect`로 끝나는�
 
 - [05-plan.md](./05-plan.md): implementation plan
 - [06-review.md](./06-review.md): branch review rounds
+- [06a-verify-independent.md](./06a-verify-independent.md): independent verification of 81776c29 (headless opus, Linux)
 
 ## 릴리스 뒤
 
