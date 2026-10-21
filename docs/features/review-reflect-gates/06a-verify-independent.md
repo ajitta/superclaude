@@ -150,3 +150,25 @@ G9 green은 언급만 보는 채점이라는 알려진 한계와 같은 이유�
 - `run_eval._git_baseline`(`evals/run_eval.py`)은 `git ls-tree HEAD`를 쓴다. 그래서 `exclude_baseline`은 setup의 baseline이 아니라 현재 HEAD를 뺀다. 커밋된 새 파일은 빠진다. 이 프로브는 `git diff baseline`으로 보완했지만, 이름이 오해를 부르고 다른 task에도 같은 구멍이 있을 수 있다.
 - 분석 문서 D(`implement.md`가 `/sc:test`·`/sc:reflect` 전에 `complete`로 정함)는 F-1·F-3과 같은 뿌리다. D를 정할 때 함께 다루는 것이 좋다.
 - Linux와 Windows의 skip 수가 다르다(3 대 12, 합계는 같다). Windows 전용 skip 목록을 문서로 남기면 다음 비교가 쉬워진다.
+
+## 반영 (2026-10-21, claude-box, Phase 9)
+
+소유자 결정: 권고안 모두, 그리고 반복된 리뷰 round를 통과하려고 들어간 덧댐·예외·중복을 찾아 정리한다. 고친 것이 맞는지는 두 번째 독립 검증이 본다.
+
+| ID | 처리 |
+|---|---|
+| F-1 | 반영: `implement.md` Integrate 끝 "a fix to a Critical or Important review finding that changes reviewed code or shipped content also goes back to /sc:review for another round before done". drift test가 고정 |
+| F-2 | 반영: 재리뷰 정규식을 관찰된 표현을 하나씩 덧붙인 한 줄에서 `(?ix)` verbose 정규식으로 바꿨다. 줄마다 한 의미 묶음(낱말, again, second/round 2, fresh/follow-up, 아직 리뷰 안 됨, `/sc:review`를 fix에, 한국어)이다. 여덟 표현과 `test.md` 자신의 표현, run에서 본 표현 19개가 통과하고, "Review done" 꼴의 완료 답 다섯이 실패한다 |
+| F-3 | 반영: `test-reflect-gate-complete`. setup이 `/sc:implement`처럼 fix 커밋 뒤 docs 커밋(계획 `complete`, fix 커밋 sha의 `Result:`, README `phase: complete`)을 더한다. phase check만 뺐다. setup 단계·prompt·check는 YAML anchor로 첫 변형과 나눠 쓴다 |
+| F-4 | 반영: drift test를 문구 표 `_GATE_PHRASES`(RULES_DOCS, `test.md` Report, `review.md` Process, `implement.md` Integrate, README 두 행)에 대한 parametrize와 체인 검사로 나눴다. handoff는 `/sc:reflect`가 첫째인지 본다. 이 표의 D1·D3·D4·D5·D6·D8·D10·D16·D17이 이제 red다. D13·D14(README 체인에서 다른 명령 삭제)는 이 기능 밖이라 고정하지 않았다 |
+| F-5 | 반영: "needs a re-review"만 있고 `/sc:reflect`가 없는 답 두 개를 실패로. G2·G3이 red다 |
+| F-6 | 반영: "pip이 든 줄은 빼고 --version은 빼고" 예외 대신, 명령 조각(`;`, `&&`, `\|\|`, `\|`, `(`로 나눔)에서 pytest가 프로그램인지 본다(환경 변수, `uv/poetry/pipenv run`, `env`, `timeout`, `python -m`, 경로 앞붙이 허용). `which pytest`, `cat pytest.ini`, `grep pytest`는 이제 실행으로 세지 않는다. `--version`·`--collect-only` 제외는 테스트를 돌리지 않는 호출이라 남겼다. subagent 안의 pytest는 여전히 미확인이다 |
+| F-7 | 반영: 15/15. Measurements는 [05a](./05a-plan-measurements.md)로 옮겼다 |
+| F-8 | 반영: 게이트와 CHANGELOG를 "its /sc:test step names the fix that went unreviewed"로. `--through` Run 단계가 `/sc:test`를 부르고 그 Report 단계가 수정을 짚으므로, `intent.md`를 바꾸지 않고 참이 된다 |
+| F-9 | 반영: "or the user has accepted the ones it found unfixed or waived the review of their fix"(RULES_DOCS, `review.md`, CHANGELOG). drift test가 두 곳을 고정 |
+| F-10 | 반영: 두 변형 모두 `git diff --quiet baseline -- docs/features/csv-export/06-review.md`. 주석의 "not checked" 목록도 고쳤다(새 리뷰 파일, 새 .md, 계획 status) |
+| F-11 | 반영: 계획 25,630 → 24,144 bytes(Measurements 분리, Phase 9는 짧게). gotcha `plan-docs-on-branch`의 출처를 소유자 결정으로 고쳤다 |
+| (오케스트레이터) | Linux canary run 1이 `/sc:reflect`를 재리뷰의 대안으로 읽었다. `test.md` Report에 "which /sc:reflect does not replace"를 더했다 |
+| (덧댐 정리) | 리뷰 round마다 표현을 하나씩 더한 정규식 두 개를 위처럼 구조로 바꿨다. 두 변형의 setup·check 중복은 anchor로, 채점 테스트는 표현 표 상수와 parametrize로, drift test의 assert 나열은 문구 표로 바꿨다. 계획 Deviations를 phase 순서로 정렬했다 |
+
+Mutation(반영 뒤, 메모리의 원본으로 되돌림, 끝의 `git diff --stat`이 mutation 전과 같다): D1, D2, D3, D4, D5, D6, D8, D9, D10, D12, D16, D17, "which /sc:reflect does not replace" 삭제, F-9 이전 문구, F-1 구절 삭제, G1, G2, G3, `06-review.md` check 삭제, pytest 프로그램 위치를 `.*`로, 두 번째 변형의 phase를 `implementing`으로. 21건 모두 red다.

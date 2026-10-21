@@ -169,6 +169,19 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] Step 4: 프로브 3번(`--runs-dir C:/sc-evals/rrg-final-<n>`)
 - [x] Commit Phase 8: `fix(core,review,test,evals): review round 4 — only Critical or Important fixes start another round`
 
+## Phase 9: 독립 검증 반영 (one commit)
+
+소유자 결정(2026-10-21): 권고안 모두, 그리고 반복된 리뷰 round를 통과하려고 들어간 덧댐·예외·중복을 정리한다. 발견별 처리는 [06a](./06a-verify-independent.md) 반영 표에 있다.
+
+- [x] Step 1: shipped 문구: `implement.md` Integrate(F-1), `test.md` Report, 종료 조건(F-9), `--through` 문장(F-8)
+- [x] Step 2: 프로브: 의미 묶음별 verbose 재리뷰 정규식(F-2), pytest가 프로그램인 명령 조각(F-6), `06-review.md` 그대로(F-10), YAML anchor를 나눠 쓰는 두 번째 변형 `test-reflect-gate-complete`(F-3)
+- [x] Step 3: 테스트: 표현 표와 두 변형 parametrize로 채점 테스트(F-5), 문구 표 parametrize로 drift test(F-4). mutation 21건 모두 red
+- [x] Step 4: 문서: Measurements를 [05a](./05a-plan-measurements.md)로, 합계 15/15(F-7, F-11), Deviations 순서, gotcha 출처
+- [x] Step 5: 영역 테스트 통과, 저장된 Linux run 세 개를 새 check로 다시 채점 → 7/7
+- [x] Commit Phase 9: `fix(implement,test,review,core,evals): independent verification — implement carries the re-review, probe variants, grader and guards cleaned up`
+- [ ] Step 6: `make canary-commands`(BASE=4fd32d90)와 두 reflect 프로브 3회씩, 05a에 적는다
+- [ ] Step 7: 두 번째 독립 검증(headless opus)이 Phase 9 수정을 본다
+
 ## Integration (커밋 아님)
 
 - [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42, 68112487, 69ad177c에서 각각 3789 passed, 12 skipped, 나머지 통과
@@ -177,24 +190,13 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 봤다: [06-review](./06-review.md) 2차
 - [x] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 봤다: [06-review](./06-review.md) 3차
 - [x] 4차 리뷰(소유자 결정): Phase 7의 바뀐 문구와 채점을 1–3차 발견을 수용 기준으로 봤다: [06-review](./06-review.md) 4차. Phase 8 뒤 round는 소유자가 멈췄다(남은 것은 테스트·프로브·drift test로 확인)
-- [x] `/sc:reflect`로 Goal과 Proof 대비 판정(2026-10-21, `--type completion`): reflect 부분은 충족(`/sc:test`만 도는 세션에서 0/6 → 12/12, sonnet). 재리뷰 부분은 규칙과 drift test로만 확인했고 어느 프로브도 `review.md` 줄을 재지 않는다. 소유자가 이 빈틈을 받아들였다. 다른 빈틈(`/sc:reflect` 세션에 재리뷰 괄호 없음, 언급만 보는 프로브, `--through` Report 목록, 분석 문서 D)은 이미 받아들였거나 후속이다
+- [x] `/sc:reflect`로 Goal과 Proof 대비 판정(2026-10-21, `--type completion`): reflect 부분은 충족(`/sc:test`만 도는 세션에서 0/6 → 15/15, sonnet). 재리뷰 부분은 규칙과 drift test로만 확인했고 어느 프로브도 `review.md` 줄을 재지 않는다. 소유자가 이 빈틈을 받아들였다. 다른 빈틈(`/sc:reflect` 세션에 재리뷰 괄호 없음, 언급만 보는 프로브, `--through` Report 목록, 분석 문서 D)은 이미 받아들였거나 후속이다
 - [ ] 계획 `status: complete`와 README `phase: complete`: 소유자가 완료를 정할 때까지 `implementing`(2026-10-21 소유자 결정). `Result:` 줄은 적었다
 - [x] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다. 소유자 답(2026-10-21): 브랜치만 push, 병합은 나중
 
 ## Measurements
 
-`test-reflect-gate`, sonnet, effort low, check 순서: reflect / 재리뷰 / 코드 그대로 / phase 그대로 / 테스트 실행.
-
-- 바꾸기 전(Phase 1 시점 src, `C:/sc-evals/rrg-before-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`를 부른 답은 0/3. 세 답 모두 F-1 수정에 round 2 리뷰가 없다고 스스로 짚었다(재리뷰 3/3). 재리뷰 check는 이미 바닥이 높아 규칙 효과를 재지 못한다.
-- 바꾼 뒤(Phase 2 src, `C:/sc-evals/rrg-after-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`는 여전히 0/3이다. 설치된 `test.md` handoff에 `/sc:reflect`가 들어간 것은 확인했다. 세 답 모두 "다음 단계"로 테스트 추가, round 2 리뷰, status 갱신을 들었고 reflect는 들지 않았다. `/sc:test`만 도는 세션에서는 handoff 한 단어로 행동이 바뀌지 않았다. RULES_DOCS 게이트는 이 세션에 로드되지 않으므로(Risks) 이 프로브로는 재지 못한다.
-- Phase 4 뒤(`test.md` Report 단계 한 줄, `C:/sc-evals/rrg-body-1..3`, 이 컴퓨터): 세 번 모두 `Y Y Y Y Y`(5/5). `/sc:reflect` 3/3(전 6회 0/6). 세 답 모두 "계획 문서로 진행했으니 `/sc:reflect` 전에는 끝이 아니다"와 F-1 수정의 다음 리뷰 round를 다음 단계로 들었다. 아홉 번 모두 최종 정규식으로 다시 채점한 값이다.
-- Phase 5 채점(7 check: reflect / 재리뷰 / 흘려 넘김 없음 / 코드 그대로 / 새 .py 없음 / phase 그대로 / pytest 실행)으로 같은 아홉 run을 다시 채점했다: before·after 여섯 번 `n Y Y Y Y Y Y`(6/7), body 세 번 7/7. 좋은 답이 새 `output_not_regex`에 걸린 경우는 없다. 방법: 각 run의 `sc-full/logs/test-reflect-gate.stream.jsonl`을 `run_eval._parse_stream`으로 읽어 답과 명령을 얻고, workspace `sc-full/test-reflect-gate`에 현재 `tasks.yaml` check를 `run_eval._check_one`으로 돌린다. 저장된 `report.md`·`results.json`은 그 run 때의 채점이다.
-- Phase 5 뒤(바뀐 `test.md`·RULES_DOCS 문구, `C:/sc-evals/rrg-fix-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점한 값이다(`run_eval.py` exit 0).
-- Phase 6 채점(2차 리뷰의 흘려 넘김·완료 주장 class, `'*.py'` scope, 실제 pytest 실행)으로 저장된 열두 run을 다시 채점했다: before·after 여섯 번 6/7, body·fix 여섯 번 7/7. 좋은 답의 오탐은 없다.
-- Phase 6 뒤(`review.md` 한 줄, 종료 조건, `test.md` 범위, `C:/sc-evals/rrg-fix2-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점(`run_eval.py` exit 0).
-- Phase 7 채점(6 check: reflect / 재리뷰 / `'*.py'` 그대로 / 새 .py 없음 / phase 그대로 / pytest 실행)으로 저장된 열다섯 run을 다시 채점했다: before·after 여섯 번 5/6(reflect만 n), body·fix·fix2 아홉 번 6/6.
-- Phase 7 뒤(종료 조건 문구, `review.md`·`test.md` 문구, `C:/sc-evals/rrg-fix3-1..3`, 이 컴퓨터): 세 번 모두 6/6, 하네스가 run 때 채점(`run_eval.py` exit 0).
-- Phase 8 뒤(최종 문구: Critical·Important 수정만 재리뷰, `C:/sc-evals/rrg-final-1..3`, 이 컴퓨터): 세 번 모두 6/6, 하네스가 run 때 채점(`run_eval.py` exit 0). 합계: `/sc:reflect`는 Report 단계 한 줄 전 0/6, 뒤 12/12.
+[05a-plan-measurements.md](./05a-plan-measurements.md)에 옮겼다(이 문서가 25,000 bytes를 넘어서, 06a F-11).
 
 ## Deviations
 
@@ -203,9 +205,10 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
 - Phase 4 측정 뒤 재리뷰 정규식에 `\bno review\b[^.\n]{0,20}\bafter\b`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
 - Phase 5를 더했다(1차 리뷰 반영). 테스트 실행 check는 출력 정규식에서 `transcript_regex` `pytest`로 바꿨다. 범위가 넓어진 곳: README bug·refactor 체인, `verifier.md` 설명 한 구절, RULES_DOCS의 `--through` 예외(소유자 결정, [06-review](./06-review.md) I-4).
-- Phase 8을 더했다(4차 리뷰 반영). 재리뷰 범위를 Critical·Important 발견에 대한 수정으로 좁혔다(소유자 결정, 4차 N-1).
-- Phase 7을 더했다(3차 리뷰 반영). 흘려 넘김·완료 주장 check는 소유자 결정으로 뺐다. Phase 5·6에서 그 check에 맞춰 적은 채점 테스트 단계는 Phase 7에서 바뀌었다.
 - Phase 6을 더했다(2차 리뷰 반영). 범위가 넓어진 곳: `review.md` Process 단계 한 줄(소유자 결정, 2차 N-1)과 README `/sc:reflect` 행.
+- Phase 7을 더했다(3차 리뷰 반영). 흘려 넘김·완료 주장 check는 소유자 결정으로 뺐다. Phase 5·6에서 그 check에 맞춰 적은 채점 테스트 단계는 Phase 7에서 바뀌었다.
+- Phase 8을 더했다(4차 리뷰 반영). 재리뷰 범위를 Critical·Important 발견에 대한 수정으로 좁혔다(소유자 결정, 4차 N-1).
+- Phase 9를 더했다(독립 검증 반영, 소유자 결정). 범위가 넓어진 곳: `implement.md` Integrate 한 구절과 두 번째 프로브 변형. 채점 정규식과 테스트는 고친 것만 덧붙이지 않고 구조를 바꿨다(소유자 지시: 반복 시험 통과용 덧댐·예외·중복 정리).
 
 ## Risks
 
@@ -232,4 +235,4 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 
 Earlier result (before Phase 4): 75d2addc — `uv run pytest` 3789 passed, 12 skipped (exit 0); lint, format, typecheck clean; drift test passed; `test-reflect-gate` `/sc:reflect` 0/3 after the change (baseline 0/3), so the third Proof item is red. Status stays `implementing` until the owner decides.
 
-Result: 0f6a3bf8 — `uv run pytest` 3789 passed, 12 skipped (exit 0); make lint, ruff format --check, make typecheck clean; drift test 1 passed; `test-reflect-gate` `/sc:reflect` 12/12 after the Report-step line (0/6 before), last 3 runs on 0f6a3bf8's text 6/6 each.
+Result: 0f6a3bf8 — `uv run pytest` 3789 passed, 12 skipped (exit 0); make lint, ruff format --check, make typecheck clean; drift test 1 passed; `test-reflect-gate` `/sc:reflect` 15/15 after the Report-step line (0/6 before), last 3 runs on 0f6a3bf8's text 6/6 each.

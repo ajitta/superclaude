@@ -512,71 +512,96 @@ def test_install_surfaces_name_every_component():
 
 
 # -------------------------------------------------- review-reflect-gates --
-def test_readme_chains_end_at_a_workflow_gate():
-    """README chains, RULES_DOCS workflow_gates and the commands that carry the
-    gates (test.md, review.md, because RULES_DOCS does not load there) say the
-    same about /sc:reflect and the re-review of fixes
-    (docs/features/review-reflect-gates: the chains ended at /sc:reflect while
-    the gates ended at /sc:test, so reflect was skipped)."""
-    text = _read(_README)
-    rows = re.findall(r"^\| \*\*(Medium|Large)\*\* \|[^|]*\| ([^|]*) \|$", text, re.M)
-    assert {tier for tier, _ in rows} == {"Medium", "Large"}, rows
-    chain_cmds = {
-        cmd
-        for _, chain in rows
-        for cmd in re.findall(r"`(/sc:[a-z-]+)", re.sub(r"\(.*?\)", "", chain))
-    }
+# RULES_DOCS does not load on /sc:test, /sc:review or /sc:implement
+# (context_loader TRIGGER_MAP), so those commands carry the review-reflect
+# gates themselves, in the same words; the README states them for users.
+_PLAN_DOC = "a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan)"
+_STOP_RULE = (
+    "rounds stop when a review round finds no Critical or Important finding, "
+    "or the user has accepted the ones it found unfixed or waived the review "
+    "of their fix; leftover Suggestions are reported, not reviewed again"
+)
+_FIX_SCOPE = "fix to a Critical or Important review finding"
+_GATE_PHRASES = [
+    ("gates", f"/sc:review -> fix -> /sc:review: a {_FIX_SCOPE}"),
+    ("gates", "with the earlier findings as acceptance criteria"),
+    ("gates", _STOP_RULE),
+    ("gates", "its /sc:test step names the fix that went unreviewed"),
+    ("gates", "`docs/plans/` plan) goes to /sc:reflect; other work is done here"),
+    ("gates", "/sc:reflect -> done: every gap /sc:reflect names is fixed"),
+    ("test Report", _PLAN_DOC),
+    ("test Report", "say it is not done until /sc:reflect has run"),
+    ("test Report", f"name a {_FIX_SCOPE}"),
+    ("test Report", "due for another review, which /sc:reflect does not replace"),
+    ("review Process", "comes back for another round"),
+    ("review Process", "earlier findings as acceptance criteria"),
+    ("review Process", _STOP_RULE),
+    ("review Process", "`/sc:intent --through` run keeps its single fix round"),
+    ("implement Integrate", f"a {_FIX_SCOPE} that changes reviewed code or shipped"),
+    ("implement Integrate", "also goes back to /sc:review for another round"),
+    ("README review row", "is reviewed again, with the earlier findings"),
+    ("README reflect row", "shipped content goes back to review"),
+    ("README reflect row", "work run from a plan is done only after this"),
+]
+
+
+def _gate_texts() -> dict[str, str]:
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
     gates = re.search(r"<workflow_gates>(.*?)</workflow_gates>", rules, re.S)
     assert gates, "RULES_DOCS.md has no <workflow_gates>"
-    targets = set(re.findall(r"->\s*(/sc:[a-z-]+)", gates.group(1)))
-    targets |= set(re.findall(r"\|\s*(/sc:[a-z-]+)", gates.group(1)))
+    texts = {"gates": gates.group(1)}
+    for name, step in (
+        ("test", "Report"),
+        ("review", "Process"),
+        ("implement", "Integrate"),
+    ):
+        body = _read(_SRC / "commands" / f"{name}.md")
+        line = re.search(rf"^\s*\d+\. {step}:.*$", body, re.M)
+        assert line, f"{name}.md has no {step} step"
+        texts[f"{name} {step}"] = line.group(0)
+    readme = _read(_README)
+    for name, row in (
+        ("review", "/sc:review --scope branch"),
+        ("reflect", "/sc:reflect"),
+    ):
+        line = re.search(rf"^\| `{re.escape(row)}` \|.*$", readme, re.M)
+        assert line, f"README has no {row} row"
+        texts[f"README {name} row"] = line.group(0)
+    return texts
+
+
+@pytest.mark.parametrize(("where", "phrase"), _GATE_PHRASES)
+def test_review_reflect_gate_wording(where, phrase):
+    """Each place that carries the review-reflect gates keeps its wording
+    (docs/features/review-reflect-gates; weakening any of these went
+    unnoticed in the independent verification's mutation checks, 06a F-4)."""
+    assert phrase in _gate_texts()[where]
+
+
+def test_readme_chains_end_at_a_workflow_gate():
+    """Every command in the README Medium and Large chains is a workflow gate
+    target, /sc:reflect sits outside the optional part of both, and /sc:test
+    hands off to /sc:reflect first (the chains ended at /sc:reflect while the
+    gates ended at /sc:test, so reflect was skipped)."""
+    text = _read(_README)
+    rows = re.findall(r"^\| \*\*(Medium|Large)\*\* \|[^|]*\| ([^|]*) \|$", text, re.M)
+    assert {tier for tier, _ in rows} == {"Medium", "Large"}, rows
+    required = {tier: re.sub(r"\(.*?\)", "", chain) for tier, chain in rows}
+    chain_cmds = {
+        cmd
+        for chain in required.values()
+        for cmd in re.findall(r"`(/sc:[a-z-]+)", chain)
+    }
+    gates = _gate_texts()["gates"]
+    targets = set(re.findall(r"(?:->|\|)\s*(/sc:[a-z-]+)", gates))
     missing = sorted(chain_cmds - targets - {"/sc:intent"})
     assert not missing, f"README chain commands no workflow gate leads to: {missing}"
-    # The other direction: the gates send planned work to /sc:reflect, so both
-    # chains keep it outside their "(optional: ...)" part.
-    for tier, chain in rows:
-        assert "`/sc:reflect`" in re.sub(r"\(.*?\)", "", chain), tier
-    assert re.search(
-        r"->\s*/sc:review: a fix to a Critical or Important review finding",
-        gates.group(1),
+    for tier, chain in required.items():
+        assert "`/sc:reflect`" in chain, tier
+    handoff = re.search(
+        r'<handoff next="([^"]*)"', _read(_SRC / "commands" / "test.md")
     )
-
-    # RULES_DOCS does not load on /sc:test, so test.md carries the gate itself.
-    test_md = _read(_SRC / "commands" / "test.md")
-    handoff = re.search(r'<handoff next="([^"]*)"', test_md)
-    assert handoff and "/sc:reflect" in handoff.group(1).split(), handoff
-    report = re.search(r"^\s*\d+\. Report:.*$", test_md, re.M)
-    assert report and "/sc:reflect" in report.group(0), report
-    # One definition of "plan document" in both places that carry the gate.
-    plan_doc = (
-        "a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan)"
-    )
-    assert plan_doc in report.group(0)
-    assert plan_doc in gates.group(1)
-    # Nor does RULES_DOCS load on /sc:review, so review.md carries the re-review.
-    process = re.search(
-        r"^\s*\d+\. Process:.*$", _read(_SRC / "commands" / "review.md"), re.M
-    )
-    assert process and "earlier findings as acceptance criteria" in process.group(0)
-    # The same stop rule in both places, tied to a round's result.
-    stop = (
-        "rounds stop when a review round finds no Critical or Important finding, "
-        "or the user has accepted the ones it found; leftover Suggestions are "
-        "reported, not reviewed again"
-    )
-    assert stop in gates.group(1)
-    assert stop in process.group(0)
-    # Only a fix to a Critical or Important finding starts another round.
-    assert "a fix to a Critical or Important review finding" in report.group(0)
-    assert "a fix to a Critical or Important review finding" in gates.group(1)
-    assert "A fix to a Critical or Important finding" in process.group(0)
-    assert "`/sc:intent --through` run keeps its single fix round" in process.group(0)
-    assert "due for another review" in report.group(0)
-    reflect_row = re.search(r"^\| `/sc:reflect` \|.*$", text, re.M)
-    assert reflect_row and "reviewed code or shipped content goes back to review" in (
-        reflect_row.group(0)
-    )
+    assert handoff and handoff.group(1).split()[0] == "/sc:reflect", handoff
     # Other README chains that run /sc:plan end with /sc:reflect too.
     for goal in ("Investigate a bug", "Refactor"):
         row = re.search(rf"^\| \*\*{goal}\*\* \| (.*) \|$", text, re.M)

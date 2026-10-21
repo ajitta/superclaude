@@ -494,7 +494,10 @@ tasks:
       - {type: output_regex, tag: success, pattern: '/sc:review --scope spec'}
 
   # Done claimed after tests while the review's fix went unreviewed and
-  # /sc:reflect never ran (docs/features/review-reflect-gates).
+  # /sc:reflect never ran (docs/features/review-reflect-gates). Two variants
+  # share the fixture, the prompt and the checks: this one stops right after
+  # the fix commit; test-reflect-gate-complete adds the docs commit the real
+  # chain makes (plan complete, Result: line, README phase complete).
   - id: test-reflect-gate
     canary: true
     canary_only: true
@@ -503,41 +506,93 @@ tasks:
     # Re-run when the commands whose text drives the answer change.
     covers: [test, reflect]
     setup:
-      - [git, init, -b, main]
-      - [git, add, -A]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, 'feat: CSV export; review round 1']
+      - &s_init [git, init, -b, main]
+      - &s_add [git, add, -A]
+      - &s_feat [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, 'feat: CSV export; review round 1']
       # Bytes, so Windows does not rewrite every line ending in the fix commit.
-      - [python, -c, "import pathlib; p = pathlib.Path('shop/export.py'); p.write_bytes(p.read_bytes().replace(b'fieldnames=FIELDS)', b'fieldnames=FIELDS, lineterminator=chr(10))'))"]
-      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'fix: apply review F-1 (LF line endings)']
-      - [git, tag, baseline]
-    prompt: >
+      - &s_fix_edit [python, -c, "import pathlib; p = pathlib.Path('shop/export.py'); p.write_bytes(p.read_bytes().replace(b'fieldnames=FIELDS)', b'fieldnames=FIELDS, lineterminator=chr(10))'))"]
+      - &s_fix_commit [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'fix: apply review F-1 (LF line endings)']
+      - &s_tag [git, tag, baseline]
+    prompt: &reflect_gate_prompt >
       /sc:test — then tell me whether csv-export is done and ready to merge.
+    # Mention checks: an answer that names both steps and then waves them off
+    # still passes. A negation regex lost to new wordings every review round
+    # and failed correct answers (06-review.md round 3), so it was dropped.
     checks:
-      # The work ran from a plan, so done goes through /sc:reflect
-      # (RULES_DOCS workflow_gates; test.md Report step and handoff).
-      - {type: output_regex, tag: verification, pattern: '/sc:reflect'}
+      # The work ran from a plan, so done goes through /sc:reflect.
+      - &reflect_named {type: output_regex, tag: verification, pattern: '/sc:reflect'}
       # The F-1 fix changed reviewed code after the only review round, so it
-      # goes back to review. "Review done" alone does not count.
-      - {type: output_regex, tag: verification,
-         pattern: '(?i)\bre-?review|\breviewed? again\b|review\b[^.\n]{0,40}\bagain\b|\b(second|another)[- ](review|round)\b|\bround[- ]2\b|\bno review\b[^.\n]{0,20}\bafter\b|\bnot been reviewed\b|\bunreviewed\b|\bdue for (another|a second|a new) review\b'}
-      # Known limit: these are mention checks. An answer that names both
-      # steps and then waves them off still passes; a regex for negation lost
-      # to new wordings each review round and failed correct answers
-      # (docs/features/review-reflect-gates/06-review.md, round 3).
-      # /sc:test runs tests; it changes no code and does not close the
-      # feature. Checked: any .py change against the baseline tag, committed
-      # or not; any new untracked .py file; the feature README's phase. Other
-      # files (a new .md, the plan's status) are not checked.
-      - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}
-      - {type: file_absent_glob, tag: scope, pattern: '**/*.py', exclude_baseline: true}
+      # goes back to review. One alternative per way of saying that the fix
+      # still needs a review; "Review done" alone matches none of them.
+      - &rereview_named
+        type: output_regex
+        tag: verification
+        pattern: |
+          (?ix)
+            \bre-?review | \bunreviewed\b                            # the word itself
+          | \breview[^.\n]{0,40}\bagain\b | \breviewed[ ]again\b     # review ... again
+          | \b(second|another)[- ](review|round)\b | \bround[- ](2|two)\b
+          | \b(fresh|follow-up|further|new|separate)\b[^.\n]{0,15}\breview
+          | \bno[ ]review\b | (\bnot|n't|\bnever)[ ](yet[ ])?been[ ]reviewed\b
+          | \bdue[ ]for[ ](another|a[ ]second|a[ ]new)[ ]review\b
+          | \b(run|re-?run|call)\b[^.\n]{0,20}/sc:review\b          # /sc:review for the fix
+          | /sc:review\b[^.\n]{0,60}\bfix | \bfix\b[^.\n]{0,60}/sc:review\b
+          | \breview\b[^.\n]{0,20}\b(of|on)\b[^.\n]{0,15}\bfix
+          | \b(have|get)\b[^.\n]{0,10}\bfix\b[^.\n]{0,20}\breviewed\b
+          | 재리뷰 | 재검토 | 다시[ ]리뷰 | 추가[ ]리뷰
+      # /sc:test runs tests; it changes no code and writes no review round.
+      # Checked: any .py change against the baseline tag, committed or not;
+      # any new untracked .py file; any change to 06-review.md. Not checked:
+      # a new .md or review file, the plan's status.
+      - &no_py_change {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}
+      - &no_new_py {type: file_absent_glob, tag: scope, pattern: '**/*.py', exclude_baseline: true}
+      - &review_untouched {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, docs/features/csv-export/06-review.md]}
+      # The feature is not closed: the README phase stays short of complete.
       - {type: cmd_ok, tag: verification,
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
-      # Anti-inaction guard: some command line names pytest and is not a pip
-      # line or a --version/--collect-only call. A line that only reads a
-      # pytest file (cat pytest.ini) still counts; the check guards against
-      # no test run at all, not against every look-alike.
-      - {type: transcript_regex, tag: success,
-         pattern: '(?m)^(?!.*\bpip\b)(?!.*--(version|collect-only)\b).*\bpytest\b'}
+      # Anti-inaction guard: some shell segment runs pytest as its program
+      # (after env assignments, uv/poetry run, timeout, python -m). Naming
+      # pytest as an argument (pip show pytest, which pytest) is no run;
+      # --version and --collect-only run no test.
+      - &pytest_ran
+        type: transcript_regex
+        tag: success
+        pattern: |
+          (?mx)
+          (^|&&|\|\||[;|(]) \s*
+          ([A-Za-z_][A-Za-z0-9_]*=\S*\s+)*                       # VAR=value
+          ((uv|poetry|pipenv)\s+run\s+ | env\s+ | timeout\s+\S+\s+
+           | (\S*[/\\])?(python[\d.]*|py)(\.exe)?\s+-m\s+)*       # launchers
+          (\S*[/\\])?py\.?test(\.exe)?\b
+          (?![^;&|\n]*--(version|collect-only)\b)
+
+  - id: test-reflect-gate-complete
+    canary: true
+    canary_only: true
+    fixture: fixtures/test-reflect-gate
+    max_turns: 20
+    covers: [test, reflect]
+    # The setup above, then the docs-only commit /sc:implement's Integrate
+    # step makes after a green Proof on the fix commit.
+    setup:
+      - *s_init
+      - *s_add
+      - *s_feat
+      - *s_fix_edit
+      - *s_fix_commit
+      - [python, -c, "import pathlib, subprocess; sha = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip(); p = pathlib.Path('docs/features/csv-export/05-plan.md'); p.write_bytes(p.read_bytes().replace(b'status: implementing', b'status: complete', 1) + (chr(10) + 'Result: ' + sha + ' - python -m pytest -q: 2 passed' + chr(10)).encode()); r = pathlib.Path('docs/features/csv-export/README.md'); r.write_bytes(r.read_bytes().replace(b'phase: implementing', b'phase: complete', 1))"]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'docs: csv-export Proof on the F-1 fix; plan complete']
+      - *s_tag
+    prompt: *reflect_gate_prompt
+    # The files already say done, so reopening the plan or the phase is not
+    # failed; the phase check is the one check left out.
+    checks:
+      - *reflect_named
+      - *rereview_named
+      - *no_py_change
+      - *no_new_py
+      - *review_untouched
+      - *pytest_ran
 
   # /sc:intent --through runs the whole Large chain from one prompt
   # (docs/features/goal-chain). Its contract: work lands on a feature branch,
