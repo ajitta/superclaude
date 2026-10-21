@@ -114,7 +114,7 @@ revised: 2026-10-22
 - [x] Step 2: Plan-Close의 근거에 리뷰 발견. CHANGELOG의 조건 (3)을 reflect와 같은 뜻으로
 - [x] Step 3: `reflect-plan-close`: 제안 동사 commit·change·move, 부정어 `shouldn't`, 채점 답 셋, 주석
 - [x] Step 4: 앵커를 짧게, `--through` 멈춤 조건 앵커, Deviations Phase 7의 가드 기록 바로잡기
-- [ ] Commit Phase 8: `fix: a complete plan reopens only on a red Result: or an open finding; Plan-Close reads the review findings`
+- [x] Commit Phase 8: `fix: a complete plan reopens only on a red Result: or an open finding; Plan-Close reads the review findings`
 
 ## Integration (커밋 아님)
 
