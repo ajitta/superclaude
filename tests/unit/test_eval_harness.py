@@ -1420,3 +1420,98 @@ def test_intent_through_ask_headless_probe_extends_the_branch_probe(tmp_path):
 
     assert grade_extra("| D1 | due today? | no | no | delegated |\n")
     assert not grade_extra("| D1 | due today? | no | yes | confirmed |\n")
+
+
+def _probe_checks(task_id: str, ctype: str) -> list[str]:
+    import yaml
+
+    tasks = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "evals" / "tasks.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    task = next(t for t in tasks["tasks"] if t["id"] == task_id)
+    return [c["pattern"] for c in task["checks"] if c["type"] == ctype]
+
+
+# Answers the per-machine session record probes must grade right; the misses
+# came from an independent verification (06a-verify-independent.md #4, #5, #12).
+_BEHIND_RIGHT = [
+    "1 commit behind origin",
+    "**1** commit behind",
+    "one commit behind",
+    "behind `origin/main` by **1**",
+    "Behind: 1",
+    "**Behind:** 1",
+    "origin/main is 1 commit ahead",
+]
+_BEHIND_WRONG = [
+    "not 1 commit behind",
+    "not **1** commit behind",
+    "could not tell whether it is behind",
+    "11 commits behind",
+    "behind by 10",
+    "1. Sync: behind",
+    "main is 1 commit ahead of origin",
+]
+_PAIRED_RIGHT = [
+    "otherbox: OTHER-TASK-9083",
+    "### otherbox\n\n- [ ] OTHER-TASK-9083",
+    "### otherbox (other machine)\n**Next actions:**\n- [ ] OTHER-TASK-9083",
+    "**otherbox** record\nbranch: main @0000000\n- [ ] OTHER-TASK-9083",
+]
+_PAIRED_WRONG = [
+    "Read session_2026-10-21_otherbox_main.md\n- OTHER-TASK-9083",
+    "OTHER-TASK-9083\na\nb\nc\nd\nfrom otherbox",
+]
+
+
+@pytest.mark.parametrize("answer", _BEHIND_RIGHT)
+def test_sync_behind_grader_passes_a_right_count(answer: str) -> None:
+    import re
+
+    (pattern,) = _probe_checks("cmd-load-sync-behind", "output_regex")
+    assert re.search(pattern, answer)
+
+
+@pytest.mark.parametrize("answer", _BEHIND_WRONG)
+def test_sync_behind_grader_fails_a_wrong_count(answer: str) -> None:
+    import re
+
+    (pattern,) = _probe_checks("cmd-load-sync-behind", "output_regex")
+    assert not re.search(pattern, answer)
+
+
+@pytest.mark.parametrize("answer", _PAIRED_RIGHT)
+def test_other_host_grader_passes_a_paired_answer(answer: str) -> None:
+    import re
+
+    pairing = _probe_checks("cmd-load-other-host", "output_regex")[-1]
+    assert re.search(pairing, answer)
+
+
+@pytest.mark.parametrize("answer", _PAIRED_WRONG)
+def test_other_host_grader_fails_an_unpaired_answer(answer: str) -> None:
+    import re
+
+    pairing = _probe_checks("cmd-load-other-host", "output_regex")[-1]
+    assert not re.search(pairing, answer)
+
+
+@pytest.mark.parametrize(
+    ("task_id", "command", "forbidden"),
+    [
+        ("cmd-save-host-record", "git -c user.name=x commit -m m", True),
+        ("cmd-save-host-record", "git push", True),
+        ("cmd-save-host-record", "git config --get commit.gpgsign", False),
+        ("cmd-load-sync-behind", "git pull --ff-only", True),
+        ("cmd-load-sync-behind", "git config --get pull.rebase", False),
+    ],
+)
+def test_session_probe_safety_regexes(
+    task_id: str, command: str, forbidden: bool
+) -> None:
+    import re
+
+    (pattern,) = _probe_checks(task_id, "transcript_not_regex")
+    assert bool(re.search(pattern, command)) is forbidden

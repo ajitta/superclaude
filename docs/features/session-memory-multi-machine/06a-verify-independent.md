@@ -154,3 +154,23 @@ revised: 2026-10-21
 - 이 머신의 `$TMPDIR`도 실제 home 아래에 있다. pytest의 `tmp_path`가 실제 `~/.claude` 위쪽 경로에 놓이는 Windows와 같은 구조다. 이번 sandbox 수정과 decoy 테스트가 이 상황을 막는다. 실제 `~/.claude/superclaude`는 이 머신에 없어서 옛 배치로도 c05는 통과했고, decoy 테스트만 실패했다.
 - `gh repo set-default`는 `ajitta/superclaude`로 정상이다.
 - auto-improve.md의 shipped gotcha `cc-session-end`("an `--eval-cmd` already in flight breaks away")는 1번의 PID 단독 kill 결과와 일치한다. 이번 변경으로 그룹 kill로도 멈출 수 없게 되었다.
+
+## 반영 (`fix/verify-1021`, 2026-10-21)
+
+| # | 반영 |
+|---|---|
+| 1 | `run_shell`: 타임아웃이 아닌 예외(KeyboardInterrupt 포함)에서도 트리를 죽이고 다시 raise. 명령이 도는 동안 기본 처리기인 SIGTERM·SIGHUP을 SystemExit로 바꿔 같은 경로를 탄다(메인 스레드, POSIX, 호출자가 정한 처리기는 그대로). 테스트: 호출자 그룹에 SIGINT·SIGTERM·SIGHUP |
+| 2 | `TEST_TIMEOUT_SECONDS = 110`. hooks.json 타임아웃보다 5초 이상 작아야 한다는 테스트 |
+| 3 | 두 docstring을 실측대로(Windows는 기다림, POSIX는 돌아오고 명령이 남음) |
+| 4 | 짝짓기 정규식이 사이에 세 줄까지 허용 |
+| 5 | 굵은 숫자, `Behind: 1`, `origin … is 1 commit ahead` 통과, `not 1 commit behind`·`11 commits behind` 실패 |
+| 6 | 변수를 fetch 명령 앞에 붙인 형태로 적고, 따로 쓴 `GIT_TERMINAL_PROMPT=0;`은 export되지 않는다고 적음. SSH `BatchMode`는 넣지 않음(소유자 결정 F7: `GIT_SSH_COMMAND`가 `core.sshCommand`를 덮음) |
+| 7 | Share가 detached HEAD·merge·cherry-pick·revert를 질문보다 먼저 거른다. 테스트 주석을 git 2.43 동작대로 |
+| 8 | `~/.claude/`(user) 또는 프로젝트 `.claude/`(project·local) 중 이 save.md와 같은 곳 |
+| 9 | "각 기록의 첫 줄", "가장 최근 날짜를 가진 기록, 그보다 오래된 컴퓨터 기록은 읽지 않음" |
+| 10 | 보류: 분석 문서가 든 `fix/review-reflect-gates`가 master에 들어올 때 해결된다 |
+| 11 | CHANGELOG Fixed를 고치고 새 세션 동작·`kill -9` 한계·110 s를 한 항목으로 적음. auto-improve gotcha `cc-session-end`도 같은 사실로 |
+| 12 | `commit.gpgsign`·`pull.rebase` 같은 설정 키는 금지 정규식에 걸리지 않음. 임의 host slug 통과는 주석에 적음. 세 프로브 채점 사례를 `test_eval_harness.py`에 고정 |
+| 13 | 반영하지 않음: POSIX 동작은 `test_run_shell.py`(타임아웃 + 신호 3종)가 지킨다 |
+
+되돌림 확인: `except BaseException` 제거 → 신호 테스트 3개 실패, 신호 처리기 제거 → SIGTERM·SIGHUP 2개 실패, 110 → 120 → 타임아웃 간격 테스트 실패, tasks.yaml·save.md·load.md를 반영 전으로 → 각각 10·1·2개 실패. 전체 suite 3825 passed, 3 skipped(Linux).
