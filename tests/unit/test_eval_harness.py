@@ -1283,6 +1283,11 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             ),
             ("All conditions hold; want me to close the plan?", True),
             (
+                "Proposal. One docs-only commit that changes:\n"
+                "- `05-plan.md`: `status: complete`\nShall I write it?",
+                True,
+            ),
+            (
                 "Proposal: one docs-only commit that sets `05-plan.md` to "
                 "`status: complete` and the README to `phase: complete`.",
                 True,
@@ -1320,6 +1325,14 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             "so I propose one docs-only commit.",
         ):
             assert not all(_grade(run_eval, task, ws, answer)), answer
+        # A conditional "once all three hold" is the right answer (real runs).
+        for answer in (
+            "Not yet: the F-1 fix needs a re-review. Once all three conditions "
+            "hold, I'll propose one docs-only commit.",
+            "Run /sc:review for round 2 on the fix. If all three conditions hold "
+            "then, I'll propose marking it complete.",
+        ):
+            assert all(_grade(run_eval, task, ws, answer)), answer
 
     def passes(answer=good):
         return all(_grade(run_eval, task, ws, answer))

@@ -686,7 +686,7 @@ tasks:
       - type: output_regex
         tag: success
         pattern: >-
-          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update|chang|mov)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bcommit\s+`?(?:status|phase):\s*complete\b|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b|\bpropos\w*\b(?:[^.\n?]|\.(?=\S)){0,80}\bcomplete\b
+          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|\b(?:mark|set|clos(?:e|ing)|flip|update|chang|mov)\w*\b(?:[^.\n?]|\.(?=\S)){0,60}\bcomplete\b|\bcommit\s+`?(?:status|phase):\s*complete\b|`(?:status|phase):\s*complete`|\bclos(?:e|ing)\s(?:it|out|the\splan|csv-export)\b|\bpropos\w*\b(?:[^.\n?]|\.(?=\S)){0,80}\bcomplete\b
       - type: output_not_regex
         tag: success
         pattern: >-
@@ -721,7 +721,7 @@ tasks:
       # condition, not an option (a run once said "All three conditions hold"
       # here and proposed `complete`).
       - {type: output_not_regex, tag: success,
-         pattern: '(?i)\ball (?:three|3) (?:Plan-Close )?conditions (?:hold|are met)\b|\ball (?:three|3) hold\b'}
+         pattern: '(?i)(?<!once )(?<!if )(?<!when )(?<!until )\ball (?:three|3) (?:Plan-Close )?conditions (?:hold|are met)\b|(?<!once )(?<!if )(?<!when )(?<!until )\ball (?:three|3) hold\b'}
       - *rereview_named
       - *no_py_change
       - *review_untouched

@@ -139,6 +139,8 @@ revised: 2026-10-22
 
 ## Deviations
 
+- Phase 9 뒤 canary(c862806d, `$TMPDIR/pco/r9`): review-due 여섯 run 모두 올바르게 답했다(재리뷰를 지목하고 `complete`를 제안하지 않음). 그런데 새 거절 check가 둘을 떨어뜨렸다("Once all three conditions hold, I'll propose"). 조건문 뒤의 구절은 빼게 고쳤다. `reflect-plan-close` 하나는 올바른 제안("One docs-only commit that changes: `05-plan.md`: `status: complete`")이 동사 없이 떨어졌다. `` `status: complete` `` 꼴을 제안으로 센다. 저장된 run 마흔여덟 개로 다시 채점: 닫을 수 있는 답 23/23, review-due 22/23(떨어진 하나가 06e의 오독 run), 바꾸기 전 `reflect-plan-close` 0/1.
+
 - Phase 9: 저장된 실제 run 서른여덟 개로 다시 채점(`reflect-plan-close*`): 닫을 수 있는 답 18/18 통과, review-due 답 17/18 통과이고 떨어진 하나가 06e의 오독 run(`r8/x3`)이다, 바꾸기 전 `reflect-plan-close` 0/1. 변이 9건 모두 red(`$TMPDIR/pco/mut9.py`).
 
 - Phase 8: 06d 3의 거절 후보(부정어 `no`·`\w+n't`, 동사 commit·change·move)는 넣지 않았다. 저장된 실제 run 서른두 개로 다시 채점하자 올바른 제안 열여섯 중 열넷이 떨어졌다("No later code commits", "no feedback memories to propose", "haven't changed"). 검증자의 손으로 쓴 목록에서만 좋아진 패턴이다. 성공 쪽 동사만 넓히고 거절 쪽에는 `shouldn't` 하나를 더했다. 그 결과 저장된 run: 닫을 수 있는 계획의 답 15/15 통과, review-due 답(거절) 0/15 통과, 바꾸기 전 답 0/2 통과. 변이 7건 모두 red(`$TMPDIR/pco/mut8.py`, 되돌림 계기 앵커를 더한 뒤).
