@@ -133,7 +133,7 @@ revised: 2026-10-22
 - [x] Step 1: Plan-Close (3)을 글자 그대로 성립하게: "has had a /sc:review round after it, or the user waived that round"
 - [x] Step 2: Plan-Close 앵커 셋(Proof를 다시 돌리지 않음, 리뷰 대기 수정의 회송, "all three hold")
 - [x] Step 3: Phase 9 Deviations의 review-due 수치는 510108c6의 재채점(22/23)으로 대체
-- [ ] Commit Phase 10: `fix: Plan-Close condition 3 reads literally; anchors for its routing`
+- [x] Commit Phase 10: `fix: Plan-Close condition 3 reads literally; anchors for its routing`
 
 ## Integration (커밋 아님)
 
