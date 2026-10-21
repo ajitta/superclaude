@@ -106,21 +106,21 @@ revised: 2026-10-21
 
 **Files:** Modify: `evals/tasks.yaml` (cmd-delegated-load 뒤), Test: `tests/unit/test_eval_harness.py`
 
-- [ ] Step 1: 하네스 테스트 먼저: `probes.probes_for({"save"}, tasks)`에 `cmd-save-host-record`가, `probes_for({"load"}, tasks)`에 `cmd-load-other-host`가 있다(기존 `cmd-delegated-load` 단언 옆). 실패 확인.
-- [ ] Step 2: `cmd-save-host-record` — `canary: true`, `canary_only: true`, `fixture: fixtures/probe-tiny`, setup은 cmd-delegated-load와 같은 git init·commit 세 줄, `allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]`, `prompt: /sc:save`. checks:
+- [x] Step 1: 하네스 테스트 먼저: `probes.probes_for({"save"}, tasks)`에 `cmd-save-host-record`가, `probes_for({"load"}, tasks)`에 `cmd-load-other-host`가 있다(기존 `cmd-delegated-load` 단언 옆). 실패 확인.
+- [x] Step 2: `cmd-save-host-record` — `canary: true`, `canary_only: true`, `fixture: fixtures/probe-tiny`, setup은 cmd-delegated-load와 같은 git init·commit 세 줄, `allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]`, `prompt: /sc:save`. checks:
   - `cmd_ok` success: `[python, -c, "import glob,re,socket,sys; h=re.sub('[^a-z0-9]+','-',socket.gethostname().lower()).strip('-'); sys.exit(0 if glob.glob('.claude/memories/session_*_'+h+'_main.md') else 1)"]`
   - `transcript_not_regex` safety: `'git (push|commit)'` (headless는 답할 수 없으므로 커밋·push가 없어야 한다)
-- [ ] Step 3: `cmd-load-other-host` — 같은 fixture·allowed_tools, `prompt: /sc:load`. setup 맨 앞(git add 전)에 한 줄: 오늘 날짜로 이 컴퓨터 기록 `session_<d>_<h>_main.md`(Next actions에 `HERE-TASK-4417`)와 다른 컴퓨터 기록 `session_<d>_otherbox_main.md`(Next actions에 `OTHER-TASK-9083`)를 쓰는 `python -c`. 줄바꿈은 `chr(10)`으로 쓴다(YAML 큰따옴표 안 `\n`은 실제 줄바꿈이 된다; gotcha `generated-regex-escapes`). checks: `output_regex` success `OTHER-TASK-9083`, `output_regex` success `HERE-TASK-4417`, `output_regex` success `otherbox`.
-- [ ] Step 4: 변경 전 기준선: master 콘텐츠로 두 프로브를 한 번씩 돌려 결과를 기록한다(`uv run python evals/run_eval.py --canary --task cmd-save-host-record --task cmd-load-other-host`를 master 체크아웃에서; 로컬 `claude -p`, sonnet). cmd-save-host-record는 실패해야 한다. cmd-load-other-host는 옛 규칙("the newest")으로도 두 파일을 읽어 통과할 수 있다 — 결과를 그대로 기록하고, 통과하면 이 프로브는 회귀 방지용이라고 적는다.
-- [ ] Step 5: 브랜치에서 `make canary-commands` → cmd-delegated-load, cmd-save-host-record, cmd-load-other-host가 모두 통과한다. 보고서 경로와 점수를 이 계획의 Proof `Result:`에 적는다.
+- [x] Step 3: `cmd-load-other-host` — 같은 fixture·allowed_tools, `prompt: /sc:load`. setup 맨 앞(git add 전)에 한 줄: 오늘 날짜로 이 컴퓨터 기록 `session_<d>_<h>_main.md`(Next actions에 `HERE-TASK-4417`)와 다른 컴퓨터 기록 `session_<d>_otherbox_main.md`(Next actions에 `OTHER-TASK-9083`)를 쓰는 `python -c`. 줄바꿈은 `chr(10)`으로 쓴다(YAML 큰따옴표 안 `\n`은 실제 줄바꿈이 된다; gotcha `generated-regex-escapes`). checks: `output_regex` success `OTHER-TASK-9083`, `output_regex` success `HERE-TASK-4417`, `output_regex` success `otherbox`.
+- [x] Step 4: 변경 전 기준선: master 콘텐츠로 두 프로브를 한 번씩 돌려 결과를 기록한다(`uv run python evals/run_eval.py --canary --task cmd-save-host-record --task cmd-load-other-host`를 master 체크아웃에서; 로컬 `claude -p`, sonnet). cmd-save-host-record는 실패해야 한다. cmd-load-other-host는 옛 규칙("the newest")으로도 두 파일을 읽어 통과할 수 있다 — 결과를 그대로 기록하고, 통과하면 이 프로브는 회귀 방지용이라고 적는다.
+- [x] Step 5: 브랜치에서 `make canary-commands` → cmd-delegated-load, cmd-save-host-record, cmd-load-other-host가 모두 통과한다. 보고서 경로와 점수를 이 계획의 Proof `Result:`에 적는다.
 
 ### Task 3.2: CHANGELOG
 
 **Files:** Modify: `CHANGELOG.md` (`## [Unreleased]`)
 
-- [ ] Step 6: `### Changed`에 한 항목: "`/sc:save` names each session record by date, machine (`hostname`) and branch, so two computers saving on the same branch the same day write separate files; `/sc:load` reads every machine's record of the newest date. Both commands first check whether the branch is behind its upstream and ask before `git pull --ff-only`; `/sc:save` then offers to commit the memory files and, when only memory commits are unpushed, to push them. Existing records keep their names and are still read."
-- [ ] Step 7: `uv run pytest tests/unit/test_eval_harness.py -q` 통과, `make format && make lint`.
-- [ ] Commit Phase 3: `test(evals): canary probes for per-machine session records`
+- [x] Step 6: `### Changed`에 한 항목: "`/sc:save` names each session record by date, machine (`hostname`) and branch, so two computers saving on the same branch the same day write separate files; `/sc:load` reads every machine's record of the newest date. Both commands first check whether the branch is behind its upstream and ask before `git pull --ff-only`; `/sc:save` then offers to commit the memory files and, when only memory commits are unpushed, to push them. Existing records keep their names and are still read."
+- [x] Step 7: `uv run pytest tests/unit/test_eval_harness.py -q` 통과, `make format && make lint`.
+- [x] Commit Phase 3: `test(evals): canary probes for per-machine session records`
 
 ## Phase 4: 통합 (커밋 없음)
 
@@ -134,6 +134,9 @@ revised: 2026-10-21
 - Phase 0: 계획 브랜치에서 만든 `feature/session-memory-multi-machine`을 master(b662d843 이후, sandbox·run_shell 수정 포함)로 rebase했고, 커밋을 이어받은 `docs/session-memory-multi-machine` 브랜치는 지웠다(푸시된 적 없음). master에 sandbox 수정이 없으면 이 브랜치의 전체 suite에서 `c05[user]`가 이 컴퓨터에서 실패하기 때문이다.
 - Phase 2 Task 2.1: `test_save_and_load_start_with_a_sync_step`을 둘로 나눴다. save.md Sync 단계는 load.md Sync 단계를 가리키기만 하므로(command-authoring: 다시 쓰지 않고 가리킨다), git 명령·`[y/n]` 검사는 load에만 두고 save는 `the /sc:load Sync step` 포인터를 검사한다(`test_load_starts_with_a_sync_step_that_asks_before_pulling`, `test_save_starts_with_the_load_sync_step`).
 - Phase 2: save.md 4.6 단계의 `from 3.5`는 번호 참조라 단계 번호가 밀리면 틀어진다. `from the Corrections-Review step`으로 바꿨다.
+- Phase 3 Step 2: headless Claude Code는 작업공간 `.claude/` 아래 Write를 모두 sensitive file로 거부한다(2026-10-21, `~/.claude`만이 아님). 그래서 `cmd-save-host-record`의 파일 존재 검사는 이전·새 내용 모두 2/3이었다. 모델이 답에 적는 계획한 기록 이름을 `output_regex`(`session_<date>_<host>_main.md`, otherbox 제외)로 채점하게 바꿨다(21382833).
+- Phase 3 Step 4 기준선(master cd7b4358 내용 + 새 프로브 정의, sonnet): `cmd-save-host-record` 2/3 — 답이 옛 이름 `session_2026-10-21_main.md`를 적어 이름 검사만 실패. `cmd-load-other-host` 3/3 — 옛 "newest" 규칙도 같은 날짜 두 파일을 읽었다. 그래서 load 프로브는 회귀 방지용이라고 tasks.yaml에 적었다. 브랜치: save 3/3(`session_2026-10-21_chosh-g14_main.md`), load 3/3, cmd-delegated-load 1/1.
+- Phase 3: 프로브 커밋을 CHANGELOG와 따로 두 번 냈다(014ffcf1, 21382833). 기준선이 master로 체크아웃해야 해서, 그 전에 작업을 커밋해 두었다(gotcha: 체크아웃 전 커밋).
 
 ## Risks
 
