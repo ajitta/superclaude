@@ -116,3 +116,10 @@ revised: 2026-10-21
 - mutator의 `claude -p`가 SIGTERM 뒤에도 사는 것(2번)은 v4.34.1부터의 동작이다. 고칠지는 소유자가 정한다.
 - SIGQUIT(Ctrl-\\)는 처리하지 않는다. 호출자는 core dump로 죽고 명령은 남는다. 터미널에서 이 신호를 쓰는 일은 드물다.
 - 06a 10번(끊어진 분석 문서 링크)은 반영 표대로 보류 상태다. 이 브랜치에서도 그대로다.
+
+## 반영 (2026-10-21)
+
+- 2번: auto-improve gotcha `cc-session-end`에 "그 순간 돌던 것에 따라 다르다"를 넣었다. eval·smoke 명령 중이면 SIGTERM·SIGHUP·Ctrl-C가 명령까지 멈추고, mutator `claude` 실행 중이거나 `kill -9`이거나 Windows `taskkill`(`/T` 없음)이면 돌던 명령이 남는다. 죽은 worker가 pid 파일을 남길 수 있다는 점도 적었다.
+- 7번: load Load 단계에 "기록의 `branch:` 머리줄은 첫 줄이고, 뒤쪽의 `branch:` 줄은 세지 않는다"를 적었다.
+- 1·3·4·5·6번은 반영하지 않았다. 모두 Suggestion·nit이다. 1번은 넓힌 창에서만 재현됐고(빠른 신호 50쌍 중 0), 4·5·6번은 eval 채점기의 한계다(배포 내용이 아님). 다음에 건드릴 때를 위한 기록으로 남긴다.
+- 문구만 바꿨으므로 3차 검증은 하지 않는다. 바뀐 명령 본문은 `make canary-commands`를 다시 돌려 확인한다.
