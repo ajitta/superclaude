@@ -1205,6 +1205,7 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
     # Phrasings seen in the baseline runs (05-plan Deviations).
     seen = "pytest passes 2 of 2. No round-2 review closes F-1; then /sc:reflect."
     assert all(_grade(run_eval, task, ws, seen))
+    assert all(_grade(run_eval, task, ws, seen.replace("2 of 2", "2/2")))
 
     readme = ws / "docs" / "features" / "csv-export" / "README.md"
     _set_field(readme, "phase", "complete")

@@ -83,6 +83,8 @@ Examples:
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
     /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list
     /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; the Proof ran on the last code commit (`Result:` line)
-    /sc:test -> done: Test pass evidence required (actual output, not claims)
+    /sc:review -> fix -> /sc:review: a fix to a review finding that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria (the review packet in RULES.md Intent Propagation); rounds stop when what is left can be checked mechanically (tests, grading, canary)
+    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (the Medium and Large chains) goes to /sc:reflect; other work is done here
+    /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that changes reviewed code goes back to review, above) or accepted by the user
   </workflow_gates>
 </component>

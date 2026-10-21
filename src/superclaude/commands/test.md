@@ -70,5 +70,5 @@ description: Execute tests with coverage analysis and quality reporting. On requ
     <never>generates test cases outside an explicit --tdd request, modifies framework config, or makes destructive changes.</never>
   </bounds>
 
-  <handoff next="/sc:troubleshoot /sc:implement"/>
+  <handoff next="/sc:reflect /sc:troubleshoot /sc:implement"/>
 </component>

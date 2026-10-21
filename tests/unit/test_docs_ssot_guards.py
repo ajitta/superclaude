@@ -509,3 +509,31 @@ def test_install_surfaces_name_every_component():
         if leaf not in body
     ]
     assert not bad, f"install surfaces missing a component: {bad}"
+
+
+# -------------------------------------------------- review-reflect-gates --
+def test_readme_chains_end_at_a_workflow_gate():
+    """Every command in README's Medium and Large chains is a gate target in
+    RULES_DOCS workflow_gates, and /sc:test hands off to /sc:reflect
+    (docs/features/review-reflect-gates: the chains ended at /sc:reflect while
+    the gates ended at /sc:test, so reflect was skipped)."""
+    text = _read(_README)
+    rows = re.findall(r"^\| \*\*(Medium|Large)\*\* \|[^|]*\| ([^|]*) \|$", text, re.M)
+    assert {tier for tier, _ in rows} == {"Medium", "Large"}, rows
+    chain_cmds = {
+        cmd
+        for _, chain in rows
+        for cmd in re.findall(r"`(/sc:[a-z-]+)", re.sub(r"\(.*?\)", "", chain))
+    }
+    rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
+    gates = re.search(r"<workflow_gates>(.*?)</workflow_gates>", rules, re.S)
+    assert gates, "RULES_DOCS.md has no <workflow_gates>"
+    targets = set(re.findall(r"->\s*(/sc:[a-z-]+)", gates.group(1)))
+    targets |= set(re.findall(r"\|\s*(/sc:[a-z-]+)", gates.group(1)))
+    missing = sorted(chain_cmds - targets - {"/sc:intent"})
+    assert not missing, f"README chain commands no workflow gate leads to: {missing}"
+
+    handoff = re.search(
+        r'<handoff next="([^"]*)"', _read(_SRC / "commands" / "test.md")
+    )
+    assert handoff and "/sc:reflect" in handoff.group(1).split(), handoff

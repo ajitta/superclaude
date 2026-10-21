@@ -56,10 +56,10 @@ revised: 2026-10-21
 
 **Files:** Test: `tests/unit/test_docs_ssot_guards.py`
 
-- [ ] Step 1: Write failing test: `test_readme_chains_end_at_a_workflow_gate`. README "By task size" 표의 Medium·Large 행에서 체인 칸의 `/sc:<name>`을 모두 모으고(괄호 안 optional 부분은 뺀다), 각 이름이 RULES_DOCS `<workflow_gates>` 안 어떤 줄의 `->` 오른쪽에 나오는지 본다. 그리고 `commands/test.md`의 handoff `next=`에 `/sc:reflect`가 있는지 본다
-- [ ] Step 2: Verify it fails: `uv run pytest tests/unit/test_docs_ssot_guards.py -k chains -q` → `/sc:reflect`가 게이트에 없다로 실패
-- [ ] Step 3: Write minimal implementation: Task 2.2와 2.3
-- [ ] Step 4: Verify it passes: 같은 명령 → 통과
+- [x] Step 1: Write failing test: `test_readme_chains_end_at_a_workflow_gate`. README "By task size" 표의 Medium·Large 행에서 체인 칸의 `/sc:<name>`을 모두 모으고(괄호 안 optional 부분은 뺀다), 각 이름이 RULES_DOCS `<workflow_gates>` 안 어떤 줄의 `->` 오른쪽에 나오는지 본다. 그리고 `commands/test.md`의 handoff `next=`에 `/sc:reflect`가 있는지 본다
+- [x] Step 2: Verify it fails: `uv run pytest tests/unit/test_docs_ssot_guards.py -k chains -q` → `/sc:reflect`가 게이트에 없다로 실패
+- [x] Step 3: Write minimal implementation: Task 2.2와 2.3
+- [x] Step 4: Verify it passes: 같은 명령 → 통과
 
 ### Task 2.2: `workflow_gates` 두 줄
 
@@ -73,17 +73,17 @@ revised: 2026-10-21
     /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that changes reviewed code goes back to review, above) or accepted by the user
 ```
 
-- [ ] Step 1: 위 세 줄로 편집
-- [ ] Step 2: `uv run pytest tests/unit/test_cross_references.py tests/unit/test_context_loader.py -q` → 통과
+- [x] Step 1: 위 세 줄로 편집
+- [x] Step 2: `uv run pytest tests/unit/test_cross_references.py tests/unit/test_context_loader.py -q` → 통과
 
 ### Task 2.3: `/sc:test` handoff
 
 **Files:** Modify: `src/superclaude/commands/test.md:73`
 
-- [ ] Step 1: `<handoff next="/sc:troubleshoot /sc:implement"/>` → `<handoff next="/sc:reflect /sc:troubleshoot /sc:implement"/>`(command-authoring: 2-3개)
-- [ ] Step 2: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_docs_ssot_guards.py -q` → 통과
-- [ ] Step 3: 바꾼 뒤 값: Phase 1 Step 3의 명령을 `--runs-dir C:/sc-evals/rrg-after-<n>`로 3번. `## Measurements`에 적는다. 재리뷰 check는 `/sc:test`에서 RULES_DOCS가 로드되지 않아 바뀌지 않을 수 있다(Risks). 그 결과로 무엇을 더 할지는 소유자가 정한다
-- [ ] Commit Phase 2: `fix(core,test): reflect and re-review gates in workflow_gates; /sc:test hands off to /sc:reflect`
+- [x] Step 1: `<handoff next="/sc:troubleshoot /sc:implement"/>` → `<handoff next="/sc:reflect /sc:troubleshoot /sc:implement"/>`(command-authoring: 2-3개)
+- [x] Step 2: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_docs_ssot_guards.py -q` → 통과
+- [x] Step 3: 바꾼 뒤 값: Phase 1 Step 3의 명령을 `--runs-dir C:/sc-evals/rrg-after-<n>`로 3번. `## Measurements`에 적는다. 재리뷰 check는 `/sc:test`에서 RULES_DOCS가 로드되지 않아 바뀌지 않을 수 있다(Risks). 그 결과로 무엇을 더 할지는 소유자가 정한다
+- [x] Commit Phase 2: `fix(core,test): reflect and re-review gates in workflow_gates; /sc:test hands off to /sc:reflect`
 
 ## Phase 3: 기록 (one commit)
 
@@ -110,10 +110,12 @@ revised: 2026-10-21
 `test-reflect-gate`, sonnet, effort low, check 순서: reflect / 재리뷰 / 코드 그대로 / phase 그대로 / 테스트 실행.
 
 - 바꾸기 전(Phase 1 시점 src, `C:/sc-evals/rrg-before-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`를 부른 답은 0/3. 세 답 모두 F-1 수정에 round 2 리뷰가 없다고 스스로 짚었다(재리뷰 3/3). 재리뷰 check는 이미 바닥이 높아 규칙 효과를 재지 못한다.
+- 바꾼 뒤(Phase 2 src, `C:/sc-evals/rrg-after-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`는 여전히 0/3이다. 설치된 `test.md` handoff에 `/sc:reflect`가 들어간 것은 확인했다. 세 답 모두 "다음 단계"로 테스트 추가, round 2 리뷰, status 갱신을 들었고 reflect는 들지 않았다. `/sc:test`만 도는 세션에서는 handoff 한 단어로 행동이 바뀌지 않았다. RULES_DOCS 게이트는 이 세션에 로드되지 않으므로(Risks) 이 프로브로는 재지 못한다.
 
 ## Deviations
 
 - Task 1.2 채점 정규식 두 개를 바꾸기 전 값 3회를 본 뒤 넓혔다. 재리뷰: `round 2` → `round[- ]2`(run 3이 "round-2"라 써서 놓쳤다). 테스트 실행: `\d+ passed`에 `pass(es|ed)? \d+ of \d+`를 더했다(run 1·2가 "passes 2 of 2"). 채점 테스트에 그 표현을 넣었고, 바꾸기 전 3회는 새 정규식으로 다시 채점했다(Measurements).
+- Phase 2 Step 3 뒤 테스트 실행 정규식을 한 번 더 넓혔다: `(of|/)`(run after-2가 "passes 2/2"). 여섯 번 모두 새 정규식으로 다시 채점했다.
 
 ## Risks
 

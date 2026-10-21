@@ -521,9 +521,10 @@ tasks:
       - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, shop, tests]}
       - {type: cmd_ok, tag: verification,
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
-      # Anti-inaction guard: the tests actually ran ("2 passed", "passes 2 of 2").
+      # Anti-inaction guard: the tests actually ran ("2 passed", "passes 2 of 2",
+      # "passes 2/2").
       - {type: output_regex, tag: success,
-         pattern: '(?i)\b\d+ passed\b|\bpass(es|ed)? \d+ of \d+'}
+         pattern: '(?i)\b\d+ passed\b|\bpass(es|ed)? \d+ ?(of|/) ?\d+'}
 
   # /sc:intent --through runs the whole Large chain from one prompt
   # (docs/features/goal-chain). Its contract: work lands on a feature branch,
