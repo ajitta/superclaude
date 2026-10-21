@@ -883,7 +883,9 @@ def test_sandbox_walk_stops_at_the_fake_home(
     $HOME, reached the developer's real ~/.claude/superclaude (pytest's temp
     root sits under the user profile) and reported it as a healthy project
     install. A decoy install above the sandbox stands in for that real one on
-    every platform; each scope must find its own install, not the decoy."""
+    every platform; each scope must find its own install, not the decoy.
+    Only [user] can fail on a side-by-side layout: project and local find
+    their own install in the project before the walk leaves it."""
     (tmp_path / ".claude" / "superclaude").mkdir(parents=True)
     _home, _project, base = fresh_install(tmp_path, monkeypatch, scope)
     analyze = base / "commands" / "sc" / "analyze.md"
