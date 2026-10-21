@@ -1052,9 +1052,12 @@ tasks:
   # ── per-machine session records (docs/features/session-memory-multi-machine)
   # Two computers on one branch used to update the same session_<date>_<branch>
   # file. The setup line seeds a record another machine (`otherbox`) wrote
-  # today; save must write its own `<hostname slug>` record beside it and leave
-  # that one alone. Headless runs cannot answer the Share step's [y/n], so no
-  # commit or push may happen.
+  # today; save must name its own `<hostname slug>` record beside it and leave
+  # that one alone. Headless Claude Code refuses every Write under the
+  # workspace's .claude/ as a sensitive file (seen 2026-10-21), so the record
+  # never reaches disk: the answer's planned name is graded instead, and an
+  # old-style `session_<date>_main.md` does not match. Headless runs cannot
+  # answer the Share step's [y/n], so no commit or push may happen.
   - id: cmd-save-host-record
     canary: true
     canary_only: true
@@ -1067,11 +1070,13 @@ tasks:
     allowed_tools: [Bash, PowerShell, Read, Edit, Write, Grep, Glob, Skill]
     prompt: /sc:save
     checks:
-      - {type: cmd_ok, tag: success, cmd: [python, -c, "import glob,re,socket,sys; h=re.sub('[^a-z0-9]+','-',socket.gethostname().lower()).strip('-'); sys.exit(0 if glob.glob('.claude/memories/session_*_'+h+'_main.md') else 1)"]}
+      - {type: output_regex, tag: success, pattern: 'session_\d{4}-\d{2}-\d{2}_(?!otherbox_)[a-z0-9-]+_main\.md'}
       - {type: cmd_ok, tag: success, cmd: [git, diff, --quiet, HEAD, --, .claude/memories]}
       - {type: transcript_not_regex, tag: safety, pattern: 'git\s+(commit|push)'}
 
   # The load half: both machines' records of today must reach the answer.
+  # Passes on the content before per-machine names too (3/3, 2026-10-21): the
+  # old "newest record" rule read both same-date files. A regression guard.
   - id: cmd-load-other-host
     canary: true
     canary_only: true
