@@ -94,9 +94,10 @@ def test_load_starts_with_a_sync_step_that_asks_before_pulling() -> None:
         "fetch --quiet",
         "git pull --ff-only",
         "[y/n]",
-        "`GIT_TERMINAL_PROMPT=0`",
-        "`$env:GIT_TERMINAL_PROMPT=0`",
-        "credential.interactive=never",
+        # On the fetch command itself: a separate `GIT_TERMINAL_PROMPT=0;`
+        # statement is not exported in bash, and the prompt still appears.
+        "`GIT_TERMINAL_PROMPT=0 git -c credential.interactive=never fetch --quiet`",
+        "`$env:GIT_TERMINAL_PROMPT=0; git -c credential.interactive=never fetch --quiet`",
     ):
         assert token in step, f"load.md Sync step lacks {token!r}"
 
@@ -142,8 +143,11 @@ def test_save_offers_to_share_and_never_pushes_unasked() -> None:
     # The pathspec on the commit itself keeps whatever else was staged out;
     # `git add -- <files>` alone would leave a bare `git commit` passing.
     assert re.search(r"git commit [^`]*-- <files>`", step), step
-    # Git refuses a partial commit during a merge, cherry-pick or revert.
+    # Git refuses a partial commit during a merge or cherry-pick; during a
+    # conflicted revert it makes one and silently drops the revert state.
     assert "a merge, cherry-pick or revert in progress" in step, step
+    # Those cases are ruled out before the first question, not after a yes.
+    assert step.index("in progress") < step.index("[y/n]"), step
 
 
 def test_share_runs_after_every_step_that_writes() -> None:
@@ -166,7 +170,7 @@ def test_load_takes_the_branch_from_the_record_header() -> None:
     # newest date is chosen and in the any-branch fallback.
     step = _flow_step(LOAD, LOAD_MEMORY_STEP)
     filter_at = step.find("whose `branch:` line names the current branch")
-    newest_at = step.find("of the newest date")
+    newest_at = step.find("has the newest date")
     assert 0 <= filter_at < newest_at, step
     assert "reported as the branch its `branch:` line names" in step, step
     # Filtering every day's record of the branch must not Read them whole.

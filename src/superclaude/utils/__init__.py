@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import subprocess
+    from collections.abc import Callable
 
 # `hashlib` and `tempfile` are imported inside the two functions that use them.
 # Every hook script pays this module's import cost on every tool call, and
@@ -88,43 +89,93 @@ def run_shell(
     """Run ``cmd`` through the shell with captured text output and a timeout
     that holds; on timeout raise ``subprocess.TimeoutExpired`` as ``run`` does.
 
-    ``subprocess.run(cmd, shell=True, timeout=...)`` kills only the shell. A
-    command the shell started keeps the output pipes open, so ``run`` waits for
-    it to finish anyway: on Windows always (cmd.exe never execs its command), on
-    POSIX whenever the shell forks. This kills the whole process tree instead
+    ``subprocess.run(cmd, shell=True, timeout=...)`` kills only the shell. On
+    Windows the command the shell started keeps the output pipes open, so
+    ``run`` waits for it to finish anyway (cmd.exe never execs its command); on
+    POSIX ``run`` returns, but the command the shell forked keeps running in
+    the background. This kills the whole process tree instead
     (tests/unit/test_run_shell.py).
+
+    On POSIX the command runs in its own session, so a signal sent to the
+    caller's process group (Ctrl-C, a supervisor's SIGTERM or SIGHUP) no longer
+    reaches it. The caller's side covers that: any exception while the command
+    runs, KeyboardInterrupt included, kills the tree, and while it runs a
+    SIGTERM or SIGHUP that would end the caller by default raises SystemExit
+    instead, so the same path runs. A descendant that leaves the session itself
+    (``setsid``) is out of reach.
     """
     import subprocess
 
     extra: dict[str, Any] = (
         {} if sys.platform == "win32" else {"start_new_session": True}
     )
-    with subprocess.Popen(
-        cmd,
-        shell=True,
-        cwd=cwd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        **extra,
-    ) as proc:
-        try:
-            stdout, stderr = proc.communicate(timeout=timeout)
-        except subprocess.TimeoutExpired as exc:
-            _kill_process_tree(proc.pid)
-            proc.kill()
+    restore = _exit_on_termination_signals()
+    try:
+        with subprocess.Popen(
+            cmd,
+            shell=True,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            **extra,
+        ) as proc:
             try:
-                # Drain the pipes so the shell can be reaped; a descendant that
-                # detached from the tree must not hang the caller here instead.
-                proc.communicate(timeout=5)
-            except subprocess.TimeoutExpired:
-                pass
-            raise exc
-        return subprocess.CompletedProcess(cmd, proc.returncode, stdout, stderr)
+                stdout, stderr = proc.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired as exc:
+                _kill_process_tree(proc.pid)
+                proc.kill()
+                try:
+                    # Drain the pipes so the shell can be reaped; a descendant
+                    # that detached from the tree must not hang the caller here.
+                    proc.communicate(timeout=5)
+                except subprocess.TimeoutExpired:
+                    pass
+                raise exc
+            except BaseException:
+                # Ctrl-C, a termination signal (see above) or any other error:
+                # the command must not outlive the call, as with ``run``.
+                _kill_process_tree(proc.pid)
+                proc.kill()
+                raise
+            return subprocess.CompletedProcess(cmd, proc.returncode, stdout, stderr)
+    finally:
+        restore()
+
+
+def _exit_on_termination_signals() -> "Callable[[], None]":
+    """While run_shell's command runs, make SIGTERM and SIGHUP raise SystemExit.
+
+    Only a signal whose handler is the default (end the process at once) is
+    changed, and only in the main thread on POSIX; a handler the caller set
+    stays. Returns the function that puts the old handlers back.
+    """
+    import threading
+
+    if sys.platform == "win32" or threading.current_thread() is not (
+        threading.main_thread()
+    ):
+        return lambda: None
+    import signal
+
+    def _exit(signum: int, _frame: object) -> None:
+        raise SystemExit(128 + signum)
+
+    changed = []
+    for sig in (signal.SIGTERM, signal.SIGHUP):
+        if signal.getsignal(sig) is signal.SIG_DFL:
+            signal.signal(sig, _exit)
+            changed.append(sig)
+
+    def restore() -> None:
+        for sig in changed:
+            signal.signal(sig, signal.SIG_DFL)
+
+    return restore
 
 
 def _kill_process_tree(pid: int) -> None:
-    """Kill ``pid`` and every process it started (run_shell's timeout path)."""
+    """Kill ``pid`` and every process it started (run_shell's cleanup path)."""
     import subprocess
 
     if sys.platform == "win32":
