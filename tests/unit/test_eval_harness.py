@@ -1127,8 +1127,9 @@ _CSV_TEST = (
 
 def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     """The fixture's Proof is red on frozen code, so a run passes only when it
-    does the task, leaves plan and README short of `complete`, names the cause
-    and leaves the frozen files alone, committed or not."""
+    does the task, records the red Proof in a Result: line, leaves plan and
+    README short of `complete`, names the cause and leaves the frozen files
+    alone, committed or not."""
     run_eval, task, ws = _fixture_ws(tmp_path, "implement-proof-fail")
     proof = subprocess.run(
         [run_eval.PY_BIN, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
@@ -1145,6 +1146,19 @@ def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     _set_field(plan, "status", "implementing")
     _set_field(readme, "phase", "implementing")
     report = "Proof red: tests/test_legacy_tax.py fails on frozen shop/legacy_tax.py."
+    footer = plan.read_text(encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, report)), "no Result: line passed"
+    for result, ok in (
+        ("Result: abc1234 — 1 failed, 2 passed", True),
+        ("Result: abc1234 — red: test_legacy_tax fails", True),
+        ("Result: abc1234 — 3 passed", False),
+        ("Result: abc1234 — 1 failed, 2 passed (accepted by user)", False),
+    ):
+        plan.write_text(footer + "\n" + result + "\n", encoding="utf-8")
+        assert all(_grade(run_eval, task, ws, report)) is ok, result
+    plan.write_text(
+        footer + "\nResult: abc1234 — 1 failed, 2 passed\n", encoding="utf-8"
+    )
     assert all(_grade(run_eval, task, ws, report))
     assert not all(_grade(run_eval, task, ws, "All tasks done."))
 
@@ -1182,6 +1196,93 @@ def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     legacy.write_text(legacy.read_text().replace("0.11", "0.10"), encoding="utf-8")
     commit_all()
     assert not all(_grade(run_eval, task, ws, report)), "a committed edit escaped"
+
+
+def test_implement_proof_green_leaves_the_plan_implementing(tmp_path):
+    """With a green Proof, a run passes only when it does the task, writes a
+    green Result: line and leaves plan and README short of `complete`."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "implement-proof-green")
+    assert not (ws / "tests" / "test_legacy_tax.py").exists()
+    (ws / "shop" / "export.py").write_text(_CSV_EXPORT, encoding="utf-8")
+    (ws / "tests" / "test_export.py").write_text(_CSV_TEST, encoding="utf-8")
+    proof = subprocess.run(
+        [run_eval.PY_BIN, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        cwd=ws,
+        capture_output=True,
+        text=True,
+    )
+    assert proof.returncode == 0, proof.stdout
+    plan = ws / "docs" / "features" / "csv-export" / "05-plan.md"
+    readme = plan.parent / "README.md"
+    footer = plan.read_text(encoding="utf-8")
+    _set_field(plan, "status", "implementing")
+    footer = plan.read_text(encoding="utf-8")
+
+    def passes():
+        return all(_grade(run_eval, task, ws, "Proof green."))
+
+    assert not passes(), "no Result: line passed"
+    for result, ok in (
+        ("Result: abc1234 — 3 passed", True),
+        ("Result: abc1234 — 1 failed, 2 passed", False),
+        ("Result: abc1234 — done", False),
+    ):
+        plan.write_text(footer + "\n" + result + "\n", encoding="utf-8")
+        assert passes() is ok, result
+    plan.write_text(footer + "\nResult: abc1234 — 3 passed\n", encoding="utf-8")
+    assert passes()
+    _set_field(plan, "status", "complete")
+    assert not passes(), "implement set the plan complete"
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "complete")
+    assert not passes(), "implement set the feature complete"
+    _set_field(readme, "phase", "implementing")
+    (ws / "tests" / "test_export.py").unlink()
+    assert not passes(), "task not done passed"
+
+
+@pytest.mark.parametrize(
+    "task_id", ["reflect-plan-close", "reflect-plan-close-review-due"]
+)
+def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
+    """Headless, /sc:reflect has no user to say yes, so a run passes only when
+    plan and README stay as they are and no code or review file changes; with
+    review round 2 in place it proposes `complete`, without it it names the
+    review that is due."""
+    run_eval, task, ws = _fixture_ws(tmp_path, task_id)
+    plan = ws / "docs" / "features" / "csv-export" / "05-plan.md"
+    readme = plan.parent / "README.md"
+    review = plan.parent / "06-review.md"
+    fix_sha = _git(ws, "rev-parse", "--short", "HEAD~1").strip()
+    assert _git(ws, "log", "-1", "--format=%s", "HEAD~1").startswith("fix: apply")
+    text = plan.read_text(encoding="utf-8")
+    assert "status: implementing" in text and f"Result: {fix_sha} " in text
+    assert ("## Round 2" in review.read_text(encoding="utf-8")) is (
+        task_id == "reflect-plan-close"
+    )
+
+    if task_id == "reflect-plan-close":
+        good = "All Plan-Close conditions hold. Shall I mark the plan complete?"
+        bad = "Done. Nothing else to do."
+    else:
+        good = "Not yet: the F-1 fix needs a re-review before the plan can close."
+        bad = "Everything checks out; the plan can close."
+
+    def passes(answer=good):
+        return all(_grade(run_eval, task, ws, answer))
+
+    assert passes()
+    assert not passes(bad)
+    _set_field(plan, "status", "complete")
+    assert not passes(), "plan written without the user's yes"
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "complete")
+    assert not passes(), "README written without the user's yes"
+    _set_field(readme, "phase", "implementing")
+    review.write_text(review.read_text(encoding="utf-8") + "\nx\n", encoding="utf-8")
+    assert not passes(), "review file edited"
+    _git(ws, "checkout", "-q", "--", ".")
+    assert passes()
 
 
 def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):

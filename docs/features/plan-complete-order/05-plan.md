@@ -17,30 +17,30 @@ revised: 2026-10-22
 
 **Files:** Modify: `evals/tasks.yaml`, `tests/unit/test_eval_harness.py`
 
-- [ ] Step 1: Write failing test: `test_implement_proof_fail_grades_status_against_the_red_proof`에 계획 Proof 아래 `Result:` 줄이 없으면, 녹색을 주장하면, "(accepted by user)"가 붙으면 실패하는 경우를 넣는다
-- [ ] Step 2: Verify it fails: `uv run pytest tests/unit/test_eval_harness.py -k proof_fail -q`
-- [ ] Step 3: check 추가: 계획 파일의 `Result:` 줄이 실패를 적는다(`fail|red|error`)
-- [ ] Step 4: Verify it passes
+- [x] Step 1: Write failing test: `test_implement_proof_fail_grades_status_against_the_red_proof`에 계획 Proof 아래 `Result:` 줄이 없으면, 녹색을 주장하면, "(accepted by user)"가 붙으면 실패하는 경우를 넣는다
+- [x] Step 2: Verify it fails: `uv run pytest tests/unit/test_eval_harness.py -k proof_fail -q`
+- [x] Step 3: check 추가: 계획 파일의 `Result:` 줄이 실패를 적는다(`fail|red|error`)
+- [x] Step 4: Verify it passes
 
 ### Task 1.2: `implement-proof-green`
 
 **Files:** Modify: `evals/tasks.yaml`, `tests/unit/test_eval_harness.py`
 
-- [ ] Step 1: Write failing test: `implement-proof-fail` fixture에서 legacy 테스트를 지운 workspace(녹색 Proof). 계획이 `complete`이면, README가 `complete`이면, `Result:`가 없으면 실패하고, `implementing` + `Result:` + 작업 완료면 통과
-- [ ] Step 2: Verify it fails (task id 없음)
-- [ ] Step 3: task 추가(`canary: true`, `canary_only: true`, `covers: [implement]`)
-- [ ] Step 4: Verify it passes
+- [x] Step 1: Write failing test: `implement-proof-fail` fixture에서 legacy 테스트를 지운 workspace(녹색 Proof). 계획이 `complete`이면, README가 `complete`이면, `Result:`가 없으면 실패하고, `implementing` + `Result:` + 작업 완료면 통과
+- [x] Step 2: Verify it fails (task id 없음)
+- [x] Step 3: task 추가(`canary: true`, `canary_only: true`, `covers: [implement]`)
+- [x] Step 4: Verify it passes
 
 ### Task 1.3: `reflect-plan-close`와 `reflect-plan-close-review-due`
 
 **Files:** Modify: `evals/tasks.yaml`, `tests/unit/test_eval_harness.py`
 
-- [ ] Step 1: Write failing test: `test-reflect-gate` fixture 위에 (a) fix 커밋, `Result:` 줄(계획은 `implementing`), 리뷰 Round 2(Critical·Important 없음)를 둔 workspace와 (b) Round 2가 없는 workspace. 둘 다 계획·README가 그대로이고 `.py`가 바뀌지 않아야 통과. (a)는 `complete` 제안을 말해야, (b)는 다음 리뷰를 말해야 통과
-- [ ] Step 2: Verify it fails
-- [ ] Step 3: task 둘 추가(`covers: [reflect]`)
-- [ ] Step 4: Verify it passes
+- [x] Step 1: Write failing test: `test-reflect-gate` fixture 위에 (a) fix 커밋, `Result:` 줄(계획은 `implementing`), 리뷰 Round 2(Critical·Important 없음)를 둔 workspace와 (b) Round 2가 없는 workspace. 둘 다 계획·README가 그대로이고 `.py`가 바뀌지 않아야 통과. (a)는 `complete` 제안을 말해야, (b)는 다음 리뷰를 말해야 통과
+- [x] Step 2: Verify it fails
+- [x] Step 3: task 둘 추가(`covers: [reflect]`)
+- [x] Step 4: Verify it passes
 - [ ] Step 5: 바꾸기 전 값: 새 프로브 셋을 지금 src로 한 번씩(sonnet, low). 05a 대신 이 계획의 Measurements에 적는다
-- [ ] Commit Phase 1: `test(evals): implement-proof-green, reflect-plan-close probes; proof-fail reads the Result line`
+- [x] Commit Phase 1: `test(evals): implement-proof-green, reflect-plan-close probes; proof-fail reads the Result line`
 
 ## Phase 2: shipped 문구 (one commit)
 
