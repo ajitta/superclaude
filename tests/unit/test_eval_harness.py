@@ -1206,6 +1206,10 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
     seen = "pytest passes 2 of 2. No round-2 review closes F-1; then /sc:reflect."
     assert all(_grade(run_eval, task, ws, seen))
     assert all(_grade(run_eval, task, ws, seen.replace("2 of 2", "2/2")))
+    after = "2 passed. No review after the fix 7e7f867; then /sc:reflect."
+    assert all(_grade(run_eval, task, ws, after))
+    done_after = "2 passed. Review done after the fix; run /sc:reflect next."
+    assert not all(_grade(run_eval, task, ws, done_after))
 
     readme = ws / "docs" / "features" / "csv-export" / "README.md"
     _set_field(readme, "phase", "complete")

@@ -97,6 +97,19 @@ revised: 2026-10-21
 - [x] Step 4: 검사(문서만, 실행 없음): 세 파일을 다시 읽는다. `uv run pytest tests/unit/test_docs_ssot_guards.py -q` → 통과
 - [x] Commit Phase 3: `docs: review-reflect-gates — CHANGELOG, analysis item B decided`
 
+## Phase 4: `/sc:test` Report 단계 한 줄 (one commit)
+
+Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2026-10-21에 `test.md` 본문 한 줄을 골랐다(로더 트리거와 그대로 두기 대신).
+
+### Task 4.1: Report 단계
+
+**Files:** Modify: `src/superclaude/commands/test.md`(flow Report 단계)
+
+- [x] Step 1: Report 단계 끝에 더한다: 시험한 작업이 계획 문서(feature 폴더의 `05-plan.md`)로 진행됐으면 `/sc:reflect`를 돌기 전에는 끝나지 않았다고 말하고, 마지막 리뷰 round 뒤에 커밋된 수정은 다시 리뷰할 차례라고 짚는다
+- [x] Step 2: `uv run pytest tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_docs_ssot_guards.py tests/unit/test_description_overlap.py -q` → 1102 passed
+- [x] Step 3: 프로브 3번(`--runs-dir C:/sc-evals/rrg-body-<n>`), `## Measurements`에 적는다
+- [x] Commit Phase 4: `fix(test): /sc:test report names /sc:reflect and the unreviewed fix for planned work`
+
 ## Integration (커밋 아님)
 
 - [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`
@@ -111,11 +124,15 @@ revised: 2026-10-21
 
 - 바꾸기 전(Phase 1 시점 src, `C:/sc-evals/rrg-before-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`를 부른 답은 0/3. 세 답 모두 F-1 수정에 round 2 리뷰가 없다고 스스로 짚었다(재리뷰 3/3). 재리뷰 check는 이미 바닥이 높아 규칙 효과를 재지 못한다.
 - 바꾼 뒤(Phase 2 src, `C:/sc-evals/rrg-after-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`는 여전히 0/3이다. 설치된 `test.md` handoff에 `/sc:reflect`가 들어간 것은 확인했다. 세 답 모두 "다음 단계"로 테스트 추가, round 2 리뷰, status 갱신을 들었고 reflect는 들지 않았다. `/sc:test`만 도는 세션에서는 handoff 한 단어로 행동이 바뀌지 않았다. RULES_DOCS 게이트는 이 세션에 로드되지 않으므로(Risks) 이 프로브로는 재지 못한다.
+- Phase 4 뒤(`test.md` Report 단계 한 줄, `C:/sc-evals/rrg-body-1..3`, 이 컴퓨터): 세 번 모두 `Y Y Y Y Y`(5/5). `/sc:reflect` 3/3(전 6회 0/6). 세 답 모두 "계획 문서로 진행했으니 `/sc:reflect` 전에는 끝이 아니다"와 F-1 수정의 다음 리뷰 round를 다음 단계로 들었다. 아홉 번 모두 최종 정규식으로 다시 채점한 값이다.
 
 ## Deviations
 
 - Task 1.2 채점 정규식 두 개를 바꾸기 전 값 3회를 본 뒤 넓혔다. 재리뷰: `round 2` → `round[- ]2`(run 3이 "round-2"라 써서 놓쳤다). 테스트 실행: `\d+ passed`에 `pass(es|ed)? \d+ of \d+`를 더했다(run 1·2가 "passes 2 of 2"). 채점 테스트에 그 표현을 넣었고, 바꾸기 전 3회는 새 정규식으로 다시 채점했다(Measurements).
 - Phase 2 Step 3 뒤 테스트 실행 정규식을 한 번 더 넓혔다: `(of|/)`(run after-2가 "passes 2/2"). 여섯 번 모두 새 정규식으로 다시 채점했다.
+- Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
+- Phase 4 측정 뒤 재리뷰 정규식에 `no review[^.
+]{0,20}after`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
 
 ## Risks
 
@@ -138,4 +155,4 @@ revised: 2026-10-21
 - `uv run pytest tests/unit/test_docs_ssot_guards.py -k chains -q` → 1 passed
 - `test-reflect-gate` 3회: `/sc:reflect` check가 바꾸기 전보다 많이 통과한다. 수치는 `## Measurements`
 
-Result: 75d2addc — `uv run pytest` 3789 passed, 12 skipped (exit 0); lint, format, typecheck clean; drift test passed; `test-reflect-gate` `/sc:reflect` 0/3 after the change (baseline 0/3), so the third Proof item is red. Status stays `implementing` until the owner decides.
+Earlier result (before Phase 4): 75d2addc — `uv run pytest` 3789 passed, 12 skipped (exit 0); lint, format, typecheck clean; drift test passed; `test-reflect-gate` `/sc:reflect` 0/3 after the change (baseline 0/3), so the third Proof item is red. Status stays `implementing` until the owner decides.

@@ -516,7 +516,7 @@ tasks:
       # The F-1 fix changed reviewed code after the only review round, so it
       # goes back to review. "Review done" alone does not count.
       - {type: output_regex, tag: verification,
-         pattern: '(?i)\bre-?review|review\b[^.\n]{0,40}\bagain\b|second (review|round)|round[- ]2'}
+         pattern: '(?i)\bre-?review|review\b[^.\n]{0,40}\bagain\b|second (review|round)|round[- ]2|\bno review\b[^.\n]{0,20}\bafter\b'}
       # /sc:test runs tests; it changes no code and does not close the feature.
       - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, shop, tests]}
       - {type: cmd_ok, tag: verification,
