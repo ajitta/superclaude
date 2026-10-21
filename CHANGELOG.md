@@ -8,6 +8,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:save` names each session record by date, machine and branch: `session_<date>_<host>_<branch>.md`, where `<host>` is your `hostname` in lowercase with other characters turned into `-`. Two computers saving on the same branch on the same day now write separate files instead of both updating one, which made the second push conflict. `/sc:load` reads every machine's record of the newest date and says which machine wrote each. Existing records keep their names and are still read. The hostname ends up in the filename, so it is committed with `.claude/memories/`.
+- `/sc:load` and `/sc:save` first check whether the branch is behind its upstream (`git fetch`) and ask before `git pull --ff-only`. After saving, `/sc:save` offers to commit the memory files it wrote and, when every unpushed commit changes only memory files, to push them. Nothing is pulled, committed or pushed without your yes; with no upstream or no network the check is one line and the command goes on.
+
 ### Fixed
 
 - Shell-command timeouts now stop the whole command. The test run after an edit (`test_runner_hook`, 120 s) and `/sc:auto-improve`'s eval and smoke commands killed only the shell when time ran out: on Windows the command it started kept running and the call waited for it to finish, so a hung test or eval never timed out; on Linux and macOS the call returned but the command was left running in the background. They now kill every process the command started.

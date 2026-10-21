@@ -5,9 +5,12 @@ Session memory lives in the committed project folder `.claude/memories/`.
 auto memory; no memory-server tool calls remain. The folder must stay out of
 superclaude's git-exclude block so the memories are committed.
 
-Session state goes into an add-only record named by date and branch. A
-fixed-name file that every save overwrites conflicts on merge as soon as two
-branches or worktrees both save, so no writer may name one.
+Session state goes into an add-only record named by date, machine and branch.
+A fixed-name file that every save overwrites conflicts on merge as soon as two
+branches or worktrees both save, so no writer may name one. The machine part
+keeps two computers on one branch apart on the same day: without it both
+updated the same `session_<date>_<branch>.md`
+(docs/features/session-memory-multi-machine).
 """
 
 import re
@@ -22,7 +25,7 @@ SAVE = SRC / "commands" / "save.md"
 LOAD = SRC / "commands" / "load.md"
 
 MEMORY_FOLDER = ".claude/memories/"
-SESSION_RECORD = "session_[date]_[branch-slug].md"
+SESSION_RECORD = "session_[date]_[host-slug]_[branch-slug].md"
 SESSION_RECORD_GLOB = "session_*_[branch-slug].md"
 # Fixed-name files every save used to overwrite.
 OVERWRITTEN_NAMES = ("last_session", "next_actions")
@@ -55,7 +58,52 @@ def test_save_writes_a_branch_scoped_session_record() -> None:
 
 
 def test_load_reads_the_record_save_writes() -> None:
-    assert SESSION_RECORD_GLOB in _load_flow_step_one()
+    # Old records (no machine part) end in `_[branch-slug].md` too, so one
+    # glob reads both.
+    assert SESSION_RECORD_GLOB in _flow_step(LOAD, LOAD_MEMORY_STEP)
+
+
+def test_save_defines_the_host_slug() -> None:
+    storage = _read(SAVE).split("<storage>", 1)[1].split("</storage>", 1)[0]
+    line = next(
+        (ln for ln in storage.splitlines() if ln.strip().startswith("Host slug:")),
+        "",
+    )
+    assert "`hostname`" in line and "[a-z0-9]" in line, (
+        "save.md <storage> must define the Host slug from `hostname`"
+    )
+
+
+def test_load_reads_every_machine_record_of_the_newest_date() -> None:
+    assert "one per machine" in _flow_step(LOAD, LOAD_MEMORY_STEP)
+
+
+def _first_flow_step(path: Path) -> str:
+    flow = _read(path).split("<flow>", 1)[1].split("</flow>", 1)[0]
+    return next(ln.strip() for ln in flow.splitlines() if ln.strip().startswith("1."))
+
+
+def test_load_starts_with_a_sync_step_that_asks_before_pulling() -> None:
+    # Two machines share the records through git: loading before a pull reads
+    # the other machine's state from before its last push.
+    step = _first_flow_step(LOAD)
+    assert step.startswith("1. Sync:"), step
+    for token in ("git fetch", "git pull --ff-only", "[y/n]"):
+        assert token in step, f"load.md Sync step lacks {token!r}"
+
+
+def test_save_starts_with_the_load_sync_step() -> None:
+    # One definition: save points at load's Sync step instead of restating it.
+    step = _first_flow_step(SAVE)
+    assert step.startswith("1. Sync:"), step
+    assert "the /sc:load Sync step" in step, step
+
+
+def test_save_offers_to_share_and_never_pushes_unasked() -> None:
+    step = _flow_step(SAVE, "Share")
+    assert step, "save.md has no Share step"
+    for token in ("[y/n]", "git push", "memory files only"):
+        assert token in step, f"save.md Share step lacks {token!r}"
 
 
 @pytest.mark.parametrize("path", [SAVE, LOAD], ids=["save", "load"])
@@ -65,15 +113,22 @@ def test_no_fixed_name_session_file(path: Path) -> None:
         assert name not in text, f"{path.name} still names {name!r}"
 
 
-def _load_flow_step_one() -> str:
-    flow = _read(LOAD).split("<flow>", 1)[1].split("</flow>", 1)[0]
+LOAD_MEMORY_STEP = "Load (memory folder)"
+
+
+def _flow_step(path: Path, label: str) -> str:
+    """The `N. <label>: ...` line of the command's <flow>, found by label so a
+    step added in front does not move it."""
+    flow = _read(path).split("<flow>", 1)[1].split("</flow>", 1)[0]
+    pattern = re.compile(rf"^\d+(?:\.\d+)?\.\s+{re.escape(label)}:")
     return next(
-        line.strip() for line in flow.splitlines() if line.strip().startswith("1.")
+        (line.strip() for line in flow.splitlines() if pattern.match(line.strip())),
+        "",
     )
 
 
-def _load_flow_step_one_keys() -> list[str]:
-    match = re.search(r"Read (.*?) when present", _load_flow_step_one())
+def _load_flow_step_keys() -> list[str]:
+    match = re.search(r"Read (.*?) when present", _flow_step(LOAD, LOAD_MEMORY_STEP))
     if match is None:
         return []
     return [key.strip() for key in match.group(1).split(",") if key.strip()]
@@ -83,9 +138,10 @@ def test_every_key_load_reads_has_a_writer() -> None:
     # Fixed-name keys load.md reads must be written by /sc:save; the retired
     # project-manager agent was the only writer of pm_context, so load.md
     # stopped reading it (docs/features/agent-roster-audit).
-    keys = _load_flow_step_one_keys()
+    keys = _load_flow_step_keys()
     assert keys, (
-        "load.md <flow> step 1 names no keys between 'Read ' and ' when present'"
+        "load.md Load (memory folder) step names no keys between 'Read ' and "
+        "' when present'"
     )
     save = _read(SAVE)
     missing = [key for key in keys if f"{MEMORY_FOLDER}{key}.md" not in save]

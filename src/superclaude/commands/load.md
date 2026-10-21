@@ -10,12 +10,13 @@ description: Load session context from the project memory folder (.claude/memori
   <syntax>/sc:load [target] [--type project|config|deps|checkpoint] [--refresh] [--analyze]</syntax>
 
   <flow>
-  1. Load (memory folder): Glob .claude/memories/*.md → Read learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the newest session_*_[branch-slug].md of the current branch (slug per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
-  2. Load (auto memory): MEMORY.md is already in context (Claude Code loads it); Read a memory file it points to only when that pointer bears on the session's work
-  3. Discover: project structure and requirements (Glob/Grep/Read)
-  4. Activate: project context and workflow preparation
-  5. Validate: context integrity and session readiness
-  6. Session Goal (optional): if the user gives a goal, record it as a 1-line objective; restate it when the work changes direction and before /sc:save.
+  1. Sync: the branch has an upstream (`git rev-parse --abbrev-ref @{u}`) → `git fetch --quiet`, then `git rev-list --count HEAD..@{u}`; behind → tell the user the count and ask `[y/n]` before `git pull --ff-only`, and wait for the answer; no upstream, fetch fails or the pull stops → say so in one line and go on with the files on disk
+  2. Load (memory folder): Glob .claude/memories/*.md → Read learnings_corrections when present (corrections /sc:save keeps there while auto memory is off) + the current branch's records of the newest date among session_*_[branch-slug].md, one per machine — the part between the date and `_[branch-slug]` names the machine, and an empty part marks a record from before machine names; read each and say which machine wrote it (slugs per /sc:save <storage>); none → the newest session_* of any branch, reported as that branch's record; folder absent → skip
+  3. Load (auto memory): MEMORY.md is already in context (Claude Code loads it); Read a memory file it points to only when that pointer bears on the session's work
+  4. Discover: project structure and requirements (Glob/Grep/Read)
+  5. Activate: project context and workflow preparation
+  6. Validate: context integrity and session readiness
+  7. Session Goal (optional): if the user gives a goal, record it as a 1-line objective; restate it when the work changes direction and before /sc:save.
   </flow>
 
   <flags>
@@ -33,6 +34,7 @@ description: Load session context from the project memory folder (.claude/memori
   - Glob/Read: memory folder, auto memory and project file analysis
   - Grep: project file analysis
   - Write: checkpoint creation
+  - Bash: git fetch in the Sync step; git pull only after the user's yes
   </tools>
 
   <examples>
@@ -58,7 +60,7 @@ description: Load session context from the project memory folder (.claude/memori
 
   <bounds>
     <does>loads the memory folder and auto memory, persists context across sessions.</does>
-    <never>modifies project structure, loads without validation, or overrides without a checkpoint.</never>
+    <never>modifies project structure, loads without validation, overrides without a checkpoint, or pulls without the user's yes.</never>
     <fallback>Memory folder absent: auto memory + Read CLAUDE.md/PLANNING.md/TASK.md, Glob for the project structure. Ask the user for guidance when uncertain.</fallback>
   </bounds>
 

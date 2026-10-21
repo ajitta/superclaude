@@ -10,15 +10,17 @@ description: Save session context to the committed project memory folder (.claud
   <syntax>/sc:save [--type session|learnings|context|all] [--summarize] [--checkpoint]</syntax>
 
   <flow>
-  1. Analyze: session progress + discoveries
-  2. Persist (memory folder): Write .claude/memories/session_[date]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch updates it → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
-  3. Persist (auto memory): save the durable facts a later session needs (the no-ephemeral gotcha) to the auto memory folder, in the file layout Claude Code's memory instructions give; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
-    3.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory whose body names the broken rule as `violated_rule: "[RNN Name]"` [R14 Correction Capture].
-    3.6. Auto memory off: Claude Code names no auto memory folder anywhere in the session's context, neither in the system prompt nor in the first message (an agent's own agent memory folder does not count; for example the `autoMemoryEnabled` setting, `CLAUDE_CODE_DISABLE_AUTO_MEMORY`, or a self-hosted session turns it off) → skip the Persist (auto memory) step and write each correction from 3.5 to .claude/memories/learnings_corrections.md instead, so /sc:analyze still finds its `violated_rule` line
-  4. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores (auto memory off: the memory folder only)
-  5. Checkpoint: recovery points + progress tracking
-  6. Validate: data integrity + no duplicates across stores
-  7. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
+  1. Sync: the /sc:load Sync step, before writing — a `learnings_` file the other machine changed would otherwise conflict
+  2. Analyze: session progress + discoveries
+  3. Persist (memory folder): Write .claude/memories/session_[date]_[host-slug]_[branch-slug].md — first line `branch: <name> @<short sha>`, then the summary and a `## Next actions` checklist; a second save the same day on the same branch from the same machine updates it; a record another machine wrote is never edited → .claude/memories/learnings_[topic].md (insights); flat basename only, no path segments; create the folder when absent
+  4. Persist (auto memory): save the durable facts a later session needs (the no-ephemeral gotcha) to the auto memory folder, in the file layout Claude Code's memory instructions give; every worktree of the repo shares this folder, so name the branch in each project entry and Edit the one MEMORY.md line instead of rewriting the file
+    4.5. Corrections-Review: capture each user correction not yet recorded as a feedback memory whose body names the broken rule as `violated_rule: "[RNN Name]"` [R14 Correction Capture].
+    4.6. Auto memory off: Claude Code names no auto memory folder anywhere in the session's context, neither in the system prompt nor in the first message (an agent's own agent memory folder does not count; for example the `autoMemoryEnabled` setting, `CLAUDE_CODE_DISABLE_AUTO_MEMORY`, or a self-hosted session turns it off) → skip the Persist (auto memory) step and write each correction from the Corrections-Review step to .claude/memories/learnings_corrections.md instead, so /sc:analyze still finds its `violated_rule` line
+  5. Verify: Glob .claude/memories/*.md + Read MEMORY.md confirms both stores (auto memory off: the memory folder only)
+  6. Share: the memory files written are uncommitted → list them and ask `[y/n]` to commit only those files (`docs: session memory — <topic>`); yes, and the branch's unpushed commits change memory files only → ask `[y/n]` again before `git push`; other unpushed commits → commit only and say the push is left to the user; no → leave the files uncommitted
+  7. Checkpoint: recovery points + progress tracking
+  8. Validate: data integrity + no duplicates across stores
+  9. Session Goal: if session goal set via /sc:load, evaluate completion status (done/partial/deferred)
   </flow>
 
   <flags>
@@ -36,7 +38,8 @@ description: Save session context to the committed project memory folder (.claud
 
   <storage>
     Memory folder (primary): .claude/memories/ — one markdown file per memory name, committed with the project
-    Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch, so parallel branches and worktrees never conflict on merge
+    Branch slug: `git branch --show-current` with `/` → `-`; detached HEAD → `detached-<short sha>`. Session records are add-only per branch and machine, so parallel branches, worktrees and machines never conflict on merge
+    Host slug: `hostname` output, lowercased, each run of characters outside [a-z0-9] → `-`, leading and trailing `-` removed; no `hostname` → the `COMPUTERNAME` or `HOSTNAME` variable; neither → `unknown-host`
     Auto memory (supplementary): the folder Claude Code names for the session, in the system prompt or the first message (CC-native, per-project; moves with the `autoMemoryDirectory` setting) — MEMORY.md is its index and loads automatically, memory files are read on demand
     Agent memory: per agent, kept by Claude Code (not written by /sc:save); location follows the agent's `memory:` scope — user ~/.claude/agent-memory/{name}/, project .claude/agent-memory/{name}/, local .claude/agent-memory-local/{name}/
   </storage>
@@ -44,7 +47,7 @@ description: Save session context to the committed project memory folder (.claud
   <outputs note="Per --type flag">
 | Type | Memory folder | Content |
 |---|---|---|
-| session | session_[date]_[branch-slug] | Full context |
+| session | session_[date]_[host-slug]_[branch-slug] | Full context |
 | learnings | learnings_[topic] | Patterns + insights |
 | context | context_[project] | Project state |
 | all | All above | Complete preservation |
@@ -56,6 +59,7 @@ Every type also saves its durable facts to auto memory as memory files, unless a
   - Write/Edit: memory folder + auto memory persistence
   - Glob: list memory files
   - Read: verify both stores
+  - Bash: git fetch in the Sync step; pull, commit and push in the Sync and Share steps only after the user's yes
   </tools>
 
   <examples>
@@ -83,7 +87,7 @@ Every type also saves its durable facts to auto memory as memory files, unless a
 
   <bounds>
     <does>memory folder + auto memory sync, checkpoints when --checkpoint is given, discovery preservation.</does>
-    <never>saves without validation, overrides without a checkpoint, or duplicates content across stores.</never>
+    <never>saves without validation, overrides without a checkpoint, duplicates content across stores, or commits, pulls or pushes without the user's yes.</never>
     <fallback>Memory folder not writable: auto memory only, and tell the user. Ask the user for guidance when uncertain.</fallback>
   </bounds>
 

@@ -1330,6 +1330,8 @@ def test_changed_command_probes_match_prompt_skill_checks_and_covers():
     assert "intent-through-branch" in probes.probes_for({"design"}, tasks)
     assert "implement-proof-fail" in probes.probes_for({"implement"}, tasks)
     assert "cmd-delegated-load" in probes.probes_for({"load"}, tasks)
+    assert "cmd-load-other-host" in probes.probes_for({"load"}, tasks)
+    assert "cmd-save-host-record" in probes.probes_for({"save"}, tasks)
     fake = [
         {"id": "a", "canary": True, "prompt": "/sc:plan --from x"},
         {"id": "b", "prompt": "/sc:plan"},
