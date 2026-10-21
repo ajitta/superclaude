@@ -157,14 +157,26 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - [x] Step 4: 프로브 3번(`--runs-dir C:/sc-evals/rrg-fix3-<n>`), 저장된 run 다시 채점
 - [x] Commit Phase 7: `fix(core,review,test,evals): review round 3 — stop rule tied to a round's result, mention-only probe, real pytest run`
 
+## Phase 8: 4차 리뷰 반영 (one commit)
+
+발견과 처리는 [06-review](./06-review.md) 4차 표에 있다. N-1(Critical·Important에 대한 수정만 다시 리뷰)과 round 종료는 소유자 결정이다.
+
+**Files:** Modify: `src/superclaude/core/rules/RULES_DOCS.md`, `src/superclaude/commands/review.md`, `src/superclaude/commands/test.md`, `README.md`, `CHANGELOG.md`, `evals/tasks.yaml`(주석), `tests/unit/test_eval_harness.py`, `tests/unit/test_docs_ssot_guards.py`
+
+- [x] Step 1: 재리뷰 범위를 "a fix to a Critical or Important (review) finding"으로 세 곳과 README, CHANGELOG에서 맞춘다(N-1). README `/sc:reflect` 행(S-1), `tasks.yaml` 주석(S-2, S-4)
+- [x] Step 2: 채점 테스트에 여러 줄 입력 두 경우(S-3), drift test에 N-1 범위 세 곳, `review.md` `--through` 예외, README `/sc:reflect` 행, docstring(S-5)
+- [x] Step 3: `uv run pytest tests/unit/test_eval_harness.py -k "test_reflect_gate or all_check_types" -q` → 2 passed; `uv run pytest tests/unit/test_docs_ssot_guards.py tests/unit/test_command_structure.py tests/unit/test_cross_references.py tests/unit/test_description_overlap.py -q` → 1102 passed
+- [x] Step 4: 프로브 3번(`--runs-dir C:/sc-evals/rrg-final-<n>`)
+- [x] Commit Phase 8: `fix(core,review,test,evals): review round 4 — only Critical or Important fixes start another round`
+
 ## Integration (커밋 아님)
 
-- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42, 68112487에서 각각 3789 passed, 12 skipped, 나머지 통과
+- [x] 전체 suite: `uv run pytest` exit 0, `make lint`, `uv run ruff format --check src tests`, `make typecheck`. 75d2addc, 4de7ccb6, 90301a42, 68112487, 69ad177c에서 각각 3789 passed, 12 skipped, 나머지 통과
 - [ ] 마지막 커밋 뒤 전체 suite를 다시 돌려 `Result:`에 적는다
 - [x] `/sc:review --scope branch` 1차(독립 리뷰, 리뷰어에게 이 계획의 판단은 주지 않는다): [06-review](./06-review.md)
 - [x] 2차 리뷰: 1차 발견을 수용 기준으로(고쳤다는 주장 없이) Phase 5를 봤다: [06-review](./06-review.md) 2차
 - [x] 3차 리뷰: 1·2차 발견을 수용 기준으로 Phase 6을 봤다: [06-review](./06-review.md) 3차
-- [ ] 4차 리뷰(소유자 결정): Phase 7의 바뀐 문구와 채점을 1–3차 발견을 수용 기준으로 본다
+- [x] 4차 리뷰(소유자 결정): Phase 7의 바뀐 문구와 채점을 1–3차 발견을 수용 기준으로 봤다: [06-review](./06-review.md) 4차. Phase 8 뒤 round는 소유자가 멈췄다(남은 것은 테스트·프로브·drift test로 확인)
 - [ ] `/sc:reflect`로 Goal과 Proof 대비 판정
 - [ ] 계획 `status: complete`와 `Result:` 줄, README `phase: complete`
 - [ ] master 병합과 push는 소유자에게 묻는다. 릴리스는 하지 않는다
@@ -182,6 +194,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 6 뒤(`review.md` 한 줄, 종료 조건, `test.md` 범위, `C:/sc-evals/rrg-fix2-1..3`, 이 컴퓨터): 세 번 모두 7/7, 하네스가 run 때 채점(`run_eval.py` exit 0).
 - Phase 7 채점(6 check: reflect / 재리뷰 / `'*.py'` 그대로 / 새 .py 없음 / phase 그대로 / pytest 실행)으로 저장된 열다섯 run을 다시 채점했다: before·after 여섯 번 5/6(reflect만 n), body·fix·fix2 아홉 번 6/6.
 - Phase 7 뒤(종료 조건 문구, `review.md`·`test.md` 문구, `C:/sc-evals/rrg-fix3-1..3`, 이 컴퓨터): 세 번 모두 6/6, 하네스가 run 때 채점(`run_eval.py` exit 0).
+- Phase 8 뒤(최종 문구: Critical·Important 수정만 재리뷰, `C:/sc-evals/rrg-final-1..3`, 이 컴퓨터): 세 번 모두 6/6, 하네스가 run 때 채점(`run_eval.py` exit 0). 합계: `/sc:reflect`는 Report 단계 한 줄 전 0/6, 뒤 12/12.
 
 ## Deviations
 
@@ -190,6 +203,7 @@ Phase 2 뒤 프로브에서 `/sc:reflect`가 0/3 그대로였다. 소유자가 2
 - Phase 4를 더했다. Risks가 범위 밖으로 둔 `test.md` 본문 한 줄을, Phase 2 뒤 측정(0/3)을 보고 소유자가 골랐다.
 - Phase 4 측정 뒤 재리뷰 정규식에 `\bno review\b[^.\n]{0,20}\bafter\b`를 더했다(run body-3이 "No review after the fix"라 써서 놓쳤다). "Review done after the fix"는 여전히 실패하는 것을 채점 테스트에 넣었다.
 - Phase 5를 더했다(1차 리뷰 반영). 테스트 실행 check는 출력 정규식에서 `transcript_regex` `pytest`로 바꿨다. 범위가 넓어진 곳: README bug·refactor 체인, `verifier.md` 설명 한 구절, RULES_DOCS의 `--through` 예외(소유자 결정, [06-review](./06-review.md) I-4).
+- Phase 8을 더했다(4차 리뷰 반영). 재리뷰 범위를 Critical·Important 발견에 대한 수정으로 좁혔다(소유자 결정, 4차 N-1).
 - Phase 7을 더했다(3차 리뷰 반영). 흘려 넘김·완료 주장 check는 소유자 결정으로 뺐다. Phase 5·6에서 그 check에 맞춰 적은 채점 테스트 단계는 Phase 7에서 바뀌었다.
 - Phase 6을 더했다(2차 리뷰 반영). 범위가 넓어진 곳: `review.md` Process 단계 한 줄(소유자 결정, 2차 N-1)과 README `/sc:reflect` 행.
 

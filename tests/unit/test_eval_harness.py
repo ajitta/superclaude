@@ -1201,7 +1201,8 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
     )
     assert passes(good)
     assert not passes(good, bash=""), "an answer without a test run passed"
-    # A command line that runs pytest counts; one that only names it does not.
+    # A command line naming pytest counts unless it is a pip line or a
+    # --version/--collect-only call; inputs are joined one command per line.
     for runs in ("cd ws && pytest -q", "PYTHONPATH=. pytest -q", "timeout 60 pytest"):
         assert passes(good, bash=runs), runs
     for names in (
@@ -1210,6 +1211,8 @@ def test_test_reflect_gate_grades_done_claims(tmp_path):
         "python -m pytest --collect-only",
     ):
         assert not passes(good, bash=names), names
+    assert passes(good, bash="pip show pytest\npython -m pytest -q")
+    assert not passes(good, bash="pytest --version\npip install pytest")
     assert not passes("2 passed. csv-export is done and ready to merge.")
     assert not passes("2 passed. Review done; run /sc:reflect next.")
     assert not passes("Review done after the fix; run /sc:reflect next.")

@@ -524,15 +524,18 @@ tasks:
       # steps and then waves them off still passes; a regex for negation lost
       # to new wordings each review round and failed correct answers
       # (docs/features/review-reflect-gates/06-review.md, round 3).
-      # /sc:test runs tests; it changes no code, adds no file and does not
-      # close the feature. Any .py change against the baseline tag, committed
-      # or not; untracked new files are the glob check's.
+      # /sc:test runs tests; it changes no code and does not close the
+      # feature. Checked: any .py change against the baseline tag, committed
+      # or not; any new untracked .py file; the feature README's phase. Other
+      # files (a new .md, the plan's status) are not checked.
       - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}
       - {type: file_absent_glob, tag: scope, pattern: '**/*.py', exclude_baseline: true}
       - {type: cmd_ok, tag: verification,
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
-      # Anti-inaction guard: a command line that runs pytest; one that only
-      # installs, shows, versions or collects it does not count.
+      # Anti-inaction guard: some command line names pytest and is not a pip
+      # line or a --version/--collect-only call. A line that only reads a
+      # pytest file (cat pytest.ini) still counts; the check guards against
+      # no test run at all, not against every look-alike.
       - {type: transcript_regex, tag: success,
          pattern: '(?m)^(?!.*\bpip\b)(?!.*--(version|collect-only)\b).*\bpytest\b'}
 

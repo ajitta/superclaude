@@ -313,9 +313,9 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` Load step stops on a spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
 | `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran on the last code commit (`Result:` line) |
-| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical and Important findings fixed or accepted; a fix that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria; a code change after the `Result:` sha re-runs the Proof |
+| `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical and Important findings fixed or accepted; a fix to one that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria; a code change after the `Result:` sha re-runs the Proof |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
-| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | Every gap it names fixed (a fix that changes reviewed code goes back to review) or accepted; work run from a plan is done only after this |
+| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | Every gap it names fixed (a fix that changes reviewed code or shipped content goes back to review) or accepted; work run from a plan is done only after this |
 
 #### Other common chains
 

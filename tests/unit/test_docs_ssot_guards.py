@@ -513,8 +513,9 @@ def test_install_surfaces_name_every_component():
 
 # -------------------------------------------------- review-reflect-gates --
 def test_readme_chains_end_at_a_workflow_gate():
-    """Every command in README's Medium and Large chains is a gate target in
-    RULES_DOCS workflow_gates, and /sc:test hands off to /sc:reflect
+    """README chains, RULES_DOCS workflow_gates and the commands that carry the
+    gates (test.md, review.md, because RULES_DOCS does not load there) say the
+    same about /sc:reflect and the re-review of fixes
     (docs/features/review-reflect-gates: the chains ended at /sc:reflect while
     the gates ended at /sc:test, so reflect was skipped)."""
     text = _read(_README)
@@ -536,7 +537,10 @@ def test_readme_chains_end_at_a_workflow_gate():
     # chains keep it outside their "(optional: ...)" part.
     for tier, chain in rows:
         assert "`/sc:reflect`" in re.sub(r"\(.*?\)", "", chain), tier
-    assert re.search(r"->\s*/sc:review: a fix to a review finding", gates.group(1))
+    assert re.search(
+        r"->\s*/sc:review: a fix to a Critical or Important review finding",
+        gates.group(1),
+    )
 
     # RULES_DOCS does not load on /sc:test, so test.md carries the gate itself.
     test_md = _read(_SRC / "commands" / "test.md")
@@ -563,8 +567,16 @@ def test_readme_chains_end_at_a_workflow_gate():
     )
     assert stop in gates.group(1)
     assert stop in process.group(0)
-    assert "a fix to a review finding" in report.group(0)
+    # Only a fix to a Critical or Important finding starts another round.
+    assert "a fix to a Critical or Important review finding" in report.group(0)
+    assert "a fix to a Critical or Important review finding" in gates.group(1)
+    assert "A fix to a Critical or Important finding" in process.group(0)
+    assert "`/sc:intent --through` run keeps its single fix round" in process.group(0)
     assert "due for another review" in report.group(0)
+    reflect_row = re.search(r"^\| `/sc:reflect` \|.*$", text, re.M)
+    assert reflect_row and "reviewed code or shipped content goes back to review" in (
+        reflect_row.group(0)
+    )
     # Other README chains that run /sc:plan end with /sc:reflect too.
     for goal in ("Investigate a bug", "Refactor"):
         row = re.search(rf"^\| \*\*{goal}\*\* \| (.*) \|$", text, re.M)

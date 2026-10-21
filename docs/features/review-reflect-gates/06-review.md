@@ -80,3 +80,20 @@ Critical 없음. 아래는 발견과 처리다. "반영"은 이 브랜치의 다
 | N11 | "No need to edit code; it needs a re-review"가 실패할 수 있다. `test.md`가 게이트보다 넓다 | 앞은 N1 결정으로 해당 없음. 뒤는 반영: "that changed reviewed code or shipped content" |
 | N12 | README `/sc:reflect` 행에 재리뷰 괄호가 없다 | 반영 |
 | (범위 밖) | `review.md` handoff가 4개(규칙은 2-3개) | 이 브랜치 전부터다. 손대지 않았다 |
+
+## 4차 (2026-10-21, `69ad177c`, `self-review` 에이전트, 새 세션)
+
+3차 반영이 맞춰야 할 R1–R9와 소유자 결정 D1–D7을 줬다. 리뷰어는 shell이 없어 정규식을 손으로 따라갔다. R1–R9 충족, D1–D7 일치. 같은 커밋에서 전체 suite 3789 passed, 12 skipped.
+
+| ID | 발견 | 처리 |
+|---|---|---|
+| N-1 (Important) | 재리뷰 조건이 심각도와 무관하게 "a fix to a review finding"이라, Suggestion만 고쳐도 새 round가 생긴다 | 소유자 결정: Critical·Important에 대한 수정만. RULES_DOCS, `review.md`, `test.md`, README, CHANGELOG에 같은 범위로. drift test가 세 곳을 고정 |
+| S-1 | README `/sc:reflect` 행이 "reviewed code"만 | 반영: "reviewed code or shipped content" |
+| S-2 | 테스트 실행 check 주석이 정규식보다 넓게 말한다(`cat pytest.ini`도 셈) | 반영: 주석이 실제 규칙을 말한다. 무엇이든 테스트 실행이 없을 때를 막는 guard다 |
+| S-3 | 여러 줄 입력 경우가 고정되지 않았다 | 반영: 두 경우 고정 |
+| S-4 | scope 주석이 "adds no file"이라 하지만 .py와 README phase만 본다 | 반영: 주석이 보는 것과 보지 않는 것을 말한다 |
+| S-5 | drift test가 `review.md`의 `--through` 예외와 README `/sc:reflect` 행을 고정하지 않고, docstring이 좁다 | 반영 |
+| N-6 | `--through` Report 목록에 리뷰받지 않은 수정 항목이 없다 | 2차 N-4와 같다. 받아들임(소유자 결정, `intent.md` 그대로) |
+| N-7, N-8, N-9 | Spec gate의 "Critical finding open"이 비슷하게 읽힘(이 브랜치 전부터), 계획 Measurements의 지난 check 이름(기록), `review.md` Process 단계가 두 일을 함(규칙 위반 없음) | 받아들임 |
+
+리뷰 round 종료(소유자 결정, 2026-10-21): N-1과 Suggestion을 반영한 뒤 남은 것은 테스트, 프로브, drift test로 확인한다. 소유자가 남은 문구를 받아들이고 5차는 돌리지 않는다.
