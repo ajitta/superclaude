@@ -677,8 +677,13 @@ tasks:
       # The plan and the feature stay as they are without the user's yes.
       - *plan_not_complete
       - *readme_not_complete
-      # The answer proposes marking it complete.
-      - {type: output_regex, tag: success, pattern: '(?i)\bcomplete\b'}
+      # The answer proposes closing the plan: a `→ complete` change, or a
+      # verb that marks, sets or closes it, not negated. A refusal ("the
+      # plan is not complete", "cannot mark it complete") fails.
+      - type: output_regex
+        tag: success
+        pattern: >-
+          (?i)(?:→|->)\s*`?(?:status:\s*|phase:\s*)?complete\b|(?<!not\s)(?<!cannot\s)(?<!can't\s)\b(?:mark|set|close|flip|update)\w*\b[^.\n?]{0,60}\bcomplete\b|\bclose\s(?:it|the\splan|csv-export)\b[^.\n]*\?
       - *no_py_change
       - *review_untouched
 
@@ -838,6 +843,20 @@ tasks:
       - {type: skill_called, tag: success, pattern: 'sc:implement'}
       - {type: skill_called, tag: success, pattern: 'sc:review'}
       - {type: skill_called, tag: success, pattern: 'sc:reflect'}
+      # Nothing marked complete on the branch: the plan (index) and the
+      # feature README wait for the user's yes to Plan-Close.
+      - &through_left_open
+        type: cmd_ok
+        tag: verification
+        cmd:
+          - python
+          - -c
+          - |
+            import re, subprocess as s, sys
+            g = lambda *a: s.run(['git', *a], capture_output=True, text=True).stdout
+            b = g('for-each-ref', '--format=%(refname:short)', 'refs/heads/feature/').split()
+            files = [f for f in g('ls-tree', '-r', '--name-only', b[0], 'docs/features').split() if re.match(r'docs/features/[^/]+/(05-plan|README)\.md$', f)] if len(b) == 1 else []
+            sys.exit(1 if any(re.match(r'(status|phase):\s*complete\s*$', l) for f in files for l in g('show', b[0] + ':' + f).splitlines()) else 0)
 
   # The same run with --ask, headless: the Checkpoint step finds no way to
   # ask and must continue as plain --through, without waiting for a reply
@@ -966,6 +985,7 @@ tasks:
       - {type: skill_called, tag: success, pattern: 'sc:implement'}
       - {type: skill_called, tag: success, pattern: 'sc:review'}
       - {type: skill_called, tag: success, pattern: 'sc:reflect'}
+      - *through_left_open
       # Headless there is no one to ask: no decision may be recorded as
       # confirmed (intent.md Checkpoint step, the no-way-to-ask path).
       - type: cmd_ok

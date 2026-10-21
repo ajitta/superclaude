@@ -60,6 +60,20 @@ revised: 2026-10-22
 - [ ] Step 2: `make canary-commands BASE=<merge-base>`와 새 프로브 셋 3회씩, Measurements에 적는다
 - [x] Commit Phase 3: `docs: plan-complete-order — CHANGELOG, upgrade note, measurements`
 
+## Phase 4: 정리 (one commit)
+
+[06-verify](./06-verify.md)(Important 2, Suggestion 4)와 [누더기 감사](../../analysis/patchwork-audit-ajitta-2026-10-22.md)(Important 3, Suggestion 10)를 한 번에 반영한다. 소유자 결정(2026-10-22): 감사 권고 1–4 모두 ★안, 그리고 `/sc:intent --through`와 충돌하지 않게.
+
+**Files:** Modify: `implement.md`, `reflect.md`, `review.md`, `intent.md`, `load.md`, `auto-improve.md`, `RULES_DOCS.md`, `CHANGELOG.md`, `evals/tasks.yaml`, `tests/unit/test_docs_ssot_guards.py`, `tests/unit/test_eval_harness.py`, 기록 문서
+
+- [x] Step 1: shipped 문구: 감사 재작성안 1–5, Plan-Close의 회송을 `/sc:implement --plan`으로, 단독 계획의 README 절, 조건 (3)을 `/sc:review` round로, `complete` 계획의 되돌림을 Plan-Close와 RULES_DOCS 상태 규칙에도
+- [x] Step 2: `--through`: implement의 재리뷰 문장에 single fix round 예외, intent Run은 Plan-Close가 지목한 단계를 Report로 넘기고, Report는 Plan-Close 결과와 남은 재리뷰를 적는다. `intent-through-*` 프로브에 "브랜치에 `complete` 없음" check
+- [x] Step 3: `_GATE_PHRASES`(문장 23개) → `_GATE_ANCHORS`(낱말)와 약화어 검사. reflect `<never>`와 README `--through` 문단도 넣는다
+- [x] Step 4: `reflect-plan-close` 성공 check를 제안 형태로, 거절 답 셋을 채점 테스트에. 재리뷰 채점 문장을 규칙마다 두세 개로, known misses는 05a로. 죽은 대입, `_probe_checks`의 YAML 재읽기, 주석의 발견 ID
+- [x] Step 5: CHANGELOG 두 항목을 하나로, 기여자 항목 둘을 한 줄로. 분석 문서 B 완료, 이 README 과거형, review-reflect-gates 05-plan의 긴 `Result:` 측정을 05a로
+- [x] Step 6: 변이 16건 모두 red(`$TMPDIR/pco/mutate_clean.py`). 저장된 `reflect-plan-close` run을 새 check로 다시 채점: 바꾼 뒤 3/3 통과, 바꾸기 전 1/1 실패
+- [ ] Commit Phase 4: `refactor: one statement per rule after the patchwork audit; Plan-Close sends to /sc:implement; --through left open`
+
 ## Integration (커밋 아님)
 
 - [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
@@ -72,6 +86,9 @@ revised: 2026-10-22
 - 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
 
 ## Deviations
+
+- 04-design B′ 표 6행의 "`Result:` 뒤 코드 커밋 → `/sc:test`"는 풀 수 없는 고리였다(06-verify 1, 감사 1). Phase 4에서 `/sc:implement --plan`(Proof 재실행, `Result:` 갱신)으로 바꿨다.
+- 감사 재작성안의 implement 문장에서 "(linked from the phase file's header)", "`status: complete` with an open box is a defect", "before done is claimed again"이 빠졌다. 앞의 둘은 `test_plan_checklist.py`와 phase 파일 문장이 맡는다.
 
 - Phase 1: 프로브와 채점 테스트를 한 번에 썼다. red는 `evals/tasks.yaml`을 HEAD로 되돌려 확인했다(4 failed).
 - Phase 2: drift test의 단계 정규식이 `3.6.` 같은 하위 단계와 `Run (--through only):` 같은 괄호 라벨을 읽게 넓혔다. README `/sc:implement --plan` 행도 고정 대상에 넣었다.

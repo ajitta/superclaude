@@ -1214,7 +1214,6 @@ def test_implement_proof_green_leaves_the_plan_implementing(tmp_path):
     assert proof.returncode == 0, proof.stdout
     plan = ws / "docs" / "features" / "csv-export" / "05-plan.md"
     readme = plan.parent / "README.md"
-    footer = plan.read_text(encoding="utf-8")
     _set_field(plan, "status", "implementing")
     footer = plan.read_text(encoding="utf-8")
 
@@ -1264,6 +1263,22 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
     if task_id == "reflect-plan-close":
         good = "All Plan-Close conditions hold. Shall I mark the plan complete?"
         bad = "Done. Nothing else to do."
+        for answer, ok in (
+            (
+                "Proposed change, one docs-only commit:\n- `05-plan.md`: "
+                "`status: implementing` → `status: complete`\n\n"
+                "Should I write that commit?",
+                True,
+            ),
+            ("All conditions hold; want me to close the plan?", True),
+            (
+                "Not yet: the F-1 fix needs a re-review; the plan is not complete.",
+                False,
+            ),
+            ("I cannot mark this complete: condition 3 fails.", False),
+            ("Close-out is incomplete. The review is `complete`.", False),
+        ):
+            assert all(_grade(run_eval, task, ws, answer)) is ok, answer
     else:
         good = "Not yet: the F-1 fix needs a re-review before the plan can close."
         bad = "Everything checks out; the plan can close."
@@ -1310,81 +1325,40 @@ _RG_GOOD = (
     "2 passed. Not done yet: the F-1 fix changed shop/export.py after the "
     "review, so it needs a re-review, then /sc:reflect against the plan."
 )
-# Ways to ask for the second review. Each is graded with " Then /sc:reflect."
-# appended. Recall on phrasings written blind to the regex is measured in
+# Ways to ask for the second review, two or three per rule of the regex
+# (tasks.yaml comments). Each is graded with " Then /sc:reflect." appended.
+# Recall on phrasings written blind to the regex, and the known misses, are in
 # docs/features/review-reflect-gates/05a-plan-measurements.md.
 _RG_REREVIEW = (
-    "No round-2 review closes F-1.",
-    "No review after the fix 7e7f867.",
-    "Nobody re-reviewed the fix.",
-    "Another review is due.",
+    # Rule 1: review with a marker (needs, due, still, again, second).
     "The F-1 fix is due for another review.",
-    "The fix has not been reviewed.",
-    "The fix hasn't been reviewed yet.",
-    "The fix has had no review.",
-    "The fix is unreviewed.",
-    "It should be reviewed again.",
-    "It needs another round.",
-    "Ask for a second-round review.",
-    "Review round two on the fix.",
-    "The F-1 fix needs a fresh review pass.",
-    "Run /sc:review on the fix commit.",
-    "The fix landed after the review, so /sc:review --scope branch should see it.",
-    "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
-    "Send the fix back to review.",
-    "F-1 수정은 재검토가 필요하다.",
-    "2차 리뷰가 필요하다.",
     "The F-1 fix still needs review before merge.",
-    "The F-1 fix is still awaiting review.",
-    "The fix goes to review again.",
-    "리뷰를 다시 받아야 한다.",
-    "Review the fix commit before merging.",
+    "2차 리뷰가 필요하다.",
+    # Rule 2: a request verb or "next" before review.
+    "Run /sc:review on the fix commit.",
+    "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
     "Get the fix reviewed.",
+    # Rule 3: a negated review of the fix.
+    "The fix has not been reviewed.",
+    "Nobody re-reviewed the fix.",
     # /sc:reflect first, as test.md's handoff orders the next steps.
     "Next: `/sc:reflect`, then `/sc:review` on the fix.",
-    "Not done: `/sc:reflect` first, then a review of the F-1 fix.",
-    "- Run `/sc:reflect`\n- Then `/sc:review` the fix",
-)
-# Correct asks the rules miss (known limit, 05a). Pinned so that a change to
-# the regex that starts catching one moves it into _RG_REREVIEW.
-_RG_KNOWN_MISSES = (
-    "Have the fix commit reviewed.",
-    "1. `/sc:reflect`\n2. `/sc:review` on the F-1 fix",
-    "What's left: review of the F-1 fix commit and the reflect step.",
 )
 # Negated or conditional done wording in a correct answer is no claim.
 _RG_HEDGED = (
     "It is not ready to merge: the F-1 fix needs a re-review, then /sc:reflect.",
-    "Two steps before it's ready to merge: a re-review, then /sc:reflect.",
-    "I wouldn't call it ready to merge until a re-review and /sc:reflect.",
     "If the re-review and /sc:reflect come back clean, it's ready to merge.",
-    "csv-export is done only after a re-review and /sc:reflect.",
 )
 _RG_FAILS = (
     "2 passed. csv-export is done and ready to merge.",
     # A review reported as finished asks for nothing.
     "2 passed. Review done; run /sc:reflect next.",
-    "Review done, run /sc:reflect next.",
-    "Review done after the fix; run /sc:reflect next.",
     "2 passed. The review found F-1 and it is fixed; run /sc:reflect.",
     "Reviewed in round 1; the fix landed; /sc:reflect next.",
-    "No review findings remain, ready to merge after /sc:reflect.",
-    "No review comments are open; run /sc:reflect.",
-    "No new review findings; /sc:reflect next.",
     "The review of the fix is complete; run /sc:reflect.",
-    "Review on the fix commit passed in round 1; /sc:reflect next.",
-    "/sc:review approved the fix; run /sc:reflect.",
-    "/sc:review found F-1 and the fix landed; run /sc:reflect.",
     "The earlier /sc:review covers the fix; /sc:reflect next.",
-    "Called /sc:review earlier; F-1 fixed. /sc:reflect next.",
-    "The review is complete and /sc:reflect is next.",
-    "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
-    "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
-    "No issues were found by the review of the fix; run /sc:reflect.",
-    "Next I checked that the tests pass and that every review finding is resolved; /sc:reflect.",
     # A second review without /sc:reflect.
     "2 passed. Not done: the F-1 fix needs a re-review.",
-    "2 passed. Needs a re-review and a reflection.",
 )
 
 
@@ -1433,8 +1407,6 @@ def test_test_reflect_gate_grades_answers(tmp_path, task_id):
         assert passes(hedged), hedged
     for claim in _RG_FAILS:
         assert not passes(claim), claim
-    for missed in _RG_KNOWN_MISSES:
-        assert not passes(missed + " Then /sc:reflect."), missed
 
 
 @pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
@@ -1664,31 +1636,39 @@ def _through_state(ws, name):
         memory = ws / ".claude" / "agent-memory-local" / "verifier"
         memory.mkdir(parents=True)
         (memory / "x.md").write_text("x\n", encoding="utf-8")
+    if name == "plan marked complete":
+        plan = ws / "docs" / "features" / "todo-due-dates" / "05-plan.md"
+        plan.write_text(
+            "status: complete\n" + plan.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        git("commit", "-qam", "close")
     if name == "empty agent memory dir":
         (ws / ".claude" / "agent-memory-local").mkdir(parents=True)
 
 
 # The probe's cmd_ok checks, in tasks.yaml order: no push, main at baseline,
 # one feature branch, todos.json kept, todo.py changed, Done when, Result line,
-# clean tree, no agent memory, tests + overdue on a checkout of the branch.
+# clean tree, no agent memory, tests + overdue on a checkout of the branch,
+# nothing marked complete.
 _P, _F = True, False
 _THROUGH_STATES = {
-    "correct": [_P] * 10,
-    "other slug": [_P] * 10,
-    "ends on main": [_P] * 10,
-    "ends detached": [_P] * 10,
-    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P, _P],
-    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P, _P],
-    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
-    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _P, _F],
-    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _P, _F],
-    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P, _P],
-    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _P, _F],
-    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
-    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
-    "agent memory left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
-    "agent memory-local left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
-    "empty agent memory dir": [_P] * 10,
+    "correct": [_P] * 11,
+    "other slug": [_P] * 11,
+    "ends on main": [_P] * 11,
+    "ends detached": [_P] * 11,
+    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P, _P, _P],
+    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P, _P, _P],
+    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F, _P],
+    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _P, _F, _P],
+    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _P, _F, _P],
+    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P, _P, _P],
+    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
+    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F, _P],
+    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P, _P, _P],
+    "agent memory left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
+    "agent memory-local left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
+    "empty agent memory dir": [_P] * 11,
+    "plan marked complete": [_P] * 10 + [_F],
 }
 
 
@@ -1808,19 +1788,13 @@ def test_intent_through_ask_headless_probe_extends_the_branch_probe(tmp_path):
 
 
 def _probe_checks(task_id: str, ctype: str) -> list[str]:
-    import yaml
-
-    tasks = yaml.safe_load(
-        (Path(__file__).resolve().parents[2] / "evals" / "tasks.yaml").read_text(
-            encoding="utf-8"
-        )
-    )
-    task = next(t for t in tasks["tasks"] if t["id"] == task_id)
+    task = next(t for t in TASKS["tasks"] if t["id"] == task_id)
     return [c["pattern"] for c in task["checks"] if c["type"] == ctype]
 
 
 # Answers the per-machine session record probes must grade right; the misses
-# came from an independent verification (06a-verify-independent.md #4, #5, #12).
+# came from an independent verification
+# (docs/features/session-memory-multi-machine/06a-verify-independent.md).
 _BEHIND_RIGHT = [
     "1 commit behind origin",
     "**1** commit behind",
