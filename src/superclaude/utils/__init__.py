@@ -19,7 +19,10 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    import subprocess
 
 # `hashlib` and `tempfile` are imported inside the two functions that use them.
 # Every hook script pays this module's import cost on every tool call, and
@@ -77,6 +80,63 @@ def int_env(name: str, default: int) -> int:
         return int(raw.strip())
     except ValueError:
         return default
+
+
+def run_shell(
+    cmd: str, *, timeout: float, cwd: str | Path | None = None
+) -> "subprocess.CompletedProcess[str]":
+    """Run ``cmd`` through the shell with captured text output and a timeout
+    that holds; on timeout raise ``subprocess.TimeoutExpired`` as ``run`` does.
+
+    ``subprocess.run(cmd, shell=True, timeout=...)`` kills only the shell. A
+    command the shell started keeps the output pipes open, so ``run`` waits for
+    it to finish anyway: on Windows always (cmd.exe never execs its command), on
+    POSIX whenever the shell forks. This kills the whole process tree instead
+    (tests/unit/test_run_shell.py).
+    """
+    import subprocess
+
+    extra: dict[str, Any] = (
+        {} if sys.platform == "win32" else {"start_new_session": True}
+    )
+    with subprocess.Popen(
+        cmd,
+        shell=True,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        **extra,
+    ) as proc:
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as exc:
+            _kill_process_tree(proc.pid)
+            proc.kill()
+            try:
+                # Drain the pipes so the shell can be reaped; a descendant that
+                # detached from the tree must not hang the caller here instead.
+                proc.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                pass
+            raise exc
+        return subprocess.CompletedProcess(cmd, proc.returncode, stdout, stderr)
+
+
+def _kill_process_tree(pid: int) -> None:
+    """Kill ``pid`` and every process it started (run_shell's timeout path)."""
+    import subprocess
+
+    if sys.platform == "win32":
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)], capture_output=True)
+    else:
+        import signal
+
+        try:
+            # start_new_session made the shell a group leader: pgid == pid.
+            os.killpg(pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
 
 
 def atomic_write_text(path: Path, text: str) -> None:

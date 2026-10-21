@@ -2,7 +2,7 @@
 
 Runs an arbitrary shell command, parses stdout as JSON, applies a jmespath
 expression, and returns a coerced float metric. Hard timeout per cycle
-enforced via subprocess.
+enforced by ``superclaude.utils.run_shell``, which kills the process tree.
 """
 
 from __future__ import annotations
@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 import jmespath
+
+from superclaude.utils import run_shell
 
 
 @dataclass(frozen=True)
@@ -39,14 +41,7 @@ def run_eval(
     """
     start = time.monotonic()
     try:
-        proc = subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=cwd,
-        )
+        proc = run_shell(cmd, timeout=timeout, cwd=cwd)
     except subprocess.TimeoutExpired as exc:
         return EvalResult(
             metric_value=None,

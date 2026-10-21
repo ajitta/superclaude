@@ -25,21 +25,21 @@ def _run_main(monkeypatch, capsys, file_path, completed):
     monkeypatch.setattr(
         hook, "detect_test_command", lambda p: ("uv run python -m pytest", Path("."))
     )
-    monkeypatch.setattr(hook.subprocess, "run", lambda *a, **k: completed)
+    monkeypatch.setattr(hook, "run_shell", lambda *a, **k: completed)
     hook.main()
     out = capsys.readouterr().out.strip()
     return json.loads(out)["systemMessage"] if out else ""
 
 
 def _capture_run(monkeypatch):
-    """Replace subprocess.run; return the list of (cmd, kwargs) it received."""
+    """Replace run_shell; return the list of (cmd, kwargs) it received."""
     calls = []
 
     def fake_run(cmd, **kwargs):
         calls.append((cmd, kwargs))
         return _completed(0)
 
-    monkeypatch.setattr(hook.subprocess, "run", fake_run)
+    monkeypatch.setattr(hook, "run_shell", fake_run)
     return calls
 
 

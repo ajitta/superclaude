@@ -18,6 +18,8 @@ import time
 from collections import deque
 from typing import Optional
 
+from superclaude.utils import run_shell
+
 
 class BudgetGuard:
     def __init__(self, deadline_monotonic: float):
@@ -78,14 +80,7 @@ class SmokeGate:
     def check(self) -> bool:
         cmd = self.smoke_cmd if self.smoke_cmd else self.eval_cmd
         try:
-            proc = subprocess.run(
-                cmd,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout,
-                cwd=self.cwd,
-            )
+            proc = run_shell(cmd, timeout=self.timeout, cwd=self.cwd)
         except subprocess.TimeoutExpired:
             return False
         return proc.returncode == 0

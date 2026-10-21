@@ -54,6 +54,9 @@ def test_enforces_timeout_kills_subprocess(script_factory):
     result = run_eval(cmd, "x", timeout=1)
     assert result.timed_out is True
     assert result.metric_value is None
+    # Killing only the shell left the child running, and the call waited the
+    # full 30 s for it on Windows (test_run_shell.py).
+    assert result.wall_seconds < 10
 
 
 def test_captures_exit_code_and_wall_seconds(script_factory):
