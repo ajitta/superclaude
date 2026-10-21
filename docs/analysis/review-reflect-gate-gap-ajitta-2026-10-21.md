@@ -29,19 +29,13 @@ revised: 2026-10-21
 
 ## 후속 작업
 
-### A. session-memory 기능 마무리 (기존 브랜치 `fix/session-memory-review`)
+### A. session-memory 기능 마무리 — 완료 (2026-10-21, master 085a6cab)
 
-- 상태:
-  - 리뷰 반영 커밋은 ec090829, 리뷰 기록은 fbd7aaa6. 둘 다 master에 병합되지 않았고 push도 안 됐다.
-  - 이 브랜치에서 전체 suite 3786 passed / 12 skipped, ruff·mypy clean.
-  - `make canary-commands`는 네 프로브가 모두 통과했다: cmd-delegated-load 1/1, cmd-load-other-host 3/3, cmd-load-sync-behind 4/4, cmd-save-host-record 3/3. 보고서는 `C:/sc-evals/smm-review/report.md`(이 컴퓨터).
-  - 계획은 `status: implementing`이다. Phase 4 리뷰 상자와 `Result:`는 아직 고치지 않았다.
-- [ ] ec090829 독립 재리뷰.
-  - 리뷰어에게는 06-review.md의 I-1–I-6, S-1–S-6, N-1–N-2를 수용 기준으로 준다. 각 항목은 결함과 그것이 없어졌음을 보이는 검사로 적고, 고쳤다는 주장은 넣지 않는다(RULES_DELEGATION `delegate_packet`).
-  - S-7–S-9는 고치지 않기로 한 결정으로만 전한다.
-- [ ] `/sc:reflect`로 기능 전체(cd7b4358..브랜치 끝)를 본다.
-- [ ] 발견을 반영하고 Proof를 다시 돈다. 그 뒤 계획 `Result:`, `status: complete`, README `phase: complete`. 그다음 master 병합과 push.
-- [ ] 릴리스 여부는 소유자가 정한다. 낡은 범프 브랜치 `chore/version-4.34.2`(로컬, 리뷰 반영 전)는 지우고 다시 만든다.
+- [x] ec090829 독립 재리뷰. 4차까지 돌았다. 반영 커밋은 28d92471, 51d61fa4, b13591f4이고, 기록은 [06-review](../features/session-memory-multi-machine/06-review.md) 2–4차에 있다. 리뷰어에게는 이전 발견을 결함과 확인 방법으로만 주고, 고쳤다는 주장은 넣지 않았다. S-7–S-9는 결정으로만 전했다.
+- [x] `/sc:reflect`로 기능 전체를 봤다. 판정은 "재리뷰 전에는 끝나지 않음"이었다. 계획 Deviations에 적었다.
+- [x] 발견 반영과 Proof: b13591f4에서 전체 suite 3786 passed, 병합 직전 7bae5106에서 3787 passed. canary는 네 프로브가 모두 통과했다(`C:/sc-evals/smm-final2/report.md`, 이 컴퓨터). 계획은 `status: complete`, README는 `phase: complete`. master에 병합하고 push했다(085a6cab). 브랜치 `fix/session-memory-review`는 원격과 로컬에서 지웠다.
+- [x] 낡은 범프 브랜치 `chore/version-4.34.2`는 지웠다.
+- [ ] 릴리스: 소유자가 보류했다(2026-10-21 "release는 아직"). 할 때는 범프 브랜치를 새로 만들고, `CANARY_OK=1 make release` 뒤 두 컴퓨터에서 설치를 맞추고 두 컴퓨터로 확인한다(feature README `릴리스 뒤`). B를 같은 릴리스에 묶으면 canary를 한 번만 돌린다.
 
 ### B. 규칙과 문서 맞추기 (새 브랜치, 예: `fix/review-reflect-gates`)
 
@@ -56,7 +50,7 @@ revised: 2026-10-21
 
 ### C. 메모리 고치기
 
-- [ ] auto memory `release-needs-complete-plan`에 "반영한 수정은 다시 리뷰한다, reflect는 체인의 단계다"를 더한다. B의 결정이 나오면 그 규칙을 가리키게 한다.
+- [x] auto memory `release-needs-complete-plan`에 "반영한 수정은 다시 리뷰한다, reflect는 체인의 단계다"를 더했다(2026-10-21). B의 결정이 나오면 그 규칙을 가리키게 한다.
 
 ## 확인 방법
 
