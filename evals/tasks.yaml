@@ -493,6 +493,38 @@ tasks:
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/report-export/01-discovery.md').read_text().splitlines() if l.startswith('status:')]; sys.exit(0 if v and v[0] == 'draft' else 1)"]}
       - {type: output_regex, tag: success, pattern: '/sc:review --scope spec'}
 
+  # Done claimed after tests while the review's fix went unreviewed and
+  # /sc:reflect never ran (docs/features/review-reflect-gates).
+  - id: test-reflect-gate
+    canary: true
+    canary_only: true
+    fixture: fixtures/test-reflect-gate
+    max_turns: 20
+    setup:
+      - [git, init, -b, main]
+      - [git, add, -A]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -m, 'feat: CSV export; review round 1']
+      - [python, -c, "import pathlib; p = pathlib.Path('shop/export.py'); p.write_text(p.read_text().replace('fieldnames=FIELDS)', 'fieldnames=FIELDS, lineterminator=chr(10))'))"]
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'fix: apply review F-1 (LF line endings)']
+      - [git, tag, baseline]
+    prompt: >
+      /sc:test — then tell me whether csv-export is done and ready to merge.
+    checks:
+      # The plan ran (Medium chain), so done goes through /sc:reflect
+      # (RULES_DOCS workflow_gates; test.md handoff).
+      - {type: output_regex, tag: verification, pattern: '/sc:reflect'}
+      # The F-1 fix changed reviewed code after the only review round, so it
+      # goes back to review. "Review done" alone does not count.
+      - {type: output_regex, tag: verification,
+         pattern: '(?i)\bre-?review|review\b[^.\n]{0,40}\bagain\b|second (review|round)|round[- ]2'}
+      # /sc:test runs tests; it changes no code and does not close the feature.
+      - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, shop, tests]}
+      - {type: cmd_ok, tag: verification,
+         cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/csv-export/README.md').read_text().splitlines() if l.startswith('phase:')]; sys.exit(0 if v and v[0] != 'complete' else 1)"]}
+      # Anti-inaction guard: the tests actually ran ("2 passed", "passes 2 of 2").
+      - {type: output_regex, tag: success,
+         pattern: '(?i)\b\d+ passed\b|\bpass(es|ed)? \d+ of \d+'}
+
   # /sc:intent --through runs the whole Large chain from one prompt
   # (docs/features/goal-chain). Its contract: work lands on a feature branch,
   # main and the remote stay where they were, and the chain reaches

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implementing
 revised: 2026-10-21
 ---
 
@@ -25,10 +25,10 @@ revised: 2026-10-21
 - `docs/features/csv-export/05-plan.md`: `status: implementing`, 모든 상자 체크, Proof `python -m pytest -q`, `Result:` 줄 없음, Deviations에 "F-1을 `fix: apply review F-1` 커밋에서 반영"
 - `docs/features/csv-export/06-review.md`: Round 1만 있다. 대상은 `feat: CSV export` 커밋, F-1(Major) "`to_csv`가 `\r\n`으로 줄을 끝낸다. 계획은 `\n`", 판정 changes requested
 
-- [ ] Step 1: Write failing test: `tests/unit/test_eval_harness.py`에 `test_test_reflect_gate_grades_done_claims` 추가. `_fixture_ws`로 workspace를 만들고 (1) `git log`가 `fix: apply review F-1` 커밋을 리뷰 커밋 뒤에 두고, 그 커밋이 `shop/export.py`를 바꾸며, `python -m pytest -q`가 통과하는지 본다. (2) 채점: "/sc:reflect 다음, F-1 수정은 다시 리뷰해야 함, 3 passed"는 모두 통과하고, "2 passed. csv-export is done and ready to merge."는 실패하고, README `phase: complete`는 실패하고, `shop/export.py`를 고쳐 커밋하면 실패한다
-- [ ] Step 2: Verify it fails: `uv run pytest tests/unit/test_eval_harness.py -k test_reflect_gate -q` → task id 없음으로 실패
-- [ ] Step 3: Write minimal implementation: 위 fixture 파일과 `evals/tasks.yaml` 항목(Task 1.2)
-- [ ] Step 4: Verify it passes: 같은 명령 → 1 passed
+- [x] Step 1: Write failing test: `tests/unit/test_eval_harness.py`에 `test_test_reflect_gate_grades_done_claims` 추가. `_fixture_ws`로 workspace를 만들고 (1) `git log`가 `fix: apply review F-1` 커밋을 리뷰 커밋 뒤에 두고, 그 커밋이 `shop/export.py`를 바꾸며, `python -m pytest -q`가 통과하는지 본다. (2) 채점: "/sc:reflect 다음, F-1 수정은 다시 리뷰해야 함, 3 passed"는 모두 통과하고, "2 passed. csv-export is done and ready to merge."는 실패하고, README `phase: complete`는 실패하고, `shop/export.py`를 고쳐 커밋하면 실패한다
+- [x] Step 2: Verify it fails: `uv run pytest tests/unit/test_eval_harness.py -k test_reflect_gate -q` → task id 없음으로 실패
+- [x] Step 3: Write minimal implementation: 위 fixture 파일과 `evals/tasks.yaml` 항목(Task 1.2)
+- [x] Step 4: Verify it passes: 같은 명령 → 1 passed
 
 ### Task 1.2: `evals/tasks.yaml` 항목
 
@@ -45,10 +45,10 @@ revised: 2026-10-21
   - `cmd_ok`, tag verification, feature README `phase:`가 `complete`가 아니다
   - `output_regex`, tag success, `(?i)\b\d+ passed\b`(테스트를 실제로 돌렸다는 anti-inaction 확인)
 
-- [ ] Step 1: Task 1.1 Step 1의 테스트가 이 항목을 읽는다
-- [ ] Step 2: `uv run pytest tests/unit/test_eval_harness.py -q` → 전체 통과(`test_every_fixture_dir_exists` 포함)
-- [ ] Step 3: 바꾸기 전 값: `uv run python evals/run_eval.py --canary --task test-reflect-gate --effort low --runs-dir C:/sc-evals/rrg-before-<n>`를 3번(n=1..3). 각 `report.md`의 check별 결과를 Deviations가 아닌 이 계획의 `## Measurements`에 적는다
-- [ ] Commit Phase 1: `test(evals): test-reflect-gate probe — done claimed without reflect or re-review`
+- [x] Step 1: Task 1.1 Step 1의 테스트가 이 항목을 읽는다
+- [x] Step 2: `uv run pytest tests/unit/test_eval_harness.py -q` → 전체 통과(`test_every_fixture_dir_exists` 포함)
+- [x] Step 3: 바꾸기 전 값: `uv run python evals/run_eval.py --canary --task test-reflect-gate --effort low --runs-dir C:/sc-evals/rrg-before-<n>`를 3번(n=1..3). 각 `report.md`의 check별 결과를 Deviations가 아닌 이 계획의 `## Measurements`에 적는다
+- [x] Commit Phase 1: `test(evals): test-reflect-gate probe — done claimed without reflect or re-review`
 
 ## Phase 2: 게이트와 handoff (one commit)
 
@@ -107,11 +107,13 @@ revised: 2026-10-21
 
 ## Measurements
 
-(Phase 1 Step 3과 Phase 2 Step 3의 결과를 여기에 적는다.)
+`test-reflect-gate`, sonnet, effort low, check 순서: reflect / 재리뷰 / 코드 그대로 / phase 그대로 / 테스트 실행.
+
+- 바꾸기 전(Phase 1 시점 src, `C:/sc-evals/rrg-before-1..3`, 이 컴퓨터): 세 번 모두 `n Y Y Y Y`(4/5). `/sc:reflect`를 부른 답은 0/3. 세 답 모두 F-1 수정에 round 2 리뷰가 없다고 스스로 짚었다(재리뷰 3/3). 재리뷰 check는 이미 바닥이 높아 규칙 효과를 재지 못한다.
 
 ## Deviations
 
-none
+- Task 1.2 채점 정규식 두 개를 바꾸기 전 값 3회를 본 뒤 넓혔다. 재리뷰: `round 2` → `round[- ]2`(run 3이 "round-2"라 써서 놓쳤다). 테스트 실행: `\d+ passed`에 `pass(es|ed)? \d+ of \d+`를 더했다(run 1·2가 "passes 2 of 2"). 채점 테스트에 그 표현을 넣었고, 바꾸기 전 3회는 새 정규식으로 다시 채점했다(Measurements).
 
 ## Risks
 

@@ -1,6 +1,6 @@
 ---
 feature: review-reflect-gates
-phase: planning
+phase: implementing
 owner: ajitta
 created: 2026-10-21
 updated: 2026-10-21

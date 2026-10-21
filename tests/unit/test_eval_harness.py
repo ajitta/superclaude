@@ -1168,6 +1168,61 @@ def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
     assert not all(_grade(run_eval, task, ws, stop))
 
 
+def test_test_reflect_gate_grades_done_claims(tmp_path):
+    """The fixture's review asked for F-1 and a later commit applied it with no
+    second review, so a run passes only when it ran the tests, names
+    /sc:reflect and a re-review, and leaves code and the feature phase alone."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "test-reflect-gate")
+    log = subprocess.run(
+        ["git", "log", "--format=%s", "--name-only"],
+        cwd=ws,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    assert log.index("fix: apply review F-1") < log.index("review round 1")
+    assert "shop/export.py" in log.split("review round 1")[0]
+    proof = subprocess.run(
+        [run_eval.PY_BIN, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        cwd=ws,
+        capture_output=True,
+        text=True,
+    )
+    assert proof.returncode == 0, proof.stdout
+
+    good = (
+        "2 passed. Not done yet: the F-1 fix changed shop/export.py after the "
+        "review, so it needs a re-review, then /sc:reflect against the plan."
+    )
+    assert all(_grade(run_eval, task, ws, good))
+    assert not all(
+        _grade(run_eval, task, ws, "2 passed. csv-export is done and ready to merge.")
+    )
+    assert not all(
+        _grade(run_eval, task, ws, "2 passed. Review done; run /sc:reflect next.")
+    )
+    assert not all(_grade(run_eval, task, ws, "Needs a re-review, then /sc:reflect."))
+    # Phrasings seen in the baseline runs (05-plan Deviations).
+    seen = "pytest passes 2 of 2. No round-2 review closes F-1; then /sc:reflect."
+    assert all(_grade(run_eval, task, ws, seen))
+
+    readme = ws / "docs" / "features" / "csv-export" / "README.md"
+    _set_field(readme, "phase", "complete")
+    assert not all(_grade(run_eval, task, ws, good))
+    _set_field(readme, "phase", "implementing")
+    assert all(_grade(run_eval, task, ws, good))
+
+    export = ws / "shop" / "export.py"
+    export.write_text(export.read_text() + "\n# touched\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=ws, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "x"],
+        cwd=ws,
+        check=True,
+    )
+    assert not all(_grade(run_eval, task, ws, good)), "a committed edit escaped"
+
+
 def _cmd_ok_results(run_eval, task, ws):
     return [
         run_eval._check_one(c, c["type"], ws, "", "")[0]
