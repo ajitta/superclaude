@@ -94,7 +94,7 @@ revised: 2026-10-22
 - [x] Step 3: `reflect-plan-close`: "propose … complete" 갈래, 거절 guard(`output_not_regex`), 채점 답 셋
 - [x] Step 4: Plan-Close가 실패 넷 모두에 단계를 준다. implement Load는 --plan 유무로 먼저 나눈다
 - [x] Step 5: 재리뷰 채점 문장 규칙 주석 바로잡기, 규칙 3에 둘. 빈 줄, Deviations, README
-- [ ] Commit Phase 6: `fix: one wording for Plan-Close condition 2 in every copy; --through review count; refusal guard`
+- [x] Commit Phase 6: `fix: one wording for Plan-Close condition 2 in every copy; --through review count; refusal guard`
 
 ## Integration (커밋 아님)
 
