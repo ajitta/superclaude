@@ -238,3 +238,12 @@ reflect → done
 - D2는 `/sc:review` 핸드오프에 `/sc:design`을 더하는 것만 한다. design Analyze의 discovery status 검사는 관찰된 실패가 없어 보류한다.
 - G6은 범용 일치 테스트를 만들지 않는다. 이번에 고치는 간선만 기존 가드 방식으로 지킨다.
 - G7–G10은 해당 파일을 다음에 고칠 때 함께 처리한다.
+
+## 구현과 측정
+
+- `roadmap.md` Validate 단계에 `## Proof` 꼬리말을 넣었다. 꼬리말은 워크플로 전체가 끝났음을 보이는 명령과 기대 출력을 적고, `/sc:implement --plan`이 마지막 상자 뒤에 실행해 `Result:`를 남긴다. 핸드오프는 `/sc:implement`만 남겼다. `review.md` 핸드오프에는 `/sc:design`을 더했다. 가드는 `test_docs_ssot_guards.py::test_roadmap_and_review_handoffs_follow_the_chain`이다. 수정을 되돌리면 이 가드가 red가 되는 것을 확인했다.
+- probe `roadmap-design-draft`에 check 하나를 더했다. roadmap 문서에 명령을 적은 `## Proof` 꼬리말이 있어야 한다. 측정 전에 커밋했다(c4afeca3).
+  - 변경 전: 저장된 run 6개(de4e6cb3·e03e1889, roadmap.md는 같음)를 다시 채점하니 0/6이었다. 그중 4개는 `## Proof`와 빈 `Result:`만 쓰고 명령은 적지 않았다.
+  - 변경 후(9b4ae86e, Linux, sonnet, 3회): roadmap 프로브 3개 모두 9/9 통과. Proof 꼬리말은 3/3에서 명령과 기대 출력을 적었다.
+  - 남은 관찰: 한 run은 꼬리말 끝에 빈 `Result:` 자리표시를 남겼다. `/sc:implement`가 Proof를 실행한 뒤 이 줄을 다시 쓰므로 문구를 더하지는 않는다.
+- 릴리스 때: `roadmap.md`와 `review.md`가 바뀌었다. 그래서 `make canary-commands`가 review를 다루는 probe(`--through` 포함)까지 고른다.
