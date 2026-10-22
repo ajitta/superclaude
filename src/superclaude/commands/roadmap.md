@@ -14,7 +14,7 @@ description: Generate a phased implementation workflow from PRDs and feature req
   2. Plan: Workflow structure + dependency mapping
   3. Consult: independent analysis streams may go to `general-purpose` delegates with the domain checks in the prompt; they return findings, and the main loop writes the doc
   4. Sequence: Order the workflow steps and their task dependencies; nothing is executed
-  5. Validate: Quality gates + workflow completeness. Write each feature as an unchecked box with an empty `Evidence:` line; the implementing session checks the box only when Evidence cites the check that passed (test output, exit code, observed user flow). The doc's frontmatter status follows core/rules/RULES_DOCS.md and starts as `status: draft`
+  5. Validate: Quality gates + workflow completeness. Write each feature as an unchecked box with an empty `Evidence:` line; the implementing session checks the box only when Evidence cites the check that passed (test output, exit code, observed user flow). End the doc with a `## Proof` footer that names the command proving the whole workflow done and its expected output; /sc:implement --plan runs it after the last box and records `Result:`, as for a /sc:plan plan. The doc's frontmatter status follows core/rules/RULES_DOCS.md and starts as `status: draft`
   6. Document: feature path `docs/features/<slug>/05-plan.md` (or `05<letter>-plan-workflow.md`, first free letter, if primary plan exists per multi-of-same-phase rule), standalone `docs/plans/<topic>-workflow-<username>-YYYY-MM-DD.md` — slug resolution (zero-match default `[f]`), frontmatter, README update per core/rules/RULES_DOCS.md `<doc_output_convention>`. A design doc that is the Analyze step's source moves from `status: draft` to `approved-for-plan` (bump its `revised`) in the same save, since building the workflow on it is its approval; its Areas of concern section keeps any concern the user chose to build past.
   </flow>
 
@@ -65,5 +65,5 @@ description: Generate a phased implementation workflow from PRDs and feature req
     <never>executes implementation beyond planning, overrides the development process, or generates without analysis.</never>
   </bounds>
 
-  <handoff next="/sc:implement /sc:task"/>
+  <handoff next="/sc:implement"/>
 </component>

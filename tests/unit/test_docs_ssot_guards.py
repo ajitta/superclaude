@@ -675,6 +675,25 @@ def _gate_texts() -> dict[str, str]:
     return texts
 
 
+def _handoff(command: str) -> list[str]:
+    m = re.search(
+        r'<handoff next="([^"]*)"', _read(_SRC / "commands" / f"{command}.md")
+    )
+    assert m, f"{command}.md has no handoff"
+    return m.group(1).split()
+
+
+def test_roadmap_and_review_handoffs_follow_the_chain():
+    """A roadmap is a plan document (05 slot): it carries the Proof footer
+    /sc:implement --plan runs, and hands off to /sc:implement only, since
+    /sc:task does not read the doc. Spec review hands off to /sc:design,
+    the next step of the Large chain (docs/analysis/command-handoff-graph-*)."""
+    roadmap = _read(_SRC / "commands" / "roadmap.md")
+    assert "End the doc with a `## Proof` footer that names the command" in roadmap
+    assert _handoff("roadmap") == ["/sc:implement"]
+    assert "/sc:design" in _handoff("review")
+
+
 @pytest.mark.parametrize("where", sorted(_GATE_ANCHORS))
 def test_review_reflect_gate_anchors(where):
     """Each place that carries the review-reflect gates keeps its rule."""
