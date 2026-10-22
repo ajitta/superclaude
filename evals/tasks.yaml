@@ -505,11 +505,12 @@ tasks:
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/report-export/01-discovery.md').read_text().splitlines() if l.startswith('status:')]; sys.exit(0 if v and v[0] == 'draft' else 1)"]}
       - {type: output_regex, tag: success, pattern: '/sc:review --scope spec'}
 
-  # /sc:roadmap applies /sc:plan's review gate (docs/features/roadmap-plan-gate):
+  # /sc:roadmap applies /sc:plan's review gate
+  # (docs/analysis/roadmap-plan-gate-ajitta-2026-10-22.md):
   # a draft discovery spec stops it, whether it is the source or sits beside
   # the design in the feature folder; a draft design does not stop it, and the
   # roadmap's save approves the design it built on. Three variants; each was
-  # run before and after the roadmap.md change (counts in that feature folder).
+  # run before and after the roadmap.md change (counts in that doc).
   - id: roadmap-draft-spec-gate
     canary: true
     canary_only: true

@@ -8,6 +8,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Changed
+
+- `/sc:roadmap` now applies the same review gate as `/sc:plan`. A discovery spec still in `status: draft` stops it, also when you give it the feature's `04-design.md` and the draft discovery spec sits beside it; before, only the file you passed was checked. A design doc no longer stops it for being `draft`: the roadmap builds on it and moves it to `approved-for-plan` in the same save, as `/sc:plan` does, and a design with unresolved Areas of concern gets the same question `/sc:plan` asks. Before, a draft design sent you to `/sc:review --scope spec`, a review meant for discovery specs.
+- For contributors: new canary probes `roadmap-draft-spec-gate`, `roadmap-design-discovery-draft` and `roadmap-design-draft`.
+
 ### Fixed
 
 - `superclaude insight`, which `/sc:insight` calls, no longer stops with an `AttributeError` when `PYTHONOPTIMIZE=2` is set or Python runs with `-OO`; it read its description from the module docstring, which that setting removes. The insight hooks were not affected. Under that setting, `superclaude <command> --help` still shows no command description, because Click takes it from the same kind of docstring. For contributors: `evals/run_eval.py` had the same crash, and the full test suite now passes under `PYTHONOPTIMIZE=2`.
