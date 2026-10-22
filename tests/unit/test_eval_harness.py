@@ -1514,6 +1514,14 @@ def test_roadmap_builds_on_a_draft_design_and_approves_it(tmp_path):
         encoding="utf-8",
     )
     assert not all(_grade(run_eval, task, ws, "")), "Proof names no command"
+    (feature / "05-plan.md").write_text(
+        "# roadmap\n\n## Proof\n\nResult: `abc1234` - 2 passed\n", encoding="utf-8"
+    )
+    assert not all(_grade(run_eval, task, ws, "")), "a Result: line is no command"
+    (feature / "05-plan.md").write_text(
+        "# roadmap\n\n```md\n## Proof\n\n`x`\n```\n", encoding="utf-8"
+    )
+    assert not all(_grade(run_eval, task, ws, "")), "a fenced heading is no footer"
     (feature / "05-plan.md").unlink()
     (ws / "docs" / "plans" / "report-export-workflow-eval-2026-10-22.md").write_text(
         _ROADMAP_DOC, encoding="utf-8"

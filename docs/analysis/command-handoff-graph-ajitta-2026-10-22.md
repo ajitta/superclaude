@@ -5,6 +5,8 @@ revised: 2026-10-22
 
 # `/sc:*` 명령 핸드오프 그래프와 구멍
 
+**지금 상태(5b28dd7e 이후):** G1의 Proof 꼬리말, G2, G3의 review → design 핸드오프, G5는 해결됐다. G1의 `Evidence:` 규칙, G3의 체인 기준(D2), G4, G6–G10은 열려 있다. 열린 항목 중 관찰된 실패가 있는 것은 없다. 처리 내용은 끝의 "검토 반영"과 "구현과 측정"에 있다. 아래 판정과 각 절은 d7f04869 시점에 쓴 기록이다.
+
 **판정: 실제로 쓰인 경로는 맞물리고, 구멍은 쓰이지 않은 두 영역에 몰려 있다.** plan 이후의 문서 계약(implement가 `Result:`를 쓰고 reflect가 확인)과 brainstorm → review → plan 관문은 이 저장소에서 실제로 작동했다. 구멍은 roadmap 경로(산출물이 plan 문서 계약을 지키지 못함)와 design의 위치(체인 정의가 두 벌)에 있다. 이 구멍들로 인한 실패는 관찰되지 않았다. 고치기 전에 결정이 두 개 필요하다(아래 "결정 사항"). 이 문서를 검토하면서 심각도를 다시 매기고 사실 오류 셋을 바로잡았다. G5는 roadmap-plan-gate(6d0985c8)에서 이미 해결됐다. 고친 내용과 결정은 끝의 "검토 반영"에 있다.
 
 ## 범위와 방법
@@ -50,11 +52,13 @@ flowchart LR
 
 ## 구멍
 
+표의 심각도 열은 검토 뒤 상태다. 각 절의 본문은 d7f04869 시점의 기록이다.
+
 | # | 심각도 | 실제 사용 | 구멍 |
 |---|---|---|---|
-| G1 | Important(두 파일 불일치) | 미사용 | roadmap 산출물이 plan 문서 계약을 지키지 못한다 |
-| G2 | Important(두 파일 불일치) | 미사용 | roadmap → task로 넘기면 plan 문서가 갱신되지 않는다 |
-| G3 | Low(검토에서 낮춤) | 명령 쪽 체인만 1회 | 체인 정의가 두 벌이고, design의 위치가 다르다 |
+| G1 | 부분 해결(9b4ae86e: Proof 꼬리말. `Evidence:` 규칙은 보류) | 미사용 | roadmap 산출물이 plan 문서 계약을 지키지 못한다 |
+| G2 | 해결됨(9b4ae86e: 핸드오프에서 task 뺌) | 미사용 | roadmap → task로 넘기면 plan 문서가 갱신되지 않는다 |
+| G3 | Low(검토에서 낮춤). review → design 핸드오프는 해결됨(9b4ae86e) | 명령 쪽 체인만 1회 | 체인 정의가 두 벌이고, design의 위치가 다르다 |
 | G4 | Low(검토에서 낮춤) | 미사용 | design → implement 간선이 plan을 건너뛴다 |
 | G5 | 해결됨(6d0985c8) | 미사용 | roadmap 관문이 "plan과 같은 관문"이라 하지만 규칙이 다르다 |
 | G6 | Low | 원인 | plan 이후 구간 밖에서는 핸드오프·관문·README가 서로 맞는지 확인하는 테스트가 없다 |
@@ -186,6 +190,8 @@ improve(`test analyze`), cleanup(`test build`), `troubleshoot --fix`(`improve im
 
 ## 부록: 명령 핸드오프 표
 
+d7f04869 시점의 표다. 그 뒤 roadmap은 `implement`만 남았고, review에는 `design`이 더해졌다(9b4ae86e).
+
 | 명령 | `next` | 명령 | `next` |
 |---|---|---|---|
 | agent | implement research | load | analyze index-repo task |
@@ -246,4 +252,17 @@ reflect → done
   - 변경 전: 저장된 run 6개(de4e6cb3·e03e1889, roadmap.md는 같음)를 다시 채점하니 0/6이었다. 그중 4개는 `## Proof`와 빈 `Result:`만 쓰고 명령은 적지 않았다.
   - 변경 후(9b4ae86e, Linux, sonnet, 3회): roadmap 프로브 3개 모두 9/9 통과. Proof 꼬리말은 3/3에서 명령과 기대 출력을 적었다.
   - 남은 관찰: 한 run은 꼬리말 끝에 빈 `Result:` 자리표시를 남겼다. `/sc:implement`가 Proof를 실행한 뒤 이 줄을 다시 쓰므로 문구를 더하지는 않는다.
-- 릴리스 때: `roadmap.md`와 `review.md`가 바뀌었다. 그래서 `make canary-commands`가 review를 다루는 probe(`--through` 포함)까지 고른다.
+- 릴리스 때: v4.34.2 이후 `roadmap.md`, `review.md`, `reflect.md`, `test.md`와 `core/rules/RULES_DOCS.md`가 바뀌었다. 그래서 `make canary-commands`(review를 다루는 `--through` probe 포함)와 `make canary-gates`가 둘 다 필요하다.
+
+## 독립 검증 반영
+
+[독립 검증](./command-handoff-graph-verify-ajitta-2026-10-22.md)(opus high)의 판정은 조건부 통과였다. Important는 1개였다.
+
+| 발견 | 처리 |
+|---|---|
+| 1 Important: 이 문서가 고친 증상을 열린 구멍으로 적음 | 맨 위에 현재 상태를 적었다. 구멍 표의 G1·G2·G3 상태를 고치고, 각 절과 부록이 d7f04869 시점 기록임을 표시했다 |
+| 2 roadmap `Evidence:` 규칙을 지키게 하는 곳 없음 | 소유자가 가장 작은 범위를 고르며 보류한 부분이라 두었다. G1은 "부분 해결"로 남긴다 |
+| 3 `RULES_DOCS.md:84`가 `--plan`과 "committed"를 말하지 않음 | `/sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer`로 고쳤다 |
+| 4 probe check가 관대함 | 펜스 블록 안의 제목을 무시하고, `Result:` 줄은 명령으로 치지 않게 고쳤다. 끝 탭도 이제 인식한다. 저장된 run을 다시 채점하니 변경 전 0/6, 변경 후 3/3으로 그대로였다. 테스트 사례 둘을 더했다. 남은 한계: 백틱으로 감싼 자리표시(`` `<command>` ``)는 통과하고, `## Proof:`나 `### Proof` 제목은 실패한다 |
+| 이 브랜치 밖, Important 후보: roadmap이 plan 옆에 쓰는 `05<letter>-plan-workflow.md`가 Plan-Close 대상 정의에 없어 `implementing`에서 나갈 길이 없음 | 같은 계약이라 이 브랜치에서 고쳤다. `reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문의 정의에 "a roadmap's `05<letter>-plan-workflow.md`"를 넣었다. 가드는 세 곳이 그 이름을 적는지 본다 |
+| 이 브랜치 밖: 릴리스에 `canary-gates`도 필요 | 위 "릴리스 때" 줄을 고쳤다 |

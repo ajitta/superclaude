@@ -692,6 +692,16 @@ def test_roadmap_and_review_handoffs_follow_the_chain():
     assert "End the doc with a `## Proof` footer that names the command" in roadmap
     assert _handoff("roadmap") == ["/sc:implement"]
     assert "/sc:design" in _handoff("review")
+    # A roadmap written beside a plan is a plan document too: Plan-Close and
+    # the reflect gate name its file.
+    rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
+    for where, text in (
+        ("RULES_DOCS", rules),
+        ("reflect", _read(_SRC / "commands" / "reflect.md")),
+        ("test", _read(_SRC / "commands" / "test.md")),
+    ):
+        assert "a roadmap's `05<letter>-plan-workflow.md`" in text, where
+    assert "/sc:roadmap -> /sc:implement --plan: Roadmap document committed" in rules
 
 
 @pytest.mark.parametrize("where", sorted(_GATE_ANCHORS))

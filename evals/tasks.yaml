@@ -579,10 +579,16 @@ tasks:
             import pathlib, re, sys
             docs = [*pathlib.Path('docs/features/report-export').glob('05*.md'), *pathlib.Path('docs/plans').glob('*.md')]
             def proof(text):
-                m = re.search(r'(?m)^## Proof[ \t]*$', text)
-                body = text[m.end():] if m else ''
-                body = re.split(r'(?m)^## ', body)[0]
-                return bool(m) and '`' in body
+                # A `## Proof` heading outside fenced blocks; its section runs
+                # to the next heading; the command is backticked (in-line or
+                # fenced) and a Result: line does not count as one.
+                fences = [m.span() for m in re.finditer(r'(?ms)^```.*?^```[ \t]*\r?$', text)]
+                heads = [m for m in re.finditer(r'(?m)^## Proof[ \t]*\r?$', text) if not any(a <= m.start() < b for a, b in fences)]
+                if not heads:
+                    return False
+                section = re.split(r'(?m)^## ', text[heads[0].end():])[0]
+                lines = [l for l in section.splitlines() if not l.strip().startswith('Result:')]
+                return '`' in chr(10).join(lines)
             sys.exit(0 if any(proof(p.read_text(encoding='utf-8')) for p in docs) else 1)
       # A roadmap plans; it changes no code and adds none.
       - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}

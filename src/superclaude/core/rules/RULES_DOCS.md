@@ -81,10 +81,10 @@ Examples:
     /sc:design -> /sc:plan: Design spec committed (components pass [R18 Necessity Test] necessity test, deferred items marked, Areas of concern resolved by the owner, or planned past by the owner at the /sc:plan Load step or the /sc:roadmap Analyze step)
     /sc:design -> /sc:roadmap: Alternative to /sc:plan for a phased workflow, from the design (the same gate as /sc:design -> /sc:plan) or from a PRD/feature doc
     /sc:plan -> /sc:implement --plan: Plan document committed to repo
-    /sc:roadmap -> /sc:implement: Roadmap tasks defined; implementation proceeds per task list
+    /sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer
     /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; no code commit follows the Proof's `Result:` sha
     /sc:review -> fix -> /sc:review: a fix to a Critical or Important review finding that changes reviewed code or shipped content gets another review round, with the earlier findings as acceptance criteria (RULES.md Intent Propagation); rounds stop as the /sc:review Process step says. A `/sc:intent --through` run keeps its single fix round; its /sc:test step names the fix left unreviewed
-    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
+    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md`, a roadmap's `05<letter>-plan-workflow.md`, or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
     /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix to reviewed code or shipped content goes back to review, above) or accepted by the user; the plan (index) becomes `complete` here, on the user's yes to Plan-Close
   </workflow_gates>
 </component>
