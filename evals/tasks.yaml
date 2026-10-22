@@ -721,11 +721,41 @@ tasks:
       # condition, not an option (a run once said "All three conditions hold"
       # here and proposed `complete`). Only a sentence that opens with the
       # verdict counts, so "once all three hold, I'll propose" passes.
-      - {type: output_not_regex, tag: success,
+      - &closable_verdict {type: output_not_regex, tag: success,
          pattern: '(?im)(?:^|[.!?;:]\s+)[\s>*_-]*(?:all (?:three|3) (?:Plan-Close )?(?:conditions )?(?:hold|are (?:met|satisfied))|(?:every|each) (?:Plan-Close )?condition (?:holds|is (?:met|satisfied)))\b'}
       - *rereview_named
       - *no_py_change
       - *review_untouched
+
+  # A later session: the review rounds happened in an earlier one and no file
+  # holds them (/sc:review writes none for branch work), so only the commit
+  # subject `fix: apply review F-1` and the plan's Deviations line show that a
+  # review ran. Plan-Close's third condition cannot be checked from the files:
+  # the answer must not call the plan closable. Baseline for
+  # docs/features/review-findings-record (pre-registered before its runs).
+  - id: reflect-plan-close-no-record
+    canary: true
+    canary_only: true
+    fixture: fixtures/test-reflect-gate
+    max_turns: 20
+    covers: [reflect]
+    setup:
+      - [python, -c, "import pathlib; d = pathlib.Path('docs/features/csv-export'); (d / '06-review.md').unlink(); r = d / 'README.md'; r.write_bytes(b''.join(l for l in r.read_bytes().splitlines(True) if b'06-review' not in l)); p = d / '05-plan.md'; p.write_bytes(p.read_bytes().replace(b' (06-review.md)', b''))"]
+      - *s_init
+      - *s_add
+      - *s_feat
+      - *s_fix_edit
+      - *s_fix_commit
+      - *s_result
+      - [git, -c, user.email=eval@local, -c, user.name=eval, commit, -am, 'docs: csv-export Proof on the F-1 fix']
+      - *s_tag
+    prompt: >
+      /sc:reflect --type completion for csv-export
+    checks:
+      - *plan_not_complete
+      - *readme_not_complete
+      - *closable_verdict
+      - *no_py_change
 
   # /sc:intent --through runs the whole Large chain from one prompt
   # (docs/features/goal-chain). Its contract: work lands on a feature branch,
