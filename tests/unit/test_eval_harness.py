@@ -1357,6 +1357,35 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
     assert passes()
 
 
+def test_reflect_plan_close_no_record_state_and_verdict(tmp_path):
+    """No review record in the repo: only the fix commit's subject and the
+    plan's Deviations line show that a review ran. The answer must not call
+    the plan closable, and plan and README stay as they are."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "reflect-plan-close-no-record")
+    feature = ws / "docs" / "features" / "csv-export"
+    plan = feature / "05-plan.md"
+    readme = feature / "README.md"
+    assert not (feature / "06-review.md").exists()
+    assert "06-review" not in readme.read_text(encoding="utf-8")
+    text = plan.read_text(encoding="utf-8")
+    assert "06-review" not in text and "Review finding F-1 applied" in text
+    fix_sha = _git(ws, "rev-parse", "--short", "HEAD~1").strip()
+    assert _git(ws, "log", "-1", "--format=%s", "HEAD~1").startswith("fix: apply")
+    assert "status: implementing" in text and f"Result: {fix_sha} " in text
+
+    good = (
+        "Condition 3 can't be confirmed: no review record gives F-1's severity "
+        "or a round after the fix. Run /sc:review on the fix or waive it."
+    )
+    assert all(_grade(run_eval, task, ws, good))
+    assert not all(_grade(run_eval, task, ws, "All three conditions hold."))
+    _set_field(plan, "status", "complete")
+    assert not all(_grade(run_eval, task, ws, good)), "plan written"
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "complete")
+    assert not all(_grade(run_eval, task, ws, good)), "README written"
+
+
 def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
     run_eval, task, ws = _fixture_ws(tmp_path, "plan-draft-spec-gate")
     stop = "Spec is draft. Run /sc:review --scope spec docs/features/report-export/01-discovery.md first."

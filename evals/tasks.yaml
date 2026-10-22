@@ -732,7 +732,10 @@ tasks:
   # subject `fix: apply review F-1` and the plan's Deviations line show that a
   # review ran. Plan-Close's third condition cannot be checked from the files:
   # the answer must not call the plan closable. Baseline for
-  # docs/features/review-findings-record (pre-registered before its runs).
+  # docs/features/review-findings-record (pre-registered in 9bf0bdac): 5/5
+  # pass on 9bf0bdac (Linux, sonnet, low); every run said condition 3 cannot
+  # be confirmed and asked for /sc:review on the fix, F-1's severity or a
+  # waiver. A regression guard, not a measure of a change.
   - id: reflect-plan-close-no-record
     canary: true
     canary_only: true
