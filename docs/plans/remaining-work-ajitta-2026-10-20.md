@@ -64,7 +64,7 @@ revised: 2026-10-22
 - [ ] C-17: `bd356afa` → `52b5517e` 시기의 local/project hook 상태가 `~/.claude/.superclaude_hooks/`에 남는다. local·project uninstall은 그 디렉터리에 닿지도 않고 보고하지도 않는다.
 - [ ] opus 후속 라운드(N2/N5): `purpose_before_action`의 opus D3a는 양(+)이지만 검정력이 부족했다(13/20 vs 8/20, p = 0.103). 그 run에는 계정 콘텐츠가 실려 있었다([purpose-opus 04](../features/purpose-opus/04-readout.md)의 caveat 참조). 재개한다면 격리된 harness에서 새로 pre-register하고, arm당 50–55회가 필요하다.
 - [ ] "참조가 가리키는 파일을 연다" 규칙 문구 시험([purpose-generalization 04](../features/purpose-generalization/04-readout.md) §2).
-- [ ] `origin/fix/plain-language-structure`: 10-10에 멈춘 문장 길이·구조 작업이다. 병합되지 않은 WIP 커밋 10개가 있다.
+- [x] `origin/fix/plain-language-structure`: 10-10에 멈춘 문장 길이·구조 작업이다. 병합되지 않은 WIP 커밋 10개가 있다. 2026-10-23 문서 4개를 실패 기록으로 master에 넣고(plan 둘 `deprecated`, README `phase: implementing`) 브랜치를 지웠다. 문제 자체의 재시도는 새 접근이 필요한 별도 결정이다.
 
 결정: 각각 재개 여부. ★모두 보류 유지. C-16/C-17은 해당 시기에 설치한 경우가 드물어 비용 대비 효과가 낮다. opus 라운드는 실행 비용이 크다.
 
