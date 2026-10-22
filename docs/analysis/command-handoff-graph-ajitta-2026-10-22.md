@@ -5,7 +5,7 @@ revised: 2026-10-22
 
 # `/sc:*` 명령 핸드오프 그래프와 구멍
 
-**지금 상태(5b28dd7e 이후):** G1의 Proof 꼬리말, G2, G3의 review → design 핸드오프, G5는 해결됐다. G1의 `Evidence:` 규칙, G3의 체인 기준(D2), G4, G6–G10은 열려 있다. 열린 항목 중 관찰된 실패가 있는 것은 없다. 처리 내용은 끝의 "검토 반영"과 "구현과 측정"에 있다. 아래 판정과 각 절은 d7f04869 시점에 쓴 기록이다.
+**지금 상태(95d5f73b 이후, 누더기 감사 반영):** G1의 Proof 꼬리말, G2, G3의 review → design 핸드오프, G5는 해결됐다. plan 문서는 역할로 정의한다. 05 슬롯의 plan이면 plan 문서이고, 분할 plan의 단계 파일은 그 인덱스로 센다. README `phase:`는 plan (index) 하나가 `complete`가 되면 `complete`가 된다. 2·3차에서 들인 "폴더의 다른 plan이 모두 끝나야" 규칙은 4차에서 되돌렸다. G1의 `Evidence:` 규칙, G3의 체인 기준(D2), G4, G6–G10은 열려 있다. 아래 표의 각 행은 그 라운드 시점의 처리이고, 뒤 라운드가 바꾼 행에는 표시를 달았다. 아래 판정과 각 절은 d7f04869 시점에 쓴 기록이다.
 
 **판정: 실제로 쓰인 경로는 맞물리고, 구멍은 쓰이지 않은 두 영역에 몰려 있다.** plan 이후의 문서 계약(implement가 `Result:`를 쓰고 reflect가 확인)과 brainstorm → review → plan 관문은 이 저장소에서 실제로 작동했다. 구멍은 roadmap 경로(산출물이 plan 문서 계약을 지키지 못함)와 design의 위치(체인 정의가 두 벌)에 있다. 이 구멍들로 인한 실패는 관찰되지 않았다. 고치기 전에 결정이 두 개 필요하다(아래 "결정 사항"). 이 문서를 검토하면서 심각도를 다시 매기고 사실 오류 셋을 바로잡았다. G5는 roadmap-plan-gate(6d0985c8)에서 이미 해결됐다. 고친 내용과 결정은 끝의 "검토 반영"에 있다.
 
@@ -264,7 +264,7 @@ reflect → done
 | 2 roadmap `Evidence:` 규칙을 지키게 하는 곳 없음 | 소유자가 가장 작은 범위를 고르며 보류한 부분이라 두었다. G1은 "부분 해결"로 남긴다 |
 | 3 `RULES_DOCS.md:84`가 `--plan`과 "committed"를 말하지 않음 | `/sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer`로 고쳤다 |
 | 4 probe check가 관대함 | ` ``` ` 펜스 블록 안의 제목을 무시하고, `Result:` 줄은 명령으로 치지 않게 고쳤다. 저장된 run을 다시 채점하니 변경 전 0/6, 변경 후 3/3으로 그대로였다. 테스트 사례 둘을 더했다. 남은 한계(2차 검증 반영으로 정정): 내용과 상관없이 펜스 블록을 명령으로 친다(기대 출력만 담은 ` ```text ` 블록도 통과). `~~~` 펜스 안의 제목, 그리고 들여쓴 펜스나 목록 안 펜스(`- ```md`) 안의 제목은 무시하지 않는다. 줄 첫 칸에서 여는 ` ``` ` 펜스만 본다(4차 검증 반영). `## Proof`가 마지막 절인지 보지 않는다. 백틱으로 감싼 자리표시(`` `<command>` ``)는 통과한다. `## Proof:`, `### Proof`, `## Proof footer` 제목은 실패한다. 절 안에 백틱이 하나라도 있으면 통과한다(자리표시나 파일 이름만 있어도). `Result:`로 시작하는 줄만 빼므로 `**Result:**`나 `- Result:` 줄은 명령으로 친다(3차 검증 반영). 명령과 출력을 정규식으로 가를 수 없으므로 더 조이지 않는다. 변경 후 세 run의 꼬리말은 사람이 직접 읽어 명령과 기대 출력이 있음을 확인했다 |
-| 이 브랜치 밖, Important 후보: roadmap이 plan 옆에 쓰는 `05<letter>-plan-workflow.md`가 Plan-Close 대상 정의에 없어 `implementing`에서 나갈 길이 없음 | 같은 계약이라 이 브랜치에서 고쳤다. `reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문의 정의에 "a roadmap's `05<letter>-plan-workflow.md`"를 넣었다. 가드는 세 곳이 그 이름을 적는지 본다 |
+| 이 브랜치 밖, Important 후보: roadmap이 plan 옆에 쓰는 `05<letter>-plan-workflow.md`가 Plan-Close 대상 정의에 없어 `implementing`에서 나갈 길이 없음 | 같은 계약이라 이 브랜치에서 고쳤다. `reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문의 정의에 "a roadmap's `05<letter>-plan-workflow.md`"를 넣었다. 가드는 세 곳이 그 이름을 적는지 본다 (2차에서 역할 정의로 바뀜) |
 | 이 브랜치 밖: 릴리스에 `canary-gates`도 필요 | 위 "릴리스 때" 줄을 고쳤다 |
 
 ## 2차 독립 검증 반영
@@ -277,7 +277,7 @@ reflect → done
 | 2 probe check의 남은 관대함 | 더 조이지 않는다. 펜스 블록 안이 명령인지 출력인지는 정규식으로 가를 수 없다. 단어 목록을 늘리면 누더기가 된다. 변경 후 run은 사람이 직접 읽었다 |
 | 3 분할 plan 단계 이름(`workflow`)과 roadmap 이름이 겹침 | 정의를 이름이 아니라 역할로 바꿨다: "a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file"(`reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문) |
 | 이 브랜치 밖, Important 후보: 다른 독립 plan `05<letter>-plan-<distinguisher>.md`도 정의에 없음 | 같은 문장으로 해결된다(`command-local-flags/05a-plan-pointer-checks.md`, `plugin-install/05a-plan-release-channel.md` 같은 파일) |
-| 4 한 폴더에 plan이 둘이면 README `phase:`가 먼저 끝난 plan에서 `complete`가 됨 | Plan-Close는 "폴더의 다른 plan 문서가 모두 `complete`일 때"만 README를 `complete`로 바꾼다. RULES_DOCS phase 매핑도 "every plan (index) in the folder"로 고쳤다 |
+| 4 한 폴더에 plan이 둘이면 README `phase:`가 먼저 끝난 plan에서 `complete`가 됨 | Plan-Close는 "폴더의 다른 plan 문서가 모두 `complete`일 때"만 README를 `complete`로 바꾼다. RULES_DOCS phase 매핑도 "every plan (index) in the folder"로 고쳤다 (4차에서 되돌림) |
 | 5 `test.md` verifier 항목이 `05-plan.md`로만 적음 | "the plan doc the work ran from"으로 바꿨다 |
 
 ## 3차 독립 검증 반영
@@ -286,10 +286,10 @@ reflect → done
 
 | 발견 | 처리 |
 |---|---|
-| 1 Important: README `complete` 조건이 끝내 `complete`가 될 수 없는 plan 문서까지 셈. 예: 박스가 없는 부속 파일 `runtime-behavior-audit/05a-plan-trigger-tiers.md`, `deprecated` plan, `archive/` | `reflect.md` Plan-Close는 "other plan documents with task boxes are all `complete` or `deprecated`"일 때 README를 바꾼다. RULES_DOCS 매핑은 "every plan (index) with task boxes in the folder (`archive/` aside) at `status: complete` or `deprecated`"이다. 둘 다 가드에 넣었다 |
-| 2 단계 파일과 별도 plan을 가르는 기준이 정의에 없음 | 정의 세 곳에 "(one its index lists with a checkbox)"를 붙였다 |
+| 1 Important: README `complete` 조건이 끝내 `complete`가 될 수 없는 plan 문서까지 셈. 예: 박스가 없는 부속 파일 `runtime-behavior-audit/05a-plan-trigger-tiers.md`, `deprecated` plan, `archive/` | `reflect.md` Plan-Close는 "other plan documents with task boxes are all `complete` or `deprecated`"일 때 README를 바꾼다. RULES_DOCS 매핑은 "every plan (index) with task boxes in the folder (`archive/` aside) at `status: complete` or `deprecated`"이다. 둘 다 가드에 넣었다 (4차에서 되돌림) |
+| 2 단계 파일과 별도 plan을 가르는 기준이 정의에 없음 | 정의 세 곳에 "(one its index lists with a checkbox)"를 붙였다 (누더기 감사에서 "단계 파일은 인덱스로 센다"로 바뀜) |
 | 3 probe check 한계 목록이 다 적지 못함 | 적용 표 4번 행에 더했다. 고치지는 않는다(G2) |
-| 4 verifier 항목을 지키는 가드가 없고, 경로를 넘기라는 말이 없음 | "whose path it is passed"를 넣고 가드에 더했다 |
+| 4 verifier 항목을 지키는 가드가 없고, 경로를 넘기라는 말이 없음 | "whose path it is passed"를 넣고 가드에 더했다 (4차에서 "pass it that path"로 바뀜) |
 | 이 브랜치 밖: implement 첫 박스가 README를 `implementing`으로 되돌릴 수 있음 | "when it is not already further"를 붙였다. 같은 README phase 규칙이라 이 브랜치에서 고쳤다 |
 
 ## 4차 독립 검증 반영
@@ -306,3 +306,16 @@ reflect → done
 | 4 `test.md` verifier 문장이 꼬임 | "(its Proof section and task list; pass it that path), and reports …"로 고치고 가드 구절을 바꿨다 |
 
 남는 것: plan 문서 정의(역할과 인덱스 체크박스 기준), verifier 경로, implement 첫 박스의 "when it is not already further"는 그대로다.
+
+## 5차 검증과 누더기 감사 반영
+
+[5차 검증](./command-handoff-graph-verify5-ajitta-2026-10-22.md)은 통과였다(Critical·Important 없음, Suggestion 2). [누더기 감사](./patchwork-audit-handoff-ajitta-2026-10-22.md)(v4.34.2 이후 미출시 작업 전체)는 조건부 통과였다(Important 2, Suggestion 6). 소유자의 ★ 권고대로 한 번에 정리했다.
+
+| 출처 | 처리 |
+|---|---|
+| 감사 1 Important: 정의가 단계 파일을 빼서, 단계 파일로 한 작업이 /sc:reflect를 건너뛰는 읽기가 남음 | 정의 세 곳을 "…, or a `docs/plans/` plan; a split plan's phase file, one its index lists with a checkbox, stands for that index"로 바꿨다(다시 쓰기 A) |
+| 감사 2 Important, 5차 제안 2: 기록이 되돌린 규칙을 현재형으로 적음 | 맨 위 "지금 상태"를 고치고, 뒤 라운드가 바꾼 행 다섯에 표시를 달았다(다시 쓰기 B). 본문은 이력으로 둔다 |
+| 감사 3, 5차 제안 1: 가드가 라운드마다 자람, reflect README 문장 미보호 | 정의·관문·첫 박스 앵커를 `_GATE_ANCHORS`로 옮겼다. reflect Plan-Close에는 "and, in a feature folder, the README `phase: complete`" 앵커를 더했다. 테스트 본문은 assert 5개다. 부정 고정과 라운드 주석은 없앴다 |
+| 감사 4: CHANGELOG 항목 하나에 변경 다섯 | 네 항목으로 나누고 기여자 줄에 `reflect-plan-close-no-record`를 더했다(다시 쓰기 C) |
+| 감사 6: `test_insight_writer` docstring | 훅은 build_parser를 거치지 않는다고 고쳤다 |
+| 감사 5, 7, 8 | 보류. roadmap의 no-op 절은 다음에 `roadmap.md`를 고칠 때 한다(측정된 문장이라 canary를 다시 돌려야 한다). review 핸드오프 다섯은 그대로 둔다. `plan.md` Save의 "source"는 대기 목록대로 한다 |

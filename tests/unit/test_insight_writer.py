@@ -1822,7 +1822,8 @@ class TestCliEntryPoint:
 
     def test_parser_builds_without_a_module_docstring(self, monkeypatch):
         """python -OO (PYTHONOPTIMIZE=2) strips docstrings; every hook goes
-        through build_parser, so it must not need the module's."""
+        through build_parser (`superclaude insight`; the hooks do not), so it must
+        not need the module's."""
         monkeypatch.setattr(iw, "__doc__", None)
         args = iw.build_parser().parse_args(["pending-count"])
         assert args.cmd == "pending-count"

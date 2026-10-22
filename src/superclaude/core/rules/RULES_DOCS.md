@@ -84,7 +84,7 @@ Examples:
     /sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer
     /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; no code commit follows the Proof's `Result:` sha
     /sc:review -> fix -> /sc:review: a fix to a Critical or Important review finding that changes reviewed code or shipped content gets another review round, with the earlier findings as acceptance criteria (RULES.md Intent Propagation); rounds stop as the /sc:review Process step says. A `/sc:intent --through` run keeps its single fix round; its /sc:test step names the fix left unreviewed
-    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file (one its index lists with a checkbox), or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
+    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan, or a `docs/plans/` plan; a split plan's phase file, one its index lists with a checkbox, stands for that index) goes to /sc:reflect; other work is done here
     /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix to reviewed code or shipped content goes back to review, above) or accepted by the user; the plan (index) becomes `complete` here, on the user's yes to Plan-Close
   </workflow_gates>
 </component>

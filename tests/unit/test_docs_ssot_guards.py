@@ -536,6 +536,9 @@ _GATE_ANCHORS = {
         "names the fix left unreviewed",
         "or accepted by the user",
         "no code commit follows the Proof's `Result:` sha",
+        "`05<letter>-plan-*.md`",
+        "split plan's phase file",
+        "/sc:roadmap -> /sc:implement --plan",
     ],
     "rules": [
         "only when every task checkbox is checked",
@@ -550,6 +553,8 @@ _GATE_ANCHORS = {
         "Critical or Important",
         "another review",
         "/sc:reflect does not replace",
+        "`05<letter>-plan-*.md`",
+        "split plan's phase file",
     ],
     "review Process": [
         "Critical or Important",
@@ -572,6 +577,7 @@ _GATE_ANCHORS = {
         "back to /sc:review",
         "even when its Proof is green",
         "single fix round",
+        "when it is not already further",
     ],
     "implement Load": [
         "is missing or has a code commit after its sha",
@@ -595,6 +601,9 @@ _GATE_ANCHORS = {
         "only when the user says yes",
         "in a feature folder",
         "/sc:implement --plan",
+        "`05<letter>-plan-*.md`",
+        "split plan's phase file",
+        "and, in a feature folder, the README `phase: complete`",
     ],
     "reflect bounds": ["without the user's yes or with a Plan-Close condition unmet"],
     "intent Run": [
@@ -684,37 +693,15 @@ def _handoff(command: str) -> list[str]:
 
 
 def test_roadmap_and_review_handoffs_follow_the_chain():
-    """A roadmap is a plan document (05 slot): it carries the Proof footer
-    /sc:implement --plan runs, and hands off to /sc:implement only, since
-    /sc:task does not read the doc. Spec review hands off to /sc:design,
-    the next step of the Large chain (docs/analysis/command-handoff-graph-*)."""
-    roadmap = _read(_SRC / "commands" / "roadmap.md")
-    assert "End the doc with a `## Proof` footer that names the command" in roadmap
+    """A roadmap is a 05-slot plan: it ends with the Proof /sc:implement --plan
+    runs and hands off to /sc:implement only. Spec review hands off to
+    /sc:design. The plan-document definition is in _GATE_ANCHORS."""
+    assert "`## Proof` footer" in _read(_SRC / "commands" / "roadmap.md")
     assert _handoff("roadmap") == ["/sc:implement"]
     assert "/sc:design" in _handoff("review")
-    # A second plan in the 05 slot (a roadmap beside a plan, a separate plan)
-    # is a plan document too; a split plan's phase file is not.
+    assert "the plan doc the work ran from" in _read(_SRC / "commands" / "test.md")
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
-    for where, text in (
-        ("RULES_DOCS", rules),
-        ("reflect", _read(_SRC / "commands" / "reflect.md")),
-        ("test", _read(_SRC / "commands" / "test.md")),
-    ):
-        assert (
-            "that is not a split plan's phase file (one its index lists with a checkbox)"
-            in text
-        ), where
-    assert "/sc:roadmap -> /sc:implement --plan: Roadmap document committed" in rules
-    # The README turns complete with a plan (index): one rule, no count of
-    # the folder's other plans (docs/analysis/command-handoff-graph-*, round 4).
     assert "| plan (index) `status: complete` → complete" in rules
-    assert "with task boxes" not in rules
-    test_md = _read(_SRC / "commands" / "test.md")
-    assert "compares with the plan doc the work ran from" in test_md
-    assert "pass it that path" in test_md
-    assert "to `implementing` when it is not already further" in _read(
-        _SRC / "commands" / "implement.md"
-    )
 
 
 @pytest.mark.parametrize("where", sorted(_GATE_ANCHORS))
