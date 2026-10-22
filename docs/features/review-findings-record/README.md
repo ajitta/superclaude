@@ -15,4 +15,5 @@ related: ../../analysis/review-reflect-gate-gap-ajitta-2026-10-21.md
 
 ## Documents
 
-- [04-design.md](./04-design.md): 설계안. 안 A·B·C와 권고(★B 계획의 `## Review Log`), 기준선 `reflect-plan-close-no-record` 5/5
+- [04-design.md](./04-design.md): 설계안. 안 A·B·C, 검증 뒤 권고 ★C(shipped 변경 없음, 프로브 보강)와 대안 B′, 기준선 `reflect-plan-close-no-record` 5/5
+- [04a-design-verify.md](./04a-design-verify.md): 설계안 독립 검증(opus high), 조건부 통과(Important 8)
