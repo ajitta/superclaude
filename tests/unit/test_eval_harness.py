@@ -1048,6 +1048,18 @@ def test_git_changed_ignores_framework_state_files(tmp_path):
     assert run_eval._check_one(check, "git_diff_max_files", ws, "", "")[0]
 
 
+def test_main_runs_without_a_module_docstring(monkeypatch, capsys):
+    """python -OO (PYTHONOPTIMIZE=2) strips docstrings; the argument parser
+    must not need run_eval's."""
+    run_eval = _import_run_eval()
+    monkeypatch.setattr(run_eval, "__doc__", None)
+    monkeypatch.setattr(sys, "argv", ["run_eval.py", "--help"])
+    with pytest.raises(SystemExit) as exc:
+        run_eval.main()
+    assert exc.value.code == 0
+    assert "--runs-dir" in capsys.readouterr().out
+
+
 def test_credential_copies_do_not_outlive_the_run(monkeypatch, tmp_path):
     """Arm isolation copies ~/.claude/.credentials.json into
     <runs-dir>/config/<arm>/; the copies must be gone when main() returns,

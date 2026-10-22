@@ -776,7 +776,9 @@ def cmd_request(args: argparse.Namespace) -> int:
 
 
 def build_parser(prog: str = "insight_writer") -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog=prog, description=__doc__.split("\n")[0])
+    # python -OO (PYTHONOPTIMIZE=2) strips the module docstring.
+    description = __doc__.split("\n")[0] if __doc__ else None
+    p = argparse.ArgumentParser(prog=prog, description=description)
     sub = p.add_subparsers(dest="cmd", required=True)
 
     a = sub.add_parser("append")

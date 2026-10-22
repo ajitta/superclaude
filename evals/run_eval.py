@@ -685,7 +685,10 @@ def write_report(
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    # python -OO (PYTHONOPTIMIZE=2) strips the module docstring.
+    ap = argparse.ArgumentParser(
+        description=__doc__.splitlines()[0] if __doc__ else None
+    )
     ap.add_argument(
         "--arms", default=",".join(ARMS), help=f"comma-separated subset of {ARMS}"
     )
