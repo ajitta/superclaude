@@ -58,7 +58,7 @@ revised: 2026-10-22
 
 재리뷰도 같은 순서 문제를 가진다(review-reflect-gates 06b 발견 5). 녹색 Proof가 `complete`를 정한 뒤에 리뷰 수정의 다음 round가 온다. 2차 round가 Critical을 찾아도 계획을 `implementing`으로 되돌리는 경로는 "a red re-run"뿐이다. `test-reflect-gate-complete` 프로브가 이 상태(파일은 complete, 일은 아직)를 잰다. D를 정할 때 그 프로브의 check도 함께 본다.
 
-### E. 리뷰 발견과 그 수락의 기록 위치 — 설계 중: [review-findings-record](../features/review-findings-record/README.md)
+### E. 리뷰 발견과 그 수락의 기록 위치 — 결정: 변경 없음(C), 프로브 보강: [review-findings-record](../features/review-findings-record/README.md)
 
 소유자 결정(2026-10-22): 새 세션에서 설계안 round로 시작한다. 그 round에서는 `src/`를 바꾸지 않는다.
 

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: complete
 revised: 2026-10-22
 ---
 
@@ -150,6 +150,8 @@ revised: 2026-10-22
 5. RULES_DOCS를 바꾸지 않아도 된다. 계획 규칙(`RULES_DOCS.md:58`)이 계획 문서의 절을 열거하는지, 그리고 `--through`의 doc 작성 단계에서 RULES_DOCS가 로드되는지.
 
 ## 소유자 결정
+
+결정(2026-10-22): 1 ★C, 2 ★긍정 check를 더해 가드로 남긴다, 3 ★(B′를 다시 열 때의 조건으로 남긴다). 프로브 주석(04a 발견 12)도 고쳤다.
 
 1. 안: ★C 변경 없음(프로브 보강만) / B′ 계획 `## Review Log`(조건 6개) / B′의 한 줄 `Review:` 형태 / A `06-review.md`
 2. 기준선 프로브 `reflect-plan-close-no-record`: ★긍정 check `*rereview_named`를 더해 가드로 남긴다 / 주석만 "phrase guard"로 고친다 / 지운다

@@ -729,13 +729,14 @@ tasks:
 
   # A later session: the review rounds happened in an earlier one and no file
   # holds them (/sc:review writes none for branch work), so only the commit
-  # subject `fix: apply review F-1` and the plan's Deviations line show that a
-  # review ran. Plan-Close's third condition cannot be checked from the files:
-  # the answer must not call the plan closable. Baseline for
-  # docs/features/review-findings-record (pre-registered in 9bf0bdac): 5/5
-  # pass on 9bf0bdac (Linux, sonnet, low); every run said condition 3 cannot
-  # be confirmed and asked for /sc:review on the fix, F-1's severity or a
-  # waiver. A regression guard, not a measure of a change.
+  # subjects and the plan's Deviations line show that a review ran.
+  # Plan-Close's third condition cannot be checked from the files: the answer
+  # does not call the plan closable and asks for the review of the fix (or the
+  # user's word on it). Pre-registered in 9bf0bdac and run 5 times there
+  # (Linux, sonnet, low): all five said condition 3 cannot be confirmed; the
+  # positive check, added after, passes all five saved runs on regrade. A
+  # regression guard: the owner kept the behaviour as it is
+  # (docs/features/review-findings-record, option C).
   - id: reflect-plan-close-no-record
     canary: true
     canary_only: true
@@ -758,6 +759,7 @@ tasks:
       - *plan_not_complete
       - *readme_not_complete
       - *closable_verdict
+      - *rereview_named
       - *no_py_change
 
   # /sc:intent --through runs the whole Large chain from one prompt

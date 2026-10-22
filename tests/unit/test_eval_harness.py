@@ -1378,7 +1378,12 @@ def test_reflect_plan_close_no_record_state_and_verdict(tmp_path):
         "or a round after the fix. Run /sc:review on the fix or waive it."
     )
     assert all(_grade(run_eval, task, ws, good))
-    assert not all(_grade(run_eval, task, ws, "All three conditions hold."))
+    for bad in (
+        "",
+        "All three conditions hold.",
+        "Conditions 1-3 are satisfied. I propose marking the plan complete.",
+    ):
+        assert not all(_grade(run_eval, task, ws, bad)), bad
     _set_field(plan, "status", "complete")
     assert not all(_grade(run_eval, task, ws, good)), "plan written"
     _set_field(plan, "status", "implementing")
