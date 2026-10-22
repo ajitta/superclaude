@@ -263,6 +263,19 @@ reflect → done
 | 1 Important: 이 문서가 고친 증상을 열린 구멍으로 적음 | 맨 위에 현재 상태를 적었다. 구멍 표의 G1·G2·G3 상태를 고치고, 각 절과 부록이 d7f04869 시점 기록임을 표시했다 |
 | 2 roadmap `Evidence:` 규칙을 지키게 하는 곳 없음 | 소유자가 가장 작은 범위를 고르며 보류한 부분이라 두었다. G1은 "부분 해결"로 남긴다 |
 | 3 `RULES_DOCS.md:84`가 `--plan`과 "committed"를 말하지 않음 | `/sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer`로 고쳤다 |
-| 4 probe check가 관대함 | 펜스 블록 안의 제목을 무시하고, `Result:` 줄은 명령으로 치지 않게 고쳤다. 끝 탭도 이제 인식한다. 저장된 run을 다시 채점하니 변경 전 0/6, 변경 후 3/3으로 그대로였다. 테스트 사례 둘을 더했다. 남은 한계: 백틱으로 감싼 자리표시(`` `<command>` ``)는 통과하고, `## Proof:`나 `### Proof` 제목은 실패한다 |
+| 4 probe check가 관대함 | ` ``` ` 펜스 블록 안의 제목을 무시하고, `Result:` 줄은 명령으로 치지 않게 고쳤다. 저장된 run을 다시 채점하니 변경 전 0/6, 변경 후 3/3으로 그대로였다. 테스트 사례 둘을 더했다. 남은 한계(2차 검증 반영으로 정정): 내용과 상관없이 펜스 블록을 명령으로 친다(기대 출력만 담은 ` ```text ` 블록도 통과). `~~~` 펜스 안의 제목은 무시하지 않는다. `## Proof`가 마지막 절인지 보지 않는다. 백틱으로 감싼 자리표시(`` `<command>` ``)는 통과한다. `## Proof:`나 `### Proof` 제목은 실패한다. 명령과 출력을 정규식으로 가를 수 없으므로 더 조이지 않는다. 변경 후 세 run의 꼬리말은 사람이 직접 읽어 명령과 기대 출력이 있음을 확인했다 |
 | 이 브랜치 밖, Important 후보: roadmap이 plan 옆에 쓰는 `05<letter>-plan-workflow.md`가 Plan-Close 대상 정의에 없어 `implementing`에서 나갈 길이 없음 | 같은 계약이라 이 브랜치에서 고쳤다. `reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문의 정의에 "a roadmap's `05<letter>-plan-workflow.md`"를 넣었다. 가드는 세 곳이 그 이름을 적는지 본다 |
 | 이 브랜치 밖: 릴리스에 `canary-gates`도 필요 | 위 "릴리스 때" 줄을 고쳤다 |
+
+## 2차 독립 검증 반영
+
+[2차 검증](./command-handoff-graph-verify2-ajitta-2026-10-22.md)의 판정은 조건부 통과였다. Important는 1개였고, 바로 위 적용 표의 거짓 문장이다.
+
+| 발견 | 처리 |
+|---|---|
+| 1 Important: 적용 표가 "끝 탭도 이제 인식한다"고 적고 남은 한계를 덜 적음(옛 check도 탭과 CRLF를 통과시켰다) | 그 문장을 지우고, 남은 한계를 다섯 가지로 적었다(위 표 4번 행) |
+| 2 probe check의 남은 관대함 | 더 조이지 않는다. 펜스 블록 안이 명령인지 출력인지는 정규식으로 가를 수 없다. 단어 목록을 늘리면 누더기가 된다. 변경 후 run은 사람이 직접 읽었다 |
+| 3 분할 plan 단계 이름(`workflow`)과 roadmap 이름이 겹침 | 정의를 이름이 아니라 역할로 바꿨다: "a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file"(`reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문) |
+| 이 브랜치 밖, Important 후보: 다른 독립 plan `05<letter>-plan-<distinguisher>.md`도 정의에 없음 | 같은 문장으로 해결된다(`command-local-flags/05a-plan-pointer-checks.md`, `plugin-install/05a-plan-release-channel.md` 같은 파일) |
+| 4 한 폴더에 plan이 둘이면 README `phase:`가 먼저 끝난 plan에서 `complete`가 됨 | Plan-Close는 "폴더의 다른 plan 문서가 모두 `complete`일 때"만 README를 `complete`로 바꾼다. RULES_DOCS phase 매핑도 "every plan (index) in the folder"로 고쳤다 |
+| 5 `test.md` verifier 항목이 `05-plan.md`로만 적음 | "the plan doc the work ran from"으로 바꿨다 |

@@ -692,16 +692,24 @@ def test_roadmap_and_review_handoffs_follow_the_chain():
     assert "End the doc with a `## Proof` footer that names the command" in roadmap
     assert _handoff("roadmap") == ["/sc:implement"]
     assert "/sc:design" in _handoff("review")
-    # A roadmap written beside a plan is a plan document too: Plan-Close and
-    # the reflect gate name its file.
+    # A second plan in the 05 slot (a roadmap beside a plan, a separate plan)
+    # is a plan document too; a split plan's phase file is not.
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
     for where, text in (
         ("RULES_DOCS", rules),
         ("reflect", _read(_SRC / "commands" / "reflect.md")),
         ("test", _read(_SRC / "commands" / "test.md")),
     ):
-        assert "a roadmap's `05<letter>-plan-workflow.md`" in text, where
+        assert (
+            "another `05<letter>-plan-*.md` plan that is not a split plan's phase file"
+            in text
+        ), where
     assert "/sc:roadmap -> /sc:implement --plan: Roadmap document committed" in rules
+    # Two plans in one folder: the feature is complete when both are.
+    assert "every plan (index) in the folder `status: complete` → complete" in rules
+    assert "whose other plan documents are all `complete`, the README" in _read(
+        _SRC / "commands" / "reflect.md"
+    )
 
 
 @pytest.mark.parametrize("where", sorted(_GATE_ANCHORS))
