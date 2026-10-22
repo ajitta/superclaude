@@ -275,7 +275,7 @@ reflect → done
 |---|---|
 | 1 Important: 적용 표가 "끝 탭도 이제 인식한다"고 적고 남은 한계를 덜 적음(옛 check도 탭과 CRLF를 통과시켰다) | 그 문장을 지우고, 남은 한계를 다섯 가지로 적었다(위 표 4번 행) |
 | 2 probe check의 남은 관대함 | 더 조이지 않는다. 펜스 블록 안이 명령인지 출력인지는 정규식으로 가를 수 없다. 단어 목록을 늘리면 누더기가 된다. 변경 후 run은 사람이 직접 읽었다 |
-| 3 분할 plan 단계 이름(`workflow`)과 roadmap 이름이 겹침 | 정의를 이름이 아니라 역할로 바꿨다: "a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file"(`reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문) |
+| 3 분할 plan 단계 이름(`workflow`)과 roadmap 이름이 겹침 | 정의를 이름이 아니라 역할로 바꿨다: "a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file"(`reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문) (누더기 감사에서 "단계 파일은 인덱스로 센다"로 바뀜) |
 | 이 브랜치 밖, Important 후보: 다른 독립 plan `05<letter>-plan-<distinguisher>.md`도 정의에 없음 | 같은 문장으로 해결된다(`command-local-flags/05a-plan-pointer-checks.md`, `plugin-install/05a-plan-release-channel.md` 같은 파일) |
 | 4 한 폴더에 plan이 둘이면 README `phase:`가 먼저 끝난 plan에서 `complete`가 됨 | Plan-Close는 "폴더의 다른 plan 문서가 모두 `complete`일 때"만 README를 `complete`로 바꾼다. RULES_DOCS phase 매핑도 "every plan (index) in the folder"로 고쳤다 (4차에서 되돌림) |
 | 5 `test.md` verifier 항목이 `05-plan.md`로만 적음 | "the plan doc the work ran from"으로 바꿨다 |
@@ -309,13 +309,4 @@ reflect → done
 
 ## 5차 검증과 누더기 감사 반영
 
-[5차 검증](./command-handoff-graph-verify5-ajitta-2026-10-22.md)은 통과였다(Critical·Important 없음, Suggestion 2). [누더기 감사](./patchwork-audit-handoff-ajitta-2026-10-22.md)(v4.34.2 이후 미출시 작업 전체)는 조건부 통과였다(Important 2, Suggestion 6). 소유자의 ★ 권고대로 한 번에 정리했다.
-
-| 출처 | 처리 |
-|---|---|
-| 감사 1 Important: 정의가 단계 파일을 빼서, 단계 파일로 한 작업이 /sc:reflect를 건너뛰는 읽기가 남음 | 정의 세 곳을 "…, or a `docs/plans/` plan; a split plan's phase file, one its index lists with a checkbox, stands for that index"로 바꿨다(다시 쓰기 A) |
-| 감사 2 Important, 5차 제안 2: 기록이 되돌린 규칙을 현재형으로 적음 | 맨 위 "지금 상태"를 고치고, 뒤 라운드가 바꾼 행 다섯에 표시를 달았다(다시 쓰기 B). 본문은 이력으로 둔다 |
-| 감사 3, 5차 제안 1: 가드가 라운드마다 자람, reflect README 문장 미보호 | 정의·관문·첫 박스 앵커를 `_GATE_ANCHORS`로 옮겼다. reflect Plan-Close에는 "and, in a feature folder, the README `phase: complete`" 앵커를 더했다. 테스트 본문은 assert 5개다. 부정 고정과 라운드 주석은 없앴다 |
-| 감사 4: CHANGELOG 항목 하나에 변경 다섯 | 네 항목으로 나누고 기여자 줄에 `reflect-plan-close-no-record`를 더했다(다시 쓰기 C) |
-| 감사 6: `test_insight_writer` docstring | 훅은 build_parser를 거치지 않는다고 고쳤다 |
-| 감사 5, 7, 8 | 보류. roadmap의 no-op 절은 다음에 `roadmap.md`를 고칠 때 한다(측정된 문장이라 canary를 다시 돌려야 한다). review 핸드오프 다섯은 그대로 둔다. `plan.md` Save의 "source"는 대기 목록대로 한다 |
+[5차 검증](./command-handoff-graph-verify5-ajitta-2026-10-22.md)은 통과, [누더기 감사](./patchwork-audit-handoff-ajitta-2026-10-22.md)는 조건부 통과(Important 2)였다. ★ 권고대로 정의, 가드, CHANGELOG, 이 문서의 표시를 고쳤다(감사 5·7·8 보류). [정리 검증](./patchwork-audit-handoff-verify-ajitta-2026-10-22.md)(Important 0, Suggestion 4)의 N1–N4도 반영했다. 앵커는 술어 "stands for that index"를 지키고, 빠졌던 assert 셋("pass it that path", "Roadmap document committed", roadmap Proof 문장)을 되살렸다. 최종 커밋의 canary: commands 13/13, gates 7/7.

@@ -537,8 +537,9 @@ _GATE_ANCHORS = {
         "or accepted by the user",
         "no code commit follows the Proof's `Result:` sha",
         "`05<letter>-plan-*.md`",
-        "split plan's phase file",
+        "stands for that index",
         "/sc:roadmap -> /sc:implement --plan",
+        "Roadmap document committed",
     ],
     "rules": [
         "only when every task checkbox is checked",
@@ -554,7 +555,7 @@ _GATE_ANCHORS = {
         "another review",
         "/sc:reflect does not replace",
         "`05<letter>-plan-*.md`",
-        "split plan's phase file",
+        "stands for that index",
     ],
     "review Process": [
         "Critical or Important",
@@ -602,7 +603,7 @@ _GATE_ANCHORS = {
         "in a feature folder",
         "/sc:implement --plan",
         "`05<letter>-plan-*.md`",
-        "split plan's phase file",
+        "stands for that index",
         "and, in a feature folder, the README `phase: complete`",
     ],
     "reflect bounds": ["without the user's yes or with a Plan-Close condition unmet"],
@@ -696,10 +697,14 @@ def test_roadmap_and_review_handoffs_follow_the_chain():
     """A roadmap is a 05-slot plan: it ends with the Proof /sc:implement --plan
     runs and hands off to /sc:implement only. Spec review hands off to
     /sc:design. The plan-document definition is in _GATE_ANCHORS."""
-    assert "`## Proof` footer" in _read(_SRC / "commands" / "roadmap.md")
+    assert "End the doc with a `## Proof` footer" in _read(
+        _SRC / "commands" / "roadmap.md"
+    )
     assert _handoff("roadmap") == ["/sc:implement"]
     assert "/sc:design" in _handoff("review")
-    assert "the plan doc the work ran from" in _read(_SRC / "commands" / "test.md")
+    test_md = _read(_SRC / "commands" / "test.md")
+    assert "the plan doc the work ran from" in test_md
+    assert "pass it that path" in test_md
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
     assert "| plan (index) `status: complete` → complete" in rules
 
