@@ -5,7 +5,6 @@ branch: master @c5c0b00f (merge c9b0b94d of feature/plan-complete-order; stable 
 ## Start here (next session)
 1. `git fetch origin && git switch master && git pull --ff-only`, then read this file, `session_2026-10-21_chosh-g14_master.md` (other machine) and `docs/plans/remaining-work-ajitta-2026-10-20.md`.
 2. The release is held by the owner. Do not start a bump branch, run canaries for a release or `make release` unasked.
-3. `docs/features/plan-complete-order/05-plan.md` is `implementing` with every box checked and `Result: f7076dbd`: by its own new rule it becomes `complete` only on the owner's yes (asked 2026-10-22).
 
 ## What was done
 - review-reflect-gates: five headless opus verifier rounds (06a–06e), cleanup of patched-in graders, merged 21d2e0fc. Details in its feature folder.
@@ -20,7 +19,7 @@ branch: master @c5c0b00f (merge c9b0b94d of feature/plan-complete-order; stable 
 - Grader proposals from a verifier are regraded against saved real runs before they are applied (one refusal regex failed 14 of 16 real correct answers).
 
 ## Next actions
-- [ ] Owner yes → plan-complete-order plan `status: complete` + README `phase: complete` (docs-only commit on master).
+- [x] Owner yes (2026-10-22) → plan-complete-order plan `status: complete` + README `phase: complete`.
 - [ ] Release 4.34.2 (owner decides; held). Core and command bodies changed since v4.34.1: `make canary-gates` and `make canary-commands` before `CANARY_OK=1 make release`; CHANGELOG [Unreleased] carries the Upgrade line for plans in progress.
 - [ ] Owner, Windows: delete `C:/sc-evals/rrg-*` and `C:/sc-evals/smm-final2` after the release.
 - [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). Reviews have no rule for where findings and their acceptance are recorded when `/sc:review` writes no file (06e, outside this branch).
