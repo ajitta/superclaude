@@ -85,7 +85,7 @@ v4.32.1로 N1–N6을 릴리스했다. 남은 것은 측정과 보류 항목이�
 - [ ] 독립 검증 06b의 남은 Suggestion·nit(소유자 결정 2026-10-21: 그 코드를 다음에 건드리는 라운드에서 함께). 트리거와 할 일([06b](../features/session-memory-multi-machine/06b-verify-fixes.md) 1·3–6번):
   - `utils.run_shell`을 다음에 고칠 때: 정리 경로에서 신호를 막는다(`pthread_sigmask` 또는 두 `except`를 하나로). 처리기 복원·메인 스레드 확인·호출자가 정한 처리기 유지에 테스트를 더한다.
   - `cmd-load-sync-behind`·`cmd-load-other-host`·`cmd-save-host-record` 채점기를 다음에 고칠 때: 06b 4–6번의 사례를 `test_eval_harness.py` 고정 사례에 더하고 정규식을 넓힌다.
-- [ ] `evals/run_eval.py --dry-run`은 runs-dir에 같은 작업 공간이 이미 있으면 `FileExistsError` traceback으로 끝난다(`except (RuntimeError, subprocess.TimeoutExpired)`가 잡지 못한다). 출처: [review-findings-record 04a](../features/review-findings-record/04a-design-verify.md) "이 브랜치 밖". ★다음에 `run_eval.py`를 고칠 때 함께 한다.
+- [x] (2026-10-22, fix/run-eval-existing-runs-dir: 이제 시작할 때 그 작업 공간을 이름으로 대고 멈춘다) `evals/run_eval.py --dry-run`은 runs-dir에 같은 작업 공간이 이미 있으면 `FileExistsError` traceback으로 끝난다(`except (RuntimeError, subprocess.TimeoutExpired)`가 잡지 못한다). 출처: [review-findings-record 04a](../features/review-findings-record/04a-design-verify.md) "이 브랜치 밖". ★다음에 `run_eval.py`를 고칠 때 함께 한다.
 - [ ] 기록이 있어도 `reflect-plan-close-review-due`에서 잘못 닫은 run이 한 번 있었다([plan-complete-order 06e](../features/plan-complete-order/06e-verify-round6.md) r8/x3). 읽는 쪽의 문제다. ★다음 모델 canary에서 이 프로브를 5회 이상 돌려 다시 나오는지 본다.
 - [ ] `plan.md` Save의 "the design doc the Load step read"를 "the design doc that is the Load step's source"로 좁힌다(roadmap과 같은 문구). 출처: [roadmap-plan-gate verify2](../analysis/roadmap-plan-gate-verify2-ajitta-2026-10-22.md) "이 브랜치 밖". ★`plan.md`를 다음에 건드리는 round에서 함께 한다(바꾸면 plan 프로브가 canary-commands 대상이 된다).
 

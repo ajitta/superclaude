@@ -16,6 +16,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 ### Fixed
 
 - `superclaude insight`, which `/sc:insight` calls, no longer stops with an `AttributeError` when `PYTHONOPTIMIZE=2` is set or Python runs with `-OO`; it read its description from the module docstring, which that setting removes. The insight hooks were not affected. Under that setting, `superclaude <command> --help` still shows no command description, because Click takes it from the same kind of docstring. For contributors: `evals/run_eval.py` had the same crash, and the full test suite now passes under `PYTHONOPTIMIZE=2`.
+- For contributors: `evals/run_eval.py` (and so `make canary-*`) given a `--runs-dir` that already holds a workspace for the same arm and task now stops at once with an error naming it, before building anything; before, it ended in a `FileExistsError` traceback. A saved run is never overwritten.
 
 ## [4.34.2] - 2026-10-22
 

@@ -765,6 +765,19 @@ def main() -> int:
             "denies file edits as sensitive; pass --runs-dir outside it "
             "(e.g. C:/tmp/superclaude-evals or /tmp/superclaude-evals)"
         )
+    # A saved run is evidence (regrading reads it); never build over one.
+    taken = [
+        runs_dir / arm / task["id"]
+        for arm in arms
+        for task in tasks
+        if (runs_dir / arm / task["id"]).exists()
+    ]
+    if taken:
+        sys.exit(
+            f"error: runs dir {runs_dir} already holds {taken[0]}"
+            + (f" and {len(taken) - 1} more" if len(taken) > 1 else "")
+            + "; pass a new --runs-dir (a saved run is never overwritten)"
+        )
     runs_dir.mkdir(parents=True, exist_ok=True)
 
     claude_bin = _which("claude")
