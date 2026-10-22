@@ -30,3 +30,17 @@ Linux, sonnet, sc-full, 각 3회. 커밋 a9e01360(변경 전)과 de4e6cb3(변경
 - 변경 전 `roadmap-design-discovery-draft`는 결과는 맞았지만 이유가 달랐다. draft design 때문에 멈췄고, discovery spec은 언급하지 않았다. 변경 후 세 run은 draft discovery spec을 이유로 들었고, design은 "draft라도 막지 않는다"고 했다.
 - 변경 후 `roadmap-design-draft`의 세 run은 모두 `05-plan.md`를 썼다. design을 `approved-for-plan`으로 바꾸고 `revised`를 올렸으며, README `phase: planning`과 Documents를 갱신했다. 코드는 바꾸지 않았다.
 - `roadmap-draft-spec-gate`는 변경 전에도 통과한 회귀 가드다.
+
+## 독립 검증 반영
+
+[독립 검증](./roadmap-plan-gate-verify-ajitta-2026-10-22.md)(opus high)의 판정은 조건부 통과였다. Important는 1개였다.
+
+| 발견 | 처리 |
+|---|---|
+| 1 Important: `RULES_DOCS.md` workflow_gates가 roadmap을 "design spec이 아닌 입력"용으로 적고, Areas of concern을 넘기는 자리를 plan Load로만 적음 | `/sc:design -> /sc:roadmap`을 "Alternative to /sc:plan for a phased workflow, from the design or from a PRD/feature doc; the same gate as /sc:design -> /sc:plan"으로 고쳤다. `/sc:design -> /sc:plan`에는 "or the /sc:roadmap Analyze step"을 더했다. `core/`가 바뀌었으므로 릴리스 때 `make canary-gates`가 필요하다 |
+| 2 입력 해석 순서가 없어 승인 대상이 plan보다 넓음 | Analyze에 plan Load와 같은 순서를 두었다. 넘겨받은 문서, 없으면 feature 폴더의 `04-design.md`(fallback `01-discovery.md`), 없으면 사용자 설명이다. 승인 대상은 "the design doc that is the Analyze step's source"로 좁혔다 |
+| 3 새 `.py` 파일을 놓침 | `roadmap-design-draft`에 `file_absent_glob '**/*.py'`(`exclude_baseline`)를 더했다. 테스트에 새 파일 변이를 넣었다 |
+| 4 "roadmap 문서 작성" check가 테스트로 지켜지지 않음 | "design은 승인됐지만 roadmap 문서는 없음 → 실패" 단언을 더했다. 그 check를 지우는 변이와 새 `.py` check를 지우는 변이가 각각 red임을 확인했다 |
+| 5 Areas of concern 분기 프로브 없음 | 하지 않는다. plan에도 같은 프로브가 없고, 관찰된 실패가 없다 |
+| 이 브랜치 밖: README가 plan 관문을 "draft spec"으로 적음 | 같은 관문이라 이 브랜치에서 고쳤다(README `/sc:review` 행과 Tightened Workflow Gates 줄: "discovery spec") |
+| 이 브랜치 밖: `RULES_DOCS.md:81` "Design spec committed"를 확인하는 단계 없음 | 기존 상태라 두었다 |

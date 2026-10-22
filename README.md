@@ -310,7 +310,7 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | `/sc:intent` | `docs/features/<slug>/00-intent.md` — problem, proposed outcome, affected users and systems, constraints, open questions, in the requester's words | User approves the wording; committed before analysis starts |
 | `/sc:brainstorm` | `docs/features/<slug>/01-discovery.md` (one-off: `docs/specs/<slug>-discovery-<user>-<date>.md`) | User approves discovery spec |
 | `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test; Areas of concern resolved) |
-| `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` Load step stops on a spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
+| `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` and `/sc:roadmap` gates stop on a discovery spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
 | `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; no code commit follows the plan's `Result:` sha; the plan stays `implementing` |
 | `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical and Important findings fixed or accepted; a fix to one that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria; a code change after the `Result:` sha re-runs the Proof |
@@ -458,7 +458,7 @@ superclaude mcp
 
 ### 🚦 **Tightened Workflow Gates**
 **Brainstorm → Plan → Implement → Review:**
-- `/sc:plan` stops on a draft spec until `/sc:review` clears it (prose gate, measured by the `plan-draft-spec-gate` probe)
+- `/sc:plan` stops on a draft discovery spec until `/sc:review` clears it (prose gate, measured by the `plan-draft-spec-gate` probe)
 - `/sc:review --audit-delegated` re-examines the decisions the model made on your behalf
 - Plan default: phase framing; opt-in `--pr-bundle` for multi-PR
 - `verified:` convention + SessionStart memory-staleness warning

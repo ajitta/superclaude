@@ -1461,6 +1461,9 @@ def test_roadmap_builds_on_a_draft_design_and_approves_it(tmp_path):
     assert "status: approved-for-plan" in (feature / "01-discovery.md").read_text()
     assert "status: draft" in (feature / "04-design.md").read_text()
     assert not all(_grade(run_eval, task, ws, "")), "nothing written passed"
+    _set_field(feature / "04-design.md", "status", "approved-for-plan")
+    assert not all(_grade(run_eval, task, ws, "")), "no roadmap written"
+    _set_field(feature / "04-design.md", "status", "draft")
 
     (feature / "05-plan.md").write_text("# roadmap\n", encoding="utf-8")
     assert not all(_grade(run_eval, task, ws, "")), "design left draft"
@@ -1476,6 +1479,10 @@ def test_roadmap_builds_on_a_draft_design_and_approves_it(tmp_path):
     _set_field(feature / "01-discovery.md", "status", "approved-for-plan")
     (ws / "report.py").write_text("x = 1\n", encoding="utf-8")
     assert not all(_grade(run_eval, task, ws, "")), "code changed"
+    _git(ws, "checkout", "-q", "--", "report.py")
+    assert all(_grade(run_eval, task, ws, ""))
+    (ws / "export_csv.py").write_text("x = 1\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, "")), "new code file"
 
 
 # test-reflect-gate grading data, shared by both variants. A good answer
