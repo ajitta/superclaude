@@ -14,7 +14,7 @@ description: Execute tests with coverage analysis and quality reporting. On requ
   2. Configure: Environment + execution params
   3. Execute: Run + real-time progress
   4. Analyze: Coverage reports + failure diagnostics
-  5. Report: Generate outputs per flags; when the tested work ran from a plan document (a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file, or a `docs/plans/` plan), say it is not done until /sc:reflect has run, and name a fix to a Critical or Important review finding that changed reviewed code or shipped content after the last review round as due for another review, which /sc:reflect does not replace
+  5. Report: Generate outputs per flags; when the tested work ran from a plan document (a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file (one its index lists with a checkbox), or a `docs/plans/` plan), say it is not done until /sc:reflect has run, and name a fix to a Critical or Important review finding that changed reviewed code or shipped content after the last review round as due for another review, which /sc:reflect does not replace
   6. Verify: when the user asks for independent evidence, dispatch the verifier (the Agent entry in the tools section) and attach its report to the output
   </flow>
 
@@ -37,7 +37,7 @@ description: Execute tests with coverage analysis and quality reporting. On requ
 
 
   <tools>
-  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc the work ran from (its Proof section and task list) and reports every mismatch without fixing; its description limits it to explicit requests for run-and-report evidence
+  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc the work ran from (its Proof section and task list), whose path it is passed and reports every mismatch without fixing; its description limits it to explicit requests for run-and-report evidence
   </tools>
 
   <patterns>

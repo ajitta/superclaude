@@ -30,7 +30,7 @@ Slug resolution (file-producing commands): derive a kebab-case slug from the com
 README update on feature-path write: `updated:` bump + append doc entry to `## Documents` + set `phase:` from the phase mapping below. Standalone path: no README update.
 Phase mapping (README `phase:` = the furthest stage the folder has reached; it never moves back, so a late `01a-discovery` during implementation leaves `implementing`):
   00-intent written → intent | 01-discovery written → discovery | 04-design written → design | 05-plan written → planning
-  first plan box checked (plan `status: implementing`) → implementing | every plan (index) in the folder `status: complete` → complete
+  first plan box checked (plan `status: implementing`) → implementing | every plan (index) with task boxes in the folder (`archive/` aside) at `status: complete` or `deprecated` → complete
   02-research, 03-analysis, 06+ docs and `deprecated` docs never move it; a folder they create starts at discovery
   abandoned: only when the user says the feature is dropped
 
@@ -84,7 +84,7 @@ Examples:
     /sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer
     /sc:implement -> /sc:review --scope branch (Large; optional for Medium) | /sc:test: plan doc checkboxes and its Deviations section match the code; no code commit follows the Proof's `Result:` sha
     /sc:review -> fix -> /sc:review: a fix to a Critical or Important review finding that changes reviewed code or shipped content gets another review round, with the earlier findings as acceptance criteria (RULES.md Intent Propagation); rounds stop as the /sc:review Process step says. A `/sc:intent --through` run keeps its single fix round; its /sc:test step names the fix left unreviewed
-    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file, or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
+    /sc:test -> /sc:reflect | done: Test pass evidence required (actual output, not claims). Work run from a plan document (a feature folder's `05-plan.md` or another `05<letter>-plan-*.md` plan that is not a split plan's phase file (one its index lists with a checkbox), or a `docs/plans/` plan) goes to /sc:reflect; other work is done here
     /sc:reflect -> done: every gap /sc:reflect names is fixed (a fix to reviewed code or shipped content goes back to review, above) or accepted by the user; the plan (index) becomes `complete` here, on the user's yes to Plan-Close
   </workflow_gates>
 </component>

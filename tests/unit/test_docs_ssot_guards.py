@@ -701,14 +701,26 @@ def test_roadmap_and_review_handoffs_follow_the_chain():
         ("test", _read(_SRC / "commands" / "test.md")),
     ):
         assert (
-            "another `05<letter>-plan-*.md` plan that is not a split plan's phase file"
+            "that is not a split plan's phase file (one its index lists with a checkbox)"
             in text
         ), where
     assert "/sc:roadmap -> /sc:implement --plan: Roadmap document committed" in rules
     # Two plans in one folder: the feature is complete when both are.
-    assert "every plan (index) in the folder `status: complete` → complete" in rules
-    assert "whose other plan documents are all `complete`, the README" in _read(
-        _SRC / "commands" / "reflect.md"
+    # Plans that cannot complete (no task boxes, deprecated, archived) do
+    # not hold the README back.
+    assert (
+        "every plan (index) with task boxes in the folder (`archive/` aside) "
+        "at `status: complete` or `deprecated` → complete" in rules
+    )
+    assert (
+        "whose other plan documents with task boxes are all `complete` or "
+        "`deprecated`, the README" in _read(_SRC / "commands" / "reflect.md")
+    )
+    test_md = _read(_SRC / "commands" / "test.md")
+    assert "compares with the plan doc the work ran from" in test_md
+    assert "whose path it is passed" in test_md
+    assert "to `implementing` when it is not already further" in _read(
+        _SRC / "commands" / "implement.md"
     )
 
 
