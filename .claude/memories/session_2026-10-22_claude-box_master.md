@@ -1,4 +1,4 @@
-branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
+branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; nothing unreleased in src/)
 
 # Session 2026-10-22 — claude-box — review-reflect-gates merged; plan-complete-order built, patchwork audit, merged
 
@@ -6,7 +6,7 @@ branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
 1. `git fetch origin && git switch master && git pull --ff-only`, then read this file, `session_2026-10-21_chosh-g14_master.md` (other machine) and `docs/plans/remaining-work-ajitta-2026-10-20.md`.
 2. v4.34.2 is released (owner's go 2026-10-22). This VM is on it; the Windows machine needs `superclaude install --force --scope user`.
 
-3. Next work the owner queued: design-proposal round for where review findings and the user's acceptance/waiver are recorded (Plan-Close condition (3) loses its evidence across sessions because `/sc:review` writes no file). Brief, candidates and steps: `docs/analysis/review-reflect-gate-gap-ajitta-2026-10-21.md` § E. Branch `docs/review-findings-record`; no `src/` change in that round.
+3. Review-findings-record (analysis § E) is decided and merged (ef6d8a09): option C, no shipped change. Remaining work: `docs/plans/remaining-work-ajitta-2026-10-20.md`.
 
 ## What was done
 - review-reflect-gates: five headless opus verifier rounds (06a–06e), cleanup of patched-in graders, merged 21d2e0fc. Details in its feature folder.
@@ -16,8 +16,11 @@ branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
 - New/changed probes: `implement-proof-green`, `reflect-plan-close`, `reflect-plan-close-review-due`; `implement-proof-fail` reads the `Result:` line; `intent-through-*` fail on a branch that marks the plan or README complete and on more than two `/sc:review` calls (`skill_called` gained `max`).
 - Final: full suite on the merge 3857 passed, 3 skipped; lint, format, typecheck clean; canary on b31415c1 (last shipped-text commit) all pass, both reflect probes 3/3; 62 saved real reflect runs regraded under the final checks (closable 31/31, review-due 30/31 — the one failure is the real misread run r8/x3). CI dispatched on master c5c0b00f.
 
+- review-findings-record (docs/features/review-findings-record): baseline probe `reflect-plan-close-no-record` pre-registered (9bf0bdac), 5/5 — with no review record /sc:reflect says condition (3) cannot be confirmed and asks. Design 04 recommended B (plan `## Review Log` written by /sc:review); independent verification 04a (opus high) found 8 Important (no exit for waiver/acceptance, no absence rule, Auto command committing headless, `<never>` exception lost, `_GATE_ANCHORS`, log after the Proof footer, weakness-4 and F12 not cited, weak probe grading) and recommended C. Owner chose C; the probe gained `*rereview_named` (regrade 5/5, empty answer and "Conditions 1-3 are satisfied" fail). B′ with six conditions stays in 04-design for a real cross-session case.
+
 ## Decisions
 - Owner: all ★ recommendations; 4.34.2 released after both features; patchwork audit before every merge after many fix rounds; a narrow Important is fixed with another round, never waived to merge sooner.
+- Review findings stay unrecorded by commands (option C); reopen only on an observed cross-session failure (F12 rule).
 - Grader proposals from a verifier are regraded against saved real runs before they are applied (one refusal regex failed 14 of 16 real correct answers).
 
 ## Next actions
@@ -25,5 +28,5 @@ branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
 - [x] Release 4.34.2 (2026-10-22): bump dbcacccb; canary-gates 4/4, canary-commands 13/13 probes all checks; CI green; `CANARY_OK=1 make release` → tag v4.34.2, stable → dbcacccb; this VM installed (`--scope user`, 64 installed).
 - [ ] Owner, Windows: `superclaude install --force --scope user` for 4.34.2.
 - [ ] Owner, Windows: delete `C:/sc-evals/rrg-*` and `C:/sc-evals/smm-final2` after the release.
-- [ ] Design proposal: review findings record (analysis § E), owner queued 2026-10-22.
-- [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). Reviews have no rule for where findings and their acceptance are recorded when `/sc:review` writes no file (06e, outside this branch).
+- [x] Review findings record (analysis § E): decided C 2026-10-22, merged ef6d8a09; CI dispatched on master. No release needed (evals/docs only).
+- [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). 
