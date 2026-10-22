@@ -130,10 +130,19 @@ revised: 2026-10-22
 
 [06f-verify-round7](./06f-verify-round7.md)(Important 1, Suggestion 3). Important(조건문 "once all three hold"를 거절로 채점)와 Suggestion 3(목록 꼴 제안)은 510108c6이 이미 고쳤다. 06f의 문장 첫머리 정규식 대신 조건 낱말 lookbehind를 썼고, 저장된 run 마흔여덟 개로 쟀다(Deviations).
 
-- [x] Step 1: Plan-Close (3)을 글자 그대로 성립하게: "has had a /sc:review round after it, or the user waived that round"
+- [x] Step 1: Plan-Close (3)을 글자 그대로 성립하게: "has had a /sc:review round after it, or the user waived that round". "after the last /sc:review round"가 남아 모순이었다(06g 1, Phase 11에서 지움)
 - [x] Step 2: Plan-Close 앵커 셋(Proof를 다시 돌리지 않음, 리뷰 대기 수정의 회송, "all three hold")
 - [x] Step 3: Phase 9 Deviations의 review-due 수치는 510108c6의 재채점(22/23)으로 대체
 - [x] Commit Phase 10: `fix: Plan-Close condition 3 reads literally; anchors for its routing`
+
+## Phase 11: 06g 반영 (one commit)
+
+[06g-verify-round8](./06g-verify-round8.md)(Important 1, Suggestion 4).
+
+- [x] Step 1: Plan-Close (3)에서 "after the last /sc:review round"를 지운다. 앵커는 남은 구절 전체로
+- [x] Step 2: review-due 거절 check를 06f의 문장 첫머리 정규식으로, 조건문 답 둘을 채점 테스트에
+- [x] Step 3: 앵커 셋(implement 재리뷰의 Critical or Important, Proof 재실행, intent Report의 Plan-Close 단계). 재리뷰 실패 문장 하나. Phase 9 수치에 대체 표시. 변이 9건 red(`$TMPDIR/pco/mut10.py`, 옛 lookbehind 변이는 원문이 없어 SKIP). 저장된 run 쉰여덟 개 재채점: 닫을 수 있는 답 28/28, review-due 27/28(떨어진 하나가 오독 run `r8/x3`), 바꾸기 전 `reflect-plan-close` 0/1
+- [ ] Commit Phase 11: `fix: Plan-Close condition 3 drops the self-contradicting clause; review-due check reads sentence openings`
 
 ## Integration (커밋 아님)
 
@@ -150,7 +159,7 @@ revised: 2026-10-22
 
 - Phase 9 뒤 canary(c862806d, `$TMPDIR/pco/r9`): review-due 여섯 run 모두 올바르게 답했다(재리뷰를 지목하고 `complete`를 제안하지 않음). 그런데 새 거절 check가 둘을 떨어뜨렸다("Once all three conditions hold, I'll propose"). 조건문 뒤의 구절은 빼게 고쳤다. `reflect-plan-close` 하나는 올바른 제안("One docs-only commit that changes: `05-plan.md`: `status: complete`")이 동사 없이 떨어졌다. `` `status: complete` `` 꼴을 제안으로 센다. 저장된 run 마흔여덟 개로 다시 채점: 닫을 수 있는 답 23/23, review-due 22/23(떨어진 하나가 06e의 오독 run), 바꾸기 전 `reflect-plan-close` 0/1.
 
-- Phase 9: 저장된 실제 run 서른여덟 개로 다시 채점(`reflect-plan-close*`): 닫을 수 있는 답 18/18 통과, review-due 답 17/18 통과이고 떨어진 하나가 06e의 오독 run(`r8/x3`)이다, 바꾸기 전 `reflect-plan-close` 0/1. 변이 9건 모두 red(`$TMPDIR/pco/mut9.py`).
+- Phase 9(뒤의 재채점으로 대체됨): 저장된 실제 run 서른여덟 개로 다시 채점(`reflect-plan-close*`): 닫을 수 있는 답 18/18 통과, review-due 답 17/18 통과이고 떨어진 하나가 06e의 오독 run(`r8/x3`)이다, 바꾸기 전 `reflect-plan-close` 0/1. 변이 9건 모두 red(`$TMPDIR/pco/mut9.py`).
 
 - Phase 8: 06d 3의 거절 후보(부정어 `no`·`\w+n't`, 동사 commit·change·move)는 넣지 않았다. 저장된 실제 run 서른두 개로 다시 채점하자 올바른 제안 열여섯 중 열넷이 떨어졌다("No later code commits", "no feedback memories to propose", "haven't changed"). 검증자의 손으로 쓴 목록에서만 좋아진 패턴이다. 성공 쪽 동사만 넓히고 거절 쪽에는 `shouldn't` 하나를 더했다. 그 결과 저장된 run: 닫을 수 있는 계획의 답 15/15 통과, review-due 답(거절) 0/15 통과, 바꾸기 전 답 0/2 통과. 변이 7건 모두 red(`$TMPDIR/pco/mut8.py`, 되돌림 계기 앵커를 더한 뒤).
 

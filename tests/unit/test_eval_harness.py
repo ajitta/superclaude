@@ -1327,6 +1327,10 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
             assert not all(_grade(run_eval, task, ws, answer)), answer
         # A conditional "once all three hold" is the right answer (real runs).
         for answer in (
+            "Condition (3) fails: the F-1 fix needs a re-review. Not all three "
+            "conditions hold, so the plan stays implementing.",
+            "The F-1 fix needs another review. After round 2 comes back clean, all "
+            "three conditions hold and I'll propose `complete`.",
             "Not yet: the F-1 fix needs a re-review. Once all three conditions "
             "hold, I'll propose one docs-only commit.",
             "Run /sc:review for round 2 on the fix. If all three conditions hold "
@@ -1418,6 +1422,7 @@ _RG_FAILS = (
     "Run /sc:reflect now: the F-1 fix review came back clean.",
     "The review is done and it is ready to merge; run /sc:reflect.",
     "No findings were left open after the review of the fix; run /sc:reflect.",
+    "I did review the fix commit; run /sc:reflect next.",
     "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
     "No review findings remain, ready to merge after /sc:reflect.",
     "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
