@@ -73,5 +73,5 @@ description: Review a work product (code, plan, design, spec) for quality, corre
     <fallback>No spec: weight the review toward the artifact quality dimension.</fallback>
   </bounds>
 
-  <handoff next="/sc:plan /sc:implement /sc:test /sc:troubleshoot"/>
+  <handoff next="/sc:plan /sc:design /sc:implement /sc:test /sc:troubleshoot"/>
 </component>
