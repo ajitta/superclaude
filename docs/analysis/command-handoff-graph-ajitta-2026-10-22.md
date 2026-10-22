@@ -263,7 +263,7 @@ reflect → done
 | 1 Important: 이 문서가 고친 증상을 열린 구멍으로 적음 | 맨 위에 현재 상태를 적었다. 구멍 표의 G1·G2·G3 상태를 고치고, 각 절과 부록이 d7f04869 시점 기록임을 표시했다 |
 | 2 roadmap `Evidence:` 규칙을 지키게 하는 곳 없음 | 소유자가 가장 작은 범위를 고르며 보류한 부분이라 두었다. G1은 "부분 해결"로 남긴다 |
 | 3 `RULES_DOCS.md:84`가 `--plan`과 "committed"를 말하지 않음 | `/sc:roadmap -> /sc:implement --plan: Roadmap document committed; implementation proceeds per its task list and ends with its Proof footer`로 고쳤다 |
-| 4 probe check가 관대함 | ` ``` ` 펜스 블록 안의 제목을 무시하고, `Result:` 줄은 명령으로 치지 않게 고쳤다. 저장된 run을 다시 채점하니 변경 전 0/6, 변경 후 3/3으로 그대로였다. 테스트 사례 둘을 더했다. 남은 한계(2차 검증 반영으로 정정): 내용과 상관없이 펜스 블록을 명령으로 친다(기대 출력만 담은 ` ```text ` 블록도 통과). `~~~` 펜스 안의 제목은 무시하지 않는다. `## Proof`가 마지막 절인지 보지 않는다. 백틱으로 감싼 자리표시(`` `<command>` ``)는 통과한다. `## Proof:`, `### Proof`, `## Proof footer` 제목은 실패한다. 절 안에 백틱이 하나라도 있으면 통과한다(자리표시나 파일 이름만 있어도). `Result:`로 시작하는 줄만 빼므로 `**Result:**`나 `- Result:` 줄은 명령으로 친다(3차 검증 반영). 명령과 출력을 정규식으로 가를 수 없으므로 더 조이지 않는다. 변경 후 세 run의 꼬리말은 사람이 직접 읽어 명령과 기대 출력이 있음을 확인했다 |
+| 4 probe check가 관대함 | ` ``` ` 펜스 블록 안의 제목을 무시하고, `Result:` 줄은 명령으로 치지 않게 고쳤다. 저장된 run을 다시 채점하니 변경 전 0/6, 변경 후 3/3으로 그대로였다. 테스트 사례 둘을 더했다. 남은 한계(2차 검증 반영으로 정정): 내용과 상관없이 펜스 블록을 명령으로 친다(기대 출력만 담은 ` ```text ` 블록도 통과). `~~~` 펜스 안의 제목, 그리고 들여쓴 펜스나 목록 안 펜스(`- ```md`) 안의 제목은 무시하지 않는다. 줄 첫 칸에서 여는 ` ``` ` 펜스만 본다(4차 검증 반영). `## Proof`가 마지막 절인지 보지 않는다. 백틱으로 감싼 자리표시(`` `<command>` ``)는 통과한다. `## Proof:`, `### Proof`, `## Proof footer` 제목은 실패한다. 절 안에 백틱이 하나라도 있으면 통과한다(자리표시나 파일 이름만 있어도). `Result:`로 시작하는 줄만 빼므로 `**Result:**`나 `- Result:` 줄은 명령으로 친다(3차 검증 반영). 명령과 출력을 정규식으로 가를 수 없으므로 더 조이지 않는다. 변경 후 세 run의 꼬리말은 사람이 직접 읽어 명령과 기대 출력이 있음을 확인했다 |
 | 이 브랜치 밖, Important 후보: roadmap이 plan 옆에 쓰는 `05<letter>-plan-workflow.md`가 Plan-Close 대상 정의에 없어 `implementing`에서 나갈 길이 없음 | 같은 계약이라 이 브랜치에서 고쳤다. `reflect.md` Plan-Close, `test.md` Report, `RULES_DOCS.md` reflect 관문의 정의에 "a roadmap's `05<letter>-plan-workflow.md`"를 넣었다. 가드는 세 곳이 그 이름을 적는지 본다 |
 | 이 브랜치 밖: 릴리스에 `canary-gates`도 필요 | 위 "릴리스 때" 줄을 고쳤다 |
 
@@ -291,3 +291,18 @@ reflect → done
 | 3 probe check 한계 목록이 다 적지 못함 | 적용 표 4번 행에 더했다. 고치지는 않는다(G2) |
 | 4 verifier 항목을 지키는 가드가 없고, 경로를 넘기라는 말이 없음 | "whose path it is passed"를 넣고 가드에 더했다 |
 | 이 브랜치 밖: implement 첫 박스가 README를 `implementing`으로 되돌릴 수 있음 | "when it is not already further"를 붙였다. 같은 README phase 규칙이라 이 브랜치에서 고쳤다 |
+
+## 4차 독립 검증 반영
+
+[4차 검증](./command-handoff-graph-verify4-ajitta-2026-10-22.md)의 판정은 조건부 통과였다. Important는 1개였다. plan이 닫힌 뒤 남은 plan을 버리거나 `archive/`로 옮기면 README를 `complete`로 쓰는 단계가 없었다.
+
+처리: 2차 제안 4에서 들인 "폴더의 다른 plan이 모두 끝나야 README `complete`" 규칙을 되돌렸다. 이 규칙은 3차와 4차에서 매번 새 막다른 상태를 만들었다(박스 없는 부속 파일, 닫은 뒤의 `deprecated`와 `archive/`). 그 상태들을 막으려면 어떤 명령도 맡지 않는 수명 주기(버리기, 옮기기, 다시 확인하기)가 필요하다. 원래 매핑은 "README `phase:` = 폴더가 도달한 가장 먼 단계"이고, plan 하나가 끝나면 그 단계에 도달한 것이다. 이 정의와 맞고 막다른 상태도 없다. 그래서 `reflect.md` Plan-Close와 RULES_DOCS 매핑을 원래 문장("plan (index) `status: complete` → complete")으로 돌렸다. 가드는 원래 문장을 고정하고 "with task boxes"가 다시 들어오지 않는지 본다. 2차 제안 4(다른 plan이 진행 중인데 README는 끝난 것처럼 보임)는 받지 않는다. phase가 "도달한 가장 먼 단계"라는 정의대로 동작하는 것이다. 각 plan의 `status:`가 진행 상황을 보여 준다.
+
+| 발견 | 처리 |
+|---|---|
+| 1 Important: 닫은 뒤 버린 plan 때문에 README가 막힘 | 위와 같이 규칙을 되돌려 원인을 없앴다 |
+| 2 reflect에 "(`archive/` aside)"가 없음 | 규칙을 되돌렸으므로 해당 없다 |
+| 3 probe 한계에 들여쓴 펜스가 빠짐 | 적용 표 4번 행에 더했다 |
+| 4 `test.md` verifier 문장이 꼬임 | "(its Proof section and task list; pass it that path), and reports …"로 고치고 가드 구절을 바꿨다 |
+
+남는 것: plan 문서 정의(역할과 인덱스 체크박스 기준), verifier 경로, implement 첫 박스의 "when it is not already further"는 그대로다.

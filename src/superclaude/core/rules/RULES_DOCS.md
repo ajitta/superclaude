@@ -30,7 +30,7 @@ Slug resolution (file-producing commands): derive a kebab-case slug from the com
 README update on feature-path write: `updated:` bump + append doc entry to `## Documents` + set `phase:` from the phase mapping below. Standalone path: no README update.
 Phase mapping (README `phase:` = the furthest stage the folder has reached; it never moves back, so a late `01a-discovery` during implementation leaves `implementing`):
   00-intent written → intent | 01-discovery written → discovery | 04-design written → design | 05-plan written → planning
-  first plan box checked (plan `status: implementing`) → implementing | every plan (index) with task boxes in the folder (`archive/` aside) at `status: complete` or `deprecated` → complete
+  first plan box checked (plan `status: implementing`) → implementing | plan (index) `status: complete` → complete
   02-research, 03-analysis, 06+ docs and `deprecated` docs never move it; a folder they create starts at discovery
   abandoned: only when the user says the feature is dropped
 

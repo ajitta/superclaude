@@ -705,20 +705,13 @@ def test_roadmap_and_review_handoffs_follow_the_chain():
             in text
         ), where
     assert "/sc:roadmap -> /sc:implement --plan: Roadmap document committed" in rules
-    # Two plans in one folder: the feature is complete when both are.
-    # Plans that cannot complete (no task boxes, deprecated, archived) do
-    # not hold the README back.
-    assert (
-        "every plan (index) with task boxes in the folder (`archive/` aside) "
-        "at `status: complete` or `deprecated` → complete" in rules
-    )
-    assert (
-        "whose other plan documents with task boxes are all `complete` or "
-        "`deprecated`, the README" in _read(_SRC / "commands" / "reflect.md")
-    )
+    # The README turns complete with a plan (index): one rule, no count of
+    # the folder's other plans (docs/analysis/command-handoff-graph-*, round 4).
+    assert "| plan (index) `status: complete` → complete" in rules
+    assert "with task boxes" not in rules
     test_md = _read(_SRC / "commands" / "test.md")
     assert "compares with the plan doc the work ran from" in test_md
-    assert "whose path it is passed" in test_md
+    assert "pass it that path" in test_md
     assert "to `implementing` when it is not already further" in _read(
         _SRC / "commands" / "implement.md"
     )

@@ -37,7 +37,7 @@ description: Execute tests with coverage analysis and quality reporting. On requ
 
 
   <tools>
-  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc the work ran from (its Proof section and task list), whose path it is passed and reports every mismatch without fixing; its description limits it to explicit requests for run-and-report evidence
+  - Agent: dispatch the `verifier` agent for a fresh-context run-and-report pass — it runs the project's commands, exercises the changed behavior, compares with the plan doc the work ran from (its Proof section and task list; pass it that path), and reports every mismatch without fixing; its description limits it to explicit requests for run-and-report evidence
   </tools>
 
   <patterns>
