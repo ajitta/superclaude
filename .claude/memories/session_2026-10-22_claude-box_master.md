@@ -1,4 +1,4 @@
-branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; nothing unreleased in src/)
+branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; unreleased: the -OO insight fix in src/superclaude/scripts)
 
 # Session 2026-10-22 — claude-box — review-reflect-gates merged; plan-complete-order built, patchwork audit, merged
 
@@ -29,4 +29,4 @@ branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; nothing unrelease
 - [x] Owner, Windows: `superclaude install --force --scope user` for 4.34.2 (owner, 2026-10-22).
 - [x] Owner, Windows: deleted the whole `C:/sc-evals/` (owner, 2026-10-22). The raw Windows runs cited in docs (`smm-final2`, `rrg-*`, `verify-1021-win`) are gone; their counts stay in the committed docs, and they can no longer be regraded.
 - [x] Review findings record (analysis § E): decided C 2026-10-22, merged ef6d8a09; CI dispatched on master. No release needed (evals/docs only).
-- [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). 
+- [x] PYTHONOPTIMIZE=2: `superclaude insight` and `evals/run_eval.py` crashed on a stripped module docstring (hooks unaffected); fixed with red-first tests, full suite green under -OO (3861 passed). Merged to master, CHANGELOG [Unreleased] Fixed. Not released: owner decides. 
