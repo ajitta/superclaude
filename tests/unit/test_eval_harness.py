@@ -1048,6 +1048,40 @@ def test_git_changed_ignores_framework_state_files(tmp_path):
     assert run_eval._check_one(check, "git_diff_max_files", ws, "", "")[0]
 
 
+def test_main_refuses_a_runs_dir_that_already_holds_the_workspace(
+    monkeypatch, tmp_path
+):
+    """A runs dir reused for the same arm and task stops before anything is
+    built, with an error naming the workspace, not a FileExistsError
+    traceback from copytree; the saved run is left as it was."""
+    run_eval = _import_run_eval()
+    task_id = next(t["id"] for t in TASKS["tasks"] if not t.get("canary_only"))
+    runs_dir = tmp_path / "runs"
+    saved = runs_dir / "vanilla" / task_id / "marker.txt"
+    saved.parent.mkdir(parents=True)
+    saved.write_text("saved run", encoding="utf-8")
+    monkeypatch.setattr(run_eval, "_which", lambda name: name)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_eval.py",
+            "--arms",
+            "vanilla",
+            "--task",
+            task_id,
+            "--runs-dir",
+            str(runs_dir),
+            "--dry-run",
+        ],
+    )
+    with pytest.raises(SystemExit) as exc:
+        run_eval.main()
+    assert "already holds" in str(exc.value.code)
+    assert str(saved.parent) in str(exc.value.code)
+    assert saved.read_text(encoding="utf-8") == "saved run"
+
+
 def test_main_runs_without_a_module_docstring(monkeypatch, capsys):
     """python -OO (PYTHONOPTIMIZE=2) strips docstrings; the argument parser
     must not need run_eval's."""
