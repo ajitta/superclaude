@@ -1,6 +1,6 @@
 ---
 status: complete
-revised: 2026-10-21
+revised: 2026-10-22
 ---
 
 # review·reflect가 빠진 원인과 후속 작업
@@ -52,11 +52,32 @@ revised: 2026-10-21
 
 - [x] auto memory `release-needs-complete-plan`에 "반영한 수정은 다시 리뷰한다, reflect는 체인의 단계다"를 더했다(2026-10-21). B의 결정이 나오면 그 규칙을 가리키게 한다.
 
-### D. 계획 `complete`와 reflect의 순서 (후속, 진행: [plan-complete-order](../features/plan-complete-order/README.md), 확정안 B′)
+### D. 계획 `complete`와 reflect의 순서 — 완료 (v4.34.2): [plan-complete-order](../features/plan-complete-order/README.md), 확정안 B′
 
 `/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
 
 재리뷰도 같은 순서 문제를 가진다(review-reflect-gates 06b 발견 5). 녹색 Proof가 `complete`를 정한 뒤에 리뷰 수정의 다음 round가 온다. 2차 round가 Critical을 찾아도 계획을 `implementing`으로 되돌리는 경로는 "a red re-run"뿐이다. `test-reflect-gate-complete` 프로브가 이 상태(파일은 complete, 일은 아직)를 잰다. D를 정할 때 그 프로브의 check도 함께 본다.
+
+### E. 리뷰 발견과 그 수락의 기록 위치 (후속, 설계안 대기)
+
+소유자 결정(2026-10-22): 새 세션에서 설계안 round로 시작한다. 그 round에서는 `src/`를 바꾸지 않는다.
+
+문제. `/sc:reflect` Plan-Close의 조건 (3)은 "every Critical or Important review finding is fixed or accepted by the user, and every fix to one that changed reviewed code or shipped content has had a /sc:review round after it, or the user waived that round"다(`reflect.md` 3.6). 판단하려면 네 가지가 필요하다. 리뷰가 낸 발견과 그 등급, 각 발견이 고쳐졌는지, 사용자가 고치지 않고 수락했는지, 수정의 재리뷰를 사용자가 면제했는지. 그런데 `/sc:review`는 파일을 쓰지 않는다(`review.md` `<outputs>`는 대화 안의 요약·조치·근거뿐이고, `<tools>`에 Write가 없다). 같은 세션에서는 대화에 남지만, `/sc:load`로 이어 가거나 다른 컴퓨터에서 이어 가면 사라진다. 그러면 reflect는 근거 없이 조건이 성립한다고 보거나, 판단하지 못해 계획이 `implementing`에 머문다. 수락과 면제도 마찬가지다. Proof의 수락은 `Result: … (accepted by user)`로 계획에 남지만, 리뷰 발견에는 그런 자리가 없다. 프로브가 쓰는 `06-review.md`(`evals/fixtures/test-reflect-gate`)는 fixture가 만든 파일이다. 이 저장소의 리뷰 기록(`06x-verify-*.md`)도 검증자에게 그렇게 쓰라고 시켰기 때문에 있다. 근거: [plan-complete-order 06e](../features/plan-complete-order/06e-verify-round6.md) "이 브랜치 밖"과 발견 2, [06h](../features/plan-complete-order/06h-verify-round9.md).
+
+후보(설계에서 다시 잰다).
+
+- (a) feature 폴더 작업이면 `/sc:review`가 `06-review.md`를 쓴다. round마다 절을 두고, 발견의 등급과 fixed / accepted / waived 상태를 적는다. 읽기 전용 명령의 계약이 바뀐다. 문서 규칙(RULES_DOCS 번호 문서, README Documents)과는 가장 자연스럽다.
+- (b) `Result:` 줄처럼 계획에 리뷰 줄을 남긴다(예: `Review: <sha> — round 2, Critical 0, Important 0; accepted: F-3`). 변경이 작고 계획 하나만 보면 된다. 누가 쓰는지(review, implement, 사용자)를 정해야 한다.
+- (c) 지금대로 두고, 기록이 없으면 Plan-Close가 조건 (3)을 사용자에게 묻는다. 가장 작지만 매번 질문이 생긴다.
+
+새 세션에서 할 일(`superclaude-maintenance-round` skill → `references/proposal-audit.md` "Own design proposal for a follow-up item"):
+
+1. `git fetch` 뒤 master에서 `docs/review-findings-record` 브랜치를 만든다. 설계 문서는 브랜치에 둔다(gotcha `plan-docs-on-branch`).
+2. 이 정보의 reader와 writer를 전부 찾는다: `reflect.md` 3.6, `implement.md` Integrate(재리뷰 문장), `review.md` Process와 `<outputs>`, `test.md` Report, `intent.md` Run·Report(`--through`는 명령이 쓰는 것을 커밋한다), RULES_DOCS 문서 규칙과 `workflow_gates`, `self-review` agent의 `<finding_policy>`, 프로브(`reflect-plan-close*`, `test-reflect-gate*`, `intent-through-*`)와 그 fixture, `_GATE_ANCHORS`.
+3. 앞선 결정을 이유별로 다시 잰다. `review.md`가 파일을 쓰지 않는 이유가 어디에 정해져 있는지(git log, docs/features의 리뷰 관련 결정), 10-20 약점 감사(`docs/research/superclaude-weakness-audit-ajitta-2026-10-20.md`), completion-proof의 `Result:` 선례, plan-complete-order 04·04a.
+4. `docs/features/review-findings-record/04-design.md`(status: draft)에 안 A·B·C를 쓴다. 안마다 바뀌는 파일, `--through`와의 관계, 프로브, 릴리스 범주를 적는다. README(`phase: design`)도 만든다.
+5. 설계안을 독립 검증한다(별도 worktree, headless `claude -p --model opus --effort high`, 한국어 보고서 `04a-design-verify.md`).
+6. 소유자에게 결정 하나를 ★안과 함께 묻는다. 그 뒤 계획·빌드·리뷰 round·누더기 감사·병합 순서는 plan-complete-order와 같다. 릴리스는 소유자가 정한다.
 
 ## 확인 방법
 

@@ -6,6 +6,8 @@ branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
 1. `git fetch origin && git switch master && git pull --ff-only`, then read this file, `session_2026-10-21_chosh-g14_master.md` (other machine) and `docs/plans/remaining-work-ajitta-2026-10-20.md`.
 2. v4.34.2 is released (owner's go 2026-10-22). This VM is on it; the Windows machine needs `superclaude install --force --scope user`.
 
+3. Next work the owner queued: design-proposal round for where review findings and the user's acceptance/waiver are recorded (Plan-Close condition (3) loses its evidence across sessions because `/sc:review` writes no file). Brief, candidates and steps: `docs/analysis/review-reflect-gate-gap-ajitta-2026-10-21.md` § E. Branch `docs/review-findings-record`; no `src/` change in that round.
+
 ## What was done
 - review-reflect-gates: five headless opus verifier rounds (06a–06e), cleanup of patched-in graders, merged 21d2e0fc. Details in its feature folder.
 - plan-complete-order (analysis item D): design 04 → design verification 04a → B′. `/sc:implement` writes `Result:` and leaves the plan `implementing`; `/sc:reflect` step 3.6 Plan-Close checks (1) boxes, (2) green or accepted `Result:` with no code commit after its sha, (3) every Critical/Important finding fixed or accepted and every fix to one re-reviewed or waived; proposes `complete` (plan + README) and writes only on the user's yes; failing conditions name the step that clears them (`/sc:implement --plan` re-runs the Proof). A `complete` plan reopens only on an unaccepted red `Result:` or a failing condition (3). `--through` never writes `complete` and hands Plan-Close's step to its Report.
@@ -23,4 +25,5 @@ branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
 - [x] Release 4.34.2 (2026-10-22): bump dbcacccb; canary-gates 4/4, canary-commands 13/13 probes all checks; CI green; `CANARY_OK=1 make release` → tag v4.34.2, stable → dbcacccb; this VM installed (`--scope user`, 64 installed).
 - [ ] Owner, Windows: `superclaude install --force --scope user` for 4.34.2.
 - [ ] Owner, Windows: delete `C:/sc-evals/rrg-*` and `C:/sc-evals/smm-final2` after the release.
+- [ ] Design proposal: review findings record (analysis § E), owner queued 2026-10-22.
 - [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). Reviews have no rule for where findings and their acceptance are recorded when `/sc:review` writes no file (06e, outside this branch).
