@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.34.3] - 2026-10-23
+
 ### Changed
 
 - `/sc:roadmap` now applies the same review gate as `/sc:plan`. A discovery spec still in `status: draft` stops it, also when you give it the feature's `04-design.md` and the draft discovery spec sits beside it; before, only the file you passed was checked. A design doc no longer stops it for being `draft`: the roadmap builds on it and moves it to `approved-for-plan` in the same save, as `/sc:plan` does, and a design with unresolved Areas of concern gets the same question `/sc:plan` asks. Before, a draft design sent you to `/sc:review --scope spec`, a review meant for discovery specs.
@@ -15,6 +17,7 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 - `/sc:roadmap` now hands off to `/sc:implement` only; `/sc:task` does not read the roadmap document. `/sc:review` also suggests `/sc:design`, the step after a spec review in the Large chain.
 - A second plan in a feature folder (`05a-plan-….md`, such as a roadmap written beside an existing plan) now goes through `/sc:reflect` and Plan-Close like `05-plan.md`. A split plan's phase files still belong to their index.
 - The first checked box no longer moves a README that is already `complete` back to `implementing`.
+- Upgrade: a roadmap written before this version has no `## Proof` footer. Add one (the command that proves the workflow done and its expected output) before `/sc:implement --plan` finishes it, or close it with `/sc:reflect` as before. Plans already `complete` stay as they are.
 - For contributors: new canary probes `roadmap-draft-spec-gate`, `roadmap-design-discovery-draft`, `roadmap-design-draft` (which also requires the Proof footer) and `reflect-plan-close-no-record`.
 
 ### Fixed
