@@ -57,7 +57,7 @@ revised: 2026-10-22
 **Files:** Modify: `CHANGELOG.md`(`[Unreleased]` Changed + upgrade note, 거짓이 된 문장), `evals/tasks.yaml`·`tests/unit/test_eval_harness.py`의 거짓이 된 주석과 docstring, 분석 문서 D, feature README
 
 - [x] Step 1: 편집
-- [ ] Step 2: `make canary-commands BASE=<merge-base>`와 새 프로브 셋 3회씩, Measurements에 적는다
+- [x] Step 2: `make canary-commands BASE=<merge-base>`와 새 프로브 셋 3회씩, Measurements에 적는다
 - [x] Commit Phase 3: `docs: plan-complete-order — CHANGELOG, upgrade note, measurements`
 
 ## Phase 4: 정리 (one commit)
@@ -146,12 +146,15 @@ revised: 2026-10-22
 
 ## Integration (커밋 아님)
 
-- [ ] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
-- [ ] 독립 검증(headless opus)과 그 반영, Critical·Important가 없을 때까지
-- [ ] 누더기 감사(소유자 지시 2026-10-22): v4.34.1 이후 미출하 작업 전체를 최종 상태로 다시 읽는 독립 감사(headless opus). 반복 수정으로 덧댄 문구, 중복, 예외, 검증기 맞춤 과적합을 찾는다. 보고서는 `docs/analysis/patchwork-audit-ajitta-2026-10-22.md`. 반영 뒤 다시 검증한다
+- [x] 전체 suite, `make lint`, `ruff format --check`, `make typecheck`
+- [x] 독립 검증(headless opus)과 그 반영, Critical·Important가 없을 때까지
+- [x] 누더기 감사(소유자 지시 2026-10-22): v4.34.1 이후 미출하 작업 전체를 최종 상태로 다시 읽는 독립 감사(headless opus). 반복 수정으로 덧댄 문구, 중복, 예외, 검증기 맞춤 과적합을 찾는다. 보고서는 `docs/analysis/patchwork-audit-ajitta-2026-10-22.md`. 반영 뒤 다시 검증한다
 - [ ] master 병합과 push. 릴리스는 하지 않는다
 
 ## Measurements
+
+- 마지막 shipped 문구 커밋 b31415c1(Linux, sonnet, low, `$TMPDIR/pco/r11`): `canary-commands` 12 probe 모두 통과, `reflect-plan-close`·`reflect-plan-close-review-due` 3회씩 모두 통과, `canary-gates` 4/4. 그 뒤 커밋은 채점과 테스트만 바꾼다. 저장된 실제 run 예순두 개 재채점: 닫을 수 있는 답 31/31, review-due 30/31(떨어진 하나가 오독 run `r8/x3`), 바꾸기 전 `reflect-plan-close` 0/1.
+- 리뷰: 06(조건부) → 06a–06g(round마다 Important 1–3, 모두 반영) → 06h(round 9, Critical·Important 없음). 06h Suggestion 넷은 다른 round 없이 반영했다(규칙대로 Suggestion은 다시 리뷰하지 않는다). 변이 6건 모두 red(`$TMPDIR/pco/mut11.py`).
 
 - 바꾸기 전(Phase 1 커밋 00607b12의 src, Linux, sonnet, low, 한 번씩, `$TMPDIR/pco/before/b1`): `implement-proof-fail` 6/6, `implement-proof-green` 3/5(계획과 README를 `complete`로 바꿔 두 check 실패, `Result:`는 녹색으로 적음), `reflect-plan-close` 5/5, `reflect-plan-close-review-due` 5/5. reflect 두 프로브는 바꾸기 전에도 통과한다: 옛 reflect는 상태를 쓰지 않았다. 두 프로브는 새 Plan-Close 단계가 headless에서 쓰지 않는지 지키는 회귀 check다.
 
