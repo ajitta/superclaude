@@ -1,4 +1,4 @@
-branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; unreleased: the -OO insight fix in src/superclaude/scripts)
+branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; unreleased: the -OO insight fix, and /sc:roadmap applying /sc:plan's review gate (roadmap.md + RULES_DOCS workflow_gates))
 
 # Session 2026-10-22 — claude-box — review-reflect-gates merged; plan-complete-order built, patchwork audit, merged
 
@@ -17,6 +17,8 @@ branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; unreleased: the -
 - Final: full suite on the merge 3857 passed, 3 skipped; lint, format, typecheck clean; canary on b31415c1 (last shipped-text commit) all pass, both reflect probes 3/3; 62 saved real reflect runs regraded under the final checks (closable 31/31, review-due 30/31 — the one failure is the real misread run r8/x3). CI dispatched on master c5c0b00f.
 
 - review-findings-record (docs/features/review-findings-record): baseline probe `reflect-plan-close-no-record` pre-registered (9bf0bdac), 5/5 — with no review record /sc:reflect says condition (3) cannot be confirmed and asks. Design 04 recommended B (plan `## Review Log` written by /sc:review); independent verification 04a (opus high) found 8 Important (no exit for waiver/acceptance, no absence rule, Auto command committing headless, `<never>` exception lost, `_GATE_ANCHORS`, log after the Proof footer, weakness-4 and F12 not cited, weak probe grading) and recommended C. Owner chose C; the probe gained `*rereview_named` (regrade 5/5, empty answer and "Conditions 1-3 are satisfied" fail). B′ with six conditions stays in 04-design for a real cross-session case.
+
+- roadmap-plan-gate (docs/analysis/roadmap-plan-gate-ajitta-2026-10-22.md): owner's analysis of design-stage review evaluated (facts right; '97cbac42 = intended no design review' and the two 04a records as evidence overstated; option C unworkable). Owner chose A + probes. Three roadmap probes pre-registered (a9e01360); roadmap-design-draft 0/3 before, 3/3 after; two opus verifier rounds (1 Important: RULES_DOCS:81-82, fixed; round 2 pass); on e03e1889 probes 9/9 and canary-gates 7/7. Next release needs CANARY_OK=1 on those runs (core/ and roadmap.md changed); make canary-commands also picks the three roadmap probes.
 
 ## Decisions
 - Owner: all ★ recommendations; 4.34.2 released after both features; patchwork audit before every merge after many fix rounds; a narrow Important is fixed with another round, never waived to merge sooner.
