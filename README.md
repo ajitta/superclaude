@@ -312,10 +312,10 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 | `/sc:design` | `docs/features/<slug>/04-design.md` (one-off: `docs/specs/…-design-…md`) | Design committed (components pass the [R18] necessity test; Areas of concern resolved) |
 | `/sc:review` | Multi-dimensional review of design/plan | Required — the `/sc:plan` Load step stops on a spec still `status: draft`, which only this review clears; a draft spec is always reviewed by an isolated reviewer that gets `00-intent.md` verbatim |
 | `/sc:plan` | `docs/features/<slug>/05-plan.md` (one-off: `docs/plans/…md`) — phased TDD tasks, file paths, verify cmds | Plan committed |
-| `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; the plan's Proof ran on the last code commit (`Result:` line) |
+| `/sc:implement --plan` | Code + per-phase commits | Plan checkboxes and Deviations match the code; no code commit follows the plan's `Result:` sha; the plan stays `implementing` |
 | `/sc:review --scope branch` | Code review against the spec and `00-intent.md`, plus stale always-loaded docs | Critical and Important findings fixed or accepted; a fix to one that changes reviewed code or shipped content is reviewed again, with the earlier findings as acceptance criteria; a code change after the `Result:` sha re-runs the Proof |
 | `/sc:test` | Test pass evidence (`42/42 pass, baseline 40`) | Real output, not predictions |
-| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | Every gap it names fixed (a fix that changes reviewed code or shipped content goes back to review) or accepted; work run from a plan is done only after this |
+| `/sc:reflect` | Retrospective; `/sc:insight` captures insights to `.claude/insights.jsonl` | Every gap it names fixed (a fix that changes reviewed code or shipped content goes back to review) or accepted; work run from a plan is done only after this; it proposes marking the plan `complete`, which you confirm |
 
 #### Other common chains
 
@@ -332,7 +332,7 @@ The framework's value comes from chaining commands. Each chain has gates: the co
 
 #### One prompt from intent to done
 
-`/sc:intent --through` records the five items in your words, then runs the rest of the Large chain on a `feature/<slug>` branch: brainstorm, spec review with `--audit-delegated`, design, plan, implement, branch review, test and reflect, committing each step. It asks nothing. Every choice takes the ★ option and is recorded as `delegated`, an independent auditor checks those choices, and review and reflect check the result against your recorded words. It never merges, pushes, deploys or deletes. It stops early on a choice that cannot be undone or reaches other people, or a Critical finding or red Proof left after one fix round, and does not start when the feature already has an intent record or a `feature/<slug>` branch. The last message lists the evidence (branch log, doc statuses, the plan's `Result:` line, the test run, the Critical count, the gap against Done when) and leaves merge and push to you.
+`/sc:intent --through` records the five items in your words, then runs the rest of the Large chain on a `feature/<slug>` branch: brainstorm, spec review with `--audit-delegated`, design, plan, implement, branch review, test and reflect, committing each step. It asks nothing. Every choice takes the ★ option and is recorded as `delegated`, an independent auditor checks those choices, and review and reflect check the result against your recorded words. It never merges, pushes, deploys or deletes. It stops early on a choice that cannot be undone or reaches other people, or a Critical finding or red Proof left after one fix round, and does not start when the feature already has an intent record or a `feature/<slug>` branch. The last message lists the evidence (branch log, doc statuses, the plan's `Result:` line, the test run, the Critical count, the gap against Done when) and leaves marking the plan complete, any review round its fix still needs, merge and push to you.
 
 ```text
 /sc:intent --through

@@ -512,110 +512,172 @@ def test_install_surfaces_name_every_component():
 
 
 # -------------------------------------------------- review-reflect-gates --
-# RULES_DOCS does not load on /sc:test, /sc:review or /sc:implement
-# (context_loader TRIGGER_MAP), so those commands carry the review-reflect
-# gates themselves, in the same words; the README states them for users.
-_PLAN_DOC = "a plan document (a feature folder's `05-plan.md` or a `docs/plans/` plan)"
-_STOP_RULE = (
-    "rounds stop when a review round finds no Critical or Important finding, "
-    "or the user has accepted the ones it found unfixed or waived the review "
-    "of their fix; leftover Suggestions are reported, not reviewed again"
+# RULES_DOCS does not load on /sc:test, /sc:review, /sc:implement or
+# /sc:reflect (context_loader TRIGGER_MAP), so those commands carry the
+# review-reflect gates themselves; the README states them for users. The
+# guard holds the words that carry each rule, so rewording passes and deleting
+# or softening a rule fails (docs/features/review-reflect-gates,
+# plan-complete-order).
+_GATE_ANCHORS = {
+    "gates": [
+        "/sc:review -> fix -> /sc:review",
+        "Critical or Important",
+        "shipped content",
+        "acceptance criteria",
+        "single fix round",
+        "/sc:test -> /sc:reflect",
+        "goes to /sc:reflect",
+        "/sc:reflect -> done",
+        "on the user's yes to Plan-Close",
+        "names the fix left unreviewed",
+        "or accepted by the user",
+        "no code commit follows the Proof's `Result:` sha",
+    ],
+    "rules": [
+        "only when every task checkbox is checked",
+        "no commit after that line's sha changes code",
+        "re-run or a Critical or Important finding in its work sets a `complete` plan back",
+        "from a green run or with the user's recorded acceptance",
+        "the user sets `complete` at the /sc:reflect Plan-Close step",
+        "back to `implementing`",
+    ],
+    "test Report": [
+        "not done until /sc:reflect",
+        "Critical or Important",
+        "another review",
+        "/sc:reflect does not replace",
+    ],
+    "review Process": [
+        "Critical or Important",
+        "comes back for another round",
+        "the user accepts the open findings or waives the re-review",
+        "acceptance criteria",
+        "no Critical or Important finding",
+        "Suggestions",
+        "single fix round",
+    ],
+    "implement Integrate": [
+        "never sets the plan (index) or the README `complete`",
+        "Plan-Close",
+        "sets it back to `implementing`",
+        "the README `phase:` never moves back",
+        "rewrites `Result:`",
+        "A fix to a Critical or Important review finding",
+        "Every later code change re-runs the Proof",
+        "counts only once the user accepts it",
+        "back to /sc:review",
+        "even when its Proof is green",
+        "single fix round",
+    ],
+    "implement Load": [
+        "is missing or has a code commit after its sha",
+        "the Integrate step's Proof re-run",
+    ],
+    "reflect Plan-Close": [
+        "every task box is checked",
+        "is green or marked accepted by the user",
+        "no commit after its sha changes code",
+        "(3) every Critical or Important review finding is fixed or accepted",
+        "an open box, a missing `Result:` line or a code commit after its sha",
+        "an open finding or a red `Result:` to the user",
+        "whose `Result:` is red and not accepted, or whose condition (3) fails",
+        "is proposed back to `implementing`, the README `phase:` unchanged",
+        "any other failing condition leaves it `complete`",
+        "the review findings and `git log`",
+        "shipped content has had a /sc:review round after it, or the user waived that round",
+        "without re-running the Proof",
+        "a fix waiting for review to /sc:review",
+        "all three hold",
+        "only when the user says yes",
+        "in a feature folder",
+        "/sc:implement --plan",
+    ],
+    "reflect bounds": ["without the user's yes or with a Plan-Close condition unmet"],
+    "intent Run": [
+        "ask nothing",
+        "Stop and report instead",
+        "cannot be undone or reaches other people",
+        "a Critical finding or a red Proof remains after one fix round",
+        "fix the Critical and Important ones once",
+        "rewrite `Result:`",
+        "Plan-Close → propose, write nothing",
+        "leave the step Plan-Close names to the Report step",
+    ],
+    "intent Report": [
+        "Plan-Close result",
+        "the step Plan-Close named",
+        "setting the plan `complete`",
+    ],
+    "README implement row": [
+        "no code commit follows the plan's `Result:` sha",
+        "stays `implementing`",
+    ],
+    "README review row": ["reviewed again", "acceptance criteria"],
+    "README reflect row": [
+        "done only after this",
+        "it proposes marking the plan `complete`, which you confirm",
+    ],
+    "README --through": [
+        "leaves marking the plan complete, any review round its fix still needs"
+    ],
+}
+# Words that soften a rule into a suggestion. Added conditions and moved
+# clauses are left to the canary probes.
+_SOFTENER = re.compile(
+    r"\b(may|might|optionally|if needed|consider|could|ideally|where useful|"
+    r"where possible|if you like|preferably|try to|unless|need not|no longer|"
+    r"when convenient)\b",
+    re.I,
 )
-_FIX_SCOPE = (
-    "fix to a Critical or Important review finding that changes reviewed code "
-    "or shipped content"
-)
-# Whole rule sentences, so a weakened word in any of them fails.
-_GATE_PHRASES = [
-    (
-        "gates",
-        f"/sc:review -> fix -> /sc:review: a {_FIX_SCOPE} is reviewed again, "
-        "with the earlier findings as acceptance criteria",
-    ),
-    ("gates", _STOP_RULE),
-    (
-        "gates",
-        "A `/sc:intent --through` run keeps its single fix round; its /sc:test "
-        "step names the fix that went unreviewed",
-    ),
-    (
-        "gates",
-        f"Work run from {_PLAN_DOC} goes to /sc:reflect; other work is done here",
-    ),
-    (
-        "gates",
-        "/sc:reflect -> done: every gap /sc:reflect names is fixed (a fix that "
-        "changes reviewed code or shipped content goes back to review, above) or "
-        "accepted by the user",
-    ),
-    (
-        "test Report",
-        f"when the tested work ran from {_PLAN_DOC}, say it is not done until "
-        "/sc:reflect has run",
-    ),
-    (
-        "test Report",
-        "name a fix to a Critical or Important review finding that changed "
-        "reviewed code or shipped content after the last review round as due for "
-        "another review, which /sc:reflect does not replace",
-    ),
-    (
-        "review Process",
-        "A fix to a Critical or Important finding that changes reviewed code or "
-        "shipped content comes back for another round, which gets the earlier "
-        "findings as acceptance criteria with no claim that they are fixed",
-    ),
-    ("review Process", _STOP_RULE),
-    ("review Process", "(a `/sc:intent --through` run keeps its single fix round)"),
-    (
-        "implement Integrate",
-        f"A {_FIX_SCOPE} also goes back to /sc:review for another round before "
-        "done, even when its Proof is green",
-    ),
-    (
-        "README review row",
-        "a fix to one that changes reviewed code or shipped content is reviewed "
-        "again, with the earlier findings as acceptance criteria",
-    ),
-    (
-        "README reflect row",
-        "Every gap it names fixed (a fix that changes reviewed code or shipped "
-        "content goes back to review) or accepted; work run from a plan is done "
-        "only after this",
-    ),
-]
 
 
 def _gate_texts() -> dict[str, str]:
     rules = _read(_SRC / "core" / "rules" / "RULES_DOCS.md")
     gates = re.search(r"<workflow_gates>(.*?)</workflow_gates>", rules, re.S)
     assert gates, "RULES_DOCS.md has no <workflow_gates>"
-    texts = {"gates": gates.group(1)}
+    plan_docs = re.search(r"^\s*Plan docs \(feature or standalone\):.*$", rules, re.M)
+    assert plan_docs, "RULES_DOCS.md has no Plan docs line"
+    texts = {"gates": gates.group(1), "rules": plan_docs.group(0)}
     for name, step in (
         ("test", "Report"),
         ("review", "Process"),
+        ("implement", "Load"),
         ("implement", "Integrate"),
+        ("reflect", "Plan-Close"),
+        ("intent", "Run"),
+        ("intent", "Report"),
     ):
         body = _read(_SRC / "commands" / f"{name}.md")
-        line = re.search(rf"^\s*\d+\. {step}:.*$", body, re.M)
+        line = re.search(rf"^\s*\d+(?:\.\d+)?\. {step}(?: \([^)]*\))?:.*$", body, re.M)
         assert line, f"{name}.md has no {step} step"
         texts[f"{name} {step}"] = line.group(0)
     readme = _read(_README)
     for name, row in (
         ("review", "/sc:review --scope branch"),
+        ("implement", "/sc:implement --plan"),
         ("reflect", "/sc:reflect"),
     ):
         line = re.search(rf"^\| `{re.escape(row)}` \|.*$", readme, re.M)
         assert line, f"README has no {row} row"
         texts[f"README {name} row"] = line.group(0)
+    through = re.search(r"^`/sc:intent --through` .*$", readme, re.M)
+    assert through, "README has no --through paragraph"
+    texts["README --through"] = through.group(0)
+    bounds = re.search(
+        r"<never>.*?</never>", _read(_SRC / "commands" / "reflect.md"), re.S
+    )
+    assert bounds, "reflect.md has no <never>"
+    texts["reflect bounds"] = bounds.group(0)
     return texts
 
 
-@pytest.mark.parametrize(("where", "phrase"), _GATE_PHRASES)
-def test_review_reflect_gate_wording(where, phrase):
-    """Each place that carries the review-reflect gates keeps its rule
-    sentence (docs/features/review-reflect-gates)."""
-    assert phrase in _gate_texts()[where]
+@pytest.mark.parametrize("where", sorted(_GATE_ANCHORS))
+def test_review_reflect_gate_anchors(where):
+    """Each place that carries the review-reflect gates keeps its rule."""
+    text = _gate_texts()[where]
+    missing = [a for a in _GATE_ANCHORS[where] if a not in text]
+    assert not missing, f"{where} lost {missing}"
+    assert not _SOFTENER.search(text), where
 
 
 def test_readme_chains_end_at_a_workflow_gate():
@@ -649,6 +711,16 @@ def test_readme_chains_end_at_a_workflow_gate():
         if re.search(r"/sc:test`?\s*(->|→)\s*done", _read(p))
     ]
     assert not retired, f"retired /sc:test -> done gate named in: {retired}"
+    # Plan-Close condition (2) is "no code commit after the Result: sha"; the
+    # older "Result: names the last code commit" wording contradicts it.
+    stale = [
+        str(p.relative_to(_SRC))
+        for p in _SRC.rglob("*.md")
+        if re.search(r"last (?:code commit|commit that changed code)", _read(p))
+    ]
+    if re.search(r"last (?:code commit|commit that changed code)", text):
+        stale.append("README.md")
+    assert not stale, f"old Result: wording in: {stale}"
     # Other README chains that run /sc:plan end with /sc:reflect too.
     for goal in ("Investigate a bug", "Refactor"):
         row = re.search(rf"^\| \*\*{goal}\*\* \| (.*) \|$", text, re.M)

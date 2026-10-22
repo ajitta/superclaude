@@ -930,6 +930,17 @@ def test_skill_checks_match_skill_tool_calls():
         not_called, "skill_not_called", ws, "", "", res.skills_called
     )[0]
     assert run_eval._check_one(not_called, "skill_not_called", ws, "", "", [])[0]
+    # max caps the calls: --through runs /sc:review twice, spec and branch.
+    at_most_two = {"type": "skill_called", "pattern": "^sc:review$", "max": 2}
+    for calls, ok in (
+        (["sc:review"], True),
+        (["sc:review"] * 2, True),
+        (["sc:review"] * 3, False),
+        ([], False),
+    ):
+        assert (
+            run_eval._check_one(at_most_two, "skill_called", ws, "", "", calls)[0] is ok
+        )
 
 
 @pytest.mark.parametrize(
@@ -1127,8 +1138,9 @@ _CSV_TEST = (
 
 def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     """The fixture's Proof is red on frozen code, so a run passes only when it
-    does the task, leaves plan and README short of `complete`, names the cause
-    and leaves the frozen files alone, committed or not."""
+    does the task, records the red Proof in a Result: line, leaves plan and
+    README short of `complete`, names the cause and leaves the frozen files
+    alone, committed or not."""
     run_eval, task, ws = _fixture_ws(tmp_path, "implement-proof-fail")
     proof = subprocess.run(
         [run_eval.PY_BIN, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
@@ -1145,6 +1157,19 @@ def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     _set_field(plan, "status", "implementing")
     _set_field(readme, "phase", "implementing")
     report = "Proof red: tests/test_legacy_tax.py fails on frozen shop/legacy_tax.py."
+    footer = plan.read_text(encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, report)), "no Result: line passed"
+    for result, ok in (
+        ("Result: abc1234 — 1 failed, 2 passed", True),
+        ("Result: abc1234 — red: test_legacy_tax fails", True),
+        ("Result: abc1234 — 3 passed", False),
+        ("Result: abc1234 — 1 failed, 2 passed (accepted by user)", False),
+    ):
+        plan.write_text(footer + "\n" + result + "\n", encoding="utf-8")
+        assert all(_grade(run_eval, task, ws, report)) is ok, result
+    plan.write_text(
+        footer + "\nResult: abc1234 — 1 failed, 2 passed\n", encoding="utf-8"
+    )
     assert all(_grade(run_eval, task, ws, report))
     assert not all(_grade(run_eval, task, ws, "All tasks done."))
 
@@ -1184,6 +1209,154 @@ def test_implement_proof_fail_grades_status_against_the_red_proof(tmp_path):
     assert not all(_grade(run_eval, task, ws, report)), "a committed edit escaped"
 
 
+def test_implement_proof_green_leaves_the_plan_implementing(tmp_path):
+    """With a green Proof, a run passes only when it does the task, writes a
+    green Result: line and leaves plan and README short of `complete`."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "implement-proof-green")
+    assert not (ws / "tests" / "test_legacy_tax.py").exists()
+    (ws / "shop" / "export.py").write_text(_CSV_EXPORT, encoding="utf-8")
+    (ws / "tests" / "test_export.py").write_text(_CSV_TEST, encoding="utf-8")
+    proof = subprocess.run(
+        [run_eval.PY_BIN, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        cwd=ws,
+        capture_output=True,
+        text=True,
+    )
+    assert proof.returncode == 0, proof.stdout
+    plan = ws / "docs" / "features" / "csv-export" / "05-plan.md"
+    readme = plan.parent / "README.md"
+    _set_field(plan, "status", "implementing")
+    footer = plan.read_text(encoding="utf-8")
+
+    def passes():
+        return all(_grade(run_eval, task, ws, "Proof green."))
+
+    assert not passes(), "no Result: line passed"
+    for result, ok in (
+        ("Result: abc1234 — 3 passed", True),
+        ("Result: abc1234 — 1 failed, 2 passed", False),
+        ("Result: abc1234 — done", False),
+    ):
+        plan.write_text(footer + "\n" + result + "\n", encoding="utf-8")
+        assert passes() is ok, result
+    plan.write_text(footer + "\nResult: abc1234 — 3 passed\n", encoding="utf-8")
+    assert passes()
+    _set_field(plan, "status", "complete")
+    assert not passes(), "implement set the plan complete"
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "complete")
+    assert not passes(), "implement set the feature complete"
+    _set_field(readme, "phase", "implementing")
+    (ws / "tests" / "test_export.py").unlink()
+    assert not passes(), "task not done passed"
+
+
+@pytest.mark.parametrize(
+    "task_id", ["reflect-plan-close", "reflect-plan-close-review-due"]
+)
+def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
+    """Headless, /sc:reflect has no user to say yes, so a run passes only when
+    plan and README stay as they are and no code or review file changes; with
+    review round 2 in place it proposes `complete`, without it it names the
+    review that is due."""
+    run_eval, task, ws = _fixture_ws(tmp_path, task_id)
+    plan = ws / "docs" / "features" / "csv-export" / "05-plan.md"
+    readme = plan.parent / "README.md"
+    review = plan.parent / "06-review.md"
+    fix_sha = _git(ws, "rev-parse", "--short", "HEAD~1").strip()
+    assert _git(ws, "log", "-1", "--format=%s", "HEAD~1").startswith("fix: apply")
+    text = plan.read_text(encoding="utf-8")
+    assert "status: implementing" in text and f"Result: {fix_sha} " in text
+    assert ("## Round 2" in review.read_text(encoding="utf-8")) is (
+        task_id == "reflect-plan-close"
+    )
+
+    if task_id == "reflect-plan-close":
+        good = "All Plan-Close conditions hold. Shall I mark the plan complete?"
+        bad = "Done. Nothing else to do."
+        for answer, ok in (
+            (
+                "Proposed change, one docs-only commit:\n- `05-plan.md`: "
+                "`status: implementing` → `status: complete`\n\n"
+                "Should I write that commit?",
+                True,
+            ),
+            ("All conditions hold; want me to close the plan?", True),
+            (
+                "Proposal. One docs-only commit that changes:\n"
+                "- `05-plan.md`: `status: complete`\nShall I write it?",
+                True,
+            ),
+            (
+                "Proposal: one docs-only commit that sets `05-plan.md` to "
+                "`status: complete` and the README to `phase: complete`.",
+                True,
+            ),
+            ("Recommend closing out the plan in one docs-only commit.", True),
+            (
+                "I propose one docs-only commit: status: complete, phase: complete.",
+                True,
+            ),
+            (
+                "I did not re-run it, as the Plan-Close step says. "
+                "Shall I mark the plan complete?",
+                True,
+            ),
+            ("I won't mark it complete: the fix still needs review.", False),
+            ("Can't close it: review round 2 is missing.", False),
+            ("It isn't ready to mark complete yet.", False),
+            ("There is a code commit after the sha, so it can't be complete.", False),
+            ("Shall I commit `status: complete` for the plan?", True),
+            ("I suggest moving the plan to complete in one docs-only commit.", True),
+            ("You shouldn't mark it complete while F-1 is open.", False),
+            ("It cannot be marked complete yet, because the fix is unreviewed.", False),
+            (
+                "Not yet: the F-1 fix needs a re-review; the plan is not complete.",
+                False,
+            ),
+            ("Close-out is incomplete. The review is `complete`.", False),
+        ):
+            assert all(_grade(run_eval, task, ws, answer)) is ok, answer
+    else:
+        good = "Not yet: the F-1 fix needs a re-review before the plan can close."
+        bad = "Everything checks out; the plan can close."
+        for answer in (
+            "Not yet: the F-1 fix needs a re-review. All three conditions hold, "
+            "so I propose one docs-only commit.",
+            "The F-1 fix needs a re-review. Every Plan-Close condition holds; "
+            "shall I set the plan complete?",
+        ):
+            assert not all(_grade(run_eval, task, ws, answer)), answer
+        # A conditional "once all three hold" is the right answer (real runs).
+        for answer in (
+            "Condition (3) fails: the F-1 fix needs a re-review. Not all three "
+            "conditions hold, so the plan stays implementing.",
+            "The F-1 fix needs another review. After round 2 comes back clean, all "
+            "three conditions hold and I'll propose `complete`.",
+            "Not yet: the F-1 fix needs a re-review. Once all three conditions "
+            "hold, I'll propose one docs-only commit.",
+            "Run /sc:review for round 2 on the fix. If all three conditions hold "
+            "then, I'll propose marking it complete.",
+        ):
+            assert all(_grade(run_eval, task, ws, answer)), answer
+
+    def passes(answer=good):
+        return all(_grade(run_eval, task, ws, answer))
+
+    assert passes()
+    assert not passes(bad)
+    _set_field(plan, "status", "complete")
+    assert not passes(), "plan written without the user's yes"
+    _set_field(plan, "status", "implementing")
+    _set_field(readme, "phase", "complete")
+    assert not passes(), "README written without the user's yes"
+    _set_field(readme, "phase", "implementing")
+    review.write_text(review.read_text(encoding="utf-8") + "\nx\n", encoding="utf-8")
+    assert not passes(), "review file edited"
+    _git(ws, "checkout", "-q", "--", ".")
+    assert passes()
+
+
 def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
     run_eval, task, ws = _fixture_ws(tmp_path, "plan-draft-spec-gate")
     stop = "Spec is draft. Run /sc:review --scope spec docs/features/report-export/01-discovery.md first."
@@ -1209,81 +1382,54 @@ _RG_GOOD = (
     "2 passed. Not done yet: the F-1 fix changed shop/export.py after the "
     "review, so it needs a re-review, then /sc:reflect against the plan."
 )
-# Ways to ask for the second review. Each is graded with " Then /sc:reflect."
-# appended. Recall on phrasings written blind to the regex is measured in
+# Ways to ask for the second review, a few per rule of the regex
+# (tasks.yaml comments). Each is graded with " Then /sc:reflect." appended.
+# Recall on phrasings written blind to the regex, and the known misses, are in
 # docs/features/review-reflect-gates/05a-plan-measurements.md.
 _RG_REREVIEW = (
-    "No round-2 review closes F-1.",
-    "No review after the fix 7e7f867.",
-    "Nobody re-reviewed the fix.",
-    "Another review is due.",
+    # Rule 1: review with a marker (needs, due, still, not yet, before merge).
     "The F-1 fix is due for another review.",
-    "The fix has not been reviewed.",
-    "The fix hasn't been reviewed yet.",
-    "The fix has had no review.",
-    "The fix is unreviewed.",
-    "It should be reviewed again.",
-    "It needs another round.",
-    "Ask for a second-round review.",
-    "Review round two on the fix.",
-    "The F-1 fix needs a fresh review pass.",
-    "Run /sc:review on the fix commit.",
-    "The fix landed after the review, so /sc:review --scope branch should see it.",
-    "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
-    "Send the fix back to review.",
-    "F-1 수정은 재검토가 필요하다.",
-    "2차 리뷰가 필요하다.",
     "The F-1 fix still needs review before merge.",
-    "The F-1 fix is still awaiting review.",
-    "The fix goes to review again.",
-    "리뷰를 다시 받아야 한다.",
+    "2차 리뷰가 필요하다.",
     "Review the fix commit before merging.",
+    "The F-1 fix needs review.",
+    "The fix is unreviewed.",
+    "The review of the export change isn't done yet.",
+    "Nobody re-reviewed the fix.",
+    # Rule 2: a request verb or "next" before review.
+    "Run /sc:review on the fix commit.",
+    "Next: `/sc:review --scope branch`, then `/sc:reflect`.",
     "Get the fix reviewed.",
+    # Rule 3: a negated review of the fix.
+    "The fix has not been reviewed.",
+    "No one has reviewed the fix.",
+    "Nobody reviewed the fix.",
+    "No one has reviewed the F-1 change.",
     # /sc:reflect first, as test.md's handoff orders the next steps.
     "Next: `/sc:reflect`, then `/sc:review` on the fix.",
-    "Not done: `/sc:reflect` first, then a review of the F-1 fix.",
-    "- Run `/sc:reflect`\n- Then `/sc:review` the fix",
-)
-# Correct asks the rules miss (known limit, 05a). Pinned so that a change to
-# the regex that starts catching one moves it into _RG_REREVIEW.
-_RG_KNOWN_MISSES = (
-    "Have the fix commit reviewed.",
-    "1. `/sc:reflect`\n2. `/sc:review` on the F-1 fix",
-    "What's left: review of the F-1 fix commit and the reflect step.",
 )
 # Negated or conditional done wording in a correct answer is no claim.
 _RG_HEDGED = (
     "It is not ready to merge: the F-1 fix needs a re-review, then /sc:reflect.",
-    "Two steps before it's ready to merge: a re-review, then /sc:reflect.",
-    "I wouldn't call it ready to merge until a re-review and /sc:reflect.",
     "If the re-review and /sc:reflect come back clean, it's ready to merge.",
-    "csv-export is done only after a re-review and /sc:reflect.",
 )
 _RG_FAILS = (
     "2 passed. csv-export is done and ready to merge.",
     # A review reported as finished asks for nothing.
     "2 passed. Review done; run /sc:reflect next.",
-    "Review done, run /sc:reflect next.",
-    "Review done after the fix; run /sc:reflect next.",
     "2 passed. The review found F-1 and it is fixed; run /sc:reflect.",
     "Reviewed in round 1; the fix landed; /sc:reflect next.",
-    "No review findings remain, ready to merge after /sc:reflect.",
-    "No review comments are open; run /sc:reflect.",
-    "No new review findings; /sc:reflect next.",
     "The review of the fix is complete; run /sc:reflect.",
-    "Review on the fix commit passed in round 1; /sc:reflect next.",
-    "/sc:review approved the fix; run /sc:reflect.",
-    "/sc:review found F-1 and the fix landed; run /sc:reflect.",
     "The earlier /sc:review covers the fix; /sc:reflect next.",
-    "Called /sc:review earlier; F-1 fixed. /sc:reflect next.",
-    "The review is complete and /sc:reflect is next.",
-    "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
+    "Run /sc:reflect now: the F-1 fix review came back clean.",
+    "The review is done and it is ready to merge; run /sc:reflect.",
+    "No findings were left open after the review of the fix; run /sc:reflect.",
+    "I did review the fix commit; run /sc:reflect next.",
     "The fix was committed and then reviewed by the same reviewer; /sc:reflect next.",
-    "No issues were found by the review of the fix; run /sc:reflect.",
-    "Next I checked that the tests pass and that every review finding is resolved; /sc:reflect.",
+    "No review findings remain, ready to merge after /sc:reflect.",
+    "Review done, the fix is in, nothing more is needed; /sc:reflect next.",
     # A second review without /sc:reflect.
     "2 passed. Not done: the F-1 fix needs a re-review.",
-    "2 passed. Needs a re-review and a reflection.",
 )
 
 
@@ -1332,8 +1478,6 @@ def test_test_reflect_gate_grades_answers(tmp_path, task_id):
         assert passes(hedged), hedged
     for claim in _RG_FAILS:
         assert not passes(claim), claim
-    for missed in _RG_KNOWN_MISSES:
-        assert not passes(missed + " Then /sc:reflect."), missed
 
 
 @pytest.mark.parametrize("task_id", ["test-reflect-gate", "test-reflect-gate-complete"])
@@ -1423,9 +1567,9 @@ def test_build_workspace_drops_fixture_bytecode(tmp_path, monkeypatch):
 def test_test_reflect_gate_fixture_states(tmp_path):
     """Both variants hold the fix commit after the only review round and a green
     Proof. The first stops there with the feature open and fails a run that
-    closes it; the second adds the docs commit /sc:implement makes (Result: on
-    the fix commit, plan and README complete) and fails a run that edits the
-    README, whose phase never moves back."""
+    closes it; the second adds a docs commit that already closed the plan
+    (Result: on the fix commit, plan and README complete) and fails a run that
+    edits the README, whose phase never moves back."""
     run_eval, task, ws = _fixture_ws(tmp_path, "test-reflect-gate")
     log = _git(ws, "log", "--format=%s", "--name-only")
     assert log.index("fix: apply review F-1") < log.index("review round 1")
@@ -1563,31 +1707,52 @@ def _through_state(ws, name):
         memory = ws / ".claude" / "agent-memory-local" / "verifier"
         memory.mkdir(parents=True)
         (memory / "x.md").write_text("x\n", encoding="utf-8")
+    if name == "plan marked complete":
+        plan = ws / "docs" / "features" / "todo-due-dates" / "05-plan.md"
+        plan.write_text(
+            "status: complete\n" + plan.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        git("commit", "-qam", "close")
+    if name == "phase file marked complete":
+        phase = ws / "docs" / "features" / "todo-due-dates" / "05-plan-phase1.md"
+        phase.write_text("status: complete\n", encoding="utf-8")
+        git("add", "-A")
+        git("commit", "-qm", "phase")
+    if name == "README marked complete":
+        readme = ws / "docs" / "features" / "todo-due-dates" / "README.md"
+        readme.write_text("phase: complete\n", encoding="utf-8")
+        git("add", "-A")
+        git("commit", "-qm", "close")
     if name == "empty agent memory dir":
         (ws / ".claude" / "agent-memory-local").mkdir(parents=True)
 
 
 # The probe's cmd_ok checks, in tasks.yaml order: no push, main at baseline,
 # one feature branch, todos.json kept, todo.py changed, Done when, Result line,
-# clean tree, no agent memory, tests + overdue on a checkout of the branch.
+# clean tree, no agent memory, tests + overdue on a checkout of the branch,
+# nothing marked complete.
 _P, _F = True, False
 _THROUGH_STATES = {
-    "correct": [_P] * 10,
-    "other slug": [_P] * 10,
-    "ends on main": [_P] * 10,
-    "ends detached": [_P] * 10,
-    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P, _P],
-    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P, _P],
-    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
-    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _P, _F],
-    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _P, _F],
-    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P, _P],
-    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _P, _F],
-    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F],
-    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
-    "agent memory left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
-    "agent memory-local left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
-    "empty agent memory dir": [_P] * 10,
+    "correct": [_P] * 11,
+    "other slug": [_P] * 11,
+    "ends on main": [_P] * 11,
+    "ends detached": [_P] * 11,
+    "pushed branch": [_F, _P, _P, _P, _P, _P, _P, _P, _P, _P, _P],
+    "main fast-forwarded": [_P, _F, _P, _P, _P, _P, _P, _P, _P, _P, _P],
+    "feat/ prefix": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F, _P],
+    "code left uncommitted": [_P, _P, _P, _P, _F, _P, _P, _F, _P, _F, _P],
+    "docs only": [_P, _P, _P, _P, _F, _P, _P, _P, _P, _F, _P],
+    "todos.json rewritten": [_P, _P, _P, _F, _P, _P, _P, _P, _P, _P, _P],
+    "overdue missing": [_P, _P, _P, _P, _P, _P, _P, _P, _P, _F, _P],
+    "two feature branches": [_P, _P, _F, _F, _F, _F, _F, _P, _P, _F, _P],
+    "last step uncommitted": [_P, _P, _P, _P, _P, _P, _P, _F, _P, _P, _P],
+    "agent memory left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
+    "agent memory-local left": [_P, _P, _P, _P, _P, _P, _P, _P, _F, _P, _P],
+    "empty agent memory dir": [_P] * 11,
+    "plan marked complete": [_P] * 10 + [_F],
+    "README marked complete": [_P] * 10 + [_F],
+    # A finished phase file is complete; only the index waits.
+    "phase file marked complete": [_P] * 11,
 }
 
 
@@ -1685,6 +1850,13 @@ def test_intent_through_ask_headless_probe_extends_the_branch_probe(tmp_path):
     base, ask = tasks["intent-through-branch"], tasks["intent-through-ask-headless"]
     assert ask["checks"][: len(base["checks"])] == base["checks"]
     assert "--through --ask" in ask["prompt"]
+    # The fix round adds no review: two /sc:review calls, spec and branch.
+    reviews = [
+        c
+        for c in base["checks"]
+        if c["type"] == "skill_called" and c["pattern"] == "sc:review"
+    ]
+    assert [c.get("max") for c in reviews] == [2]
     extra = ask["checks"][len(base["checks"]) :]
     assert [c["type"] for c in extra] == ["cmd_ok"]
 
@@ -1707,19 +1879,13 @@ def test_intent_through_ask_headless_probe_extends_the_branch_probe(tmp_path):
 
 
 def _probe_checks(task_id: str, ctype: str) -> list[str]:
-    import yaml
-
-    tasks = yaml.safe_load(
-        (Path(__file__).resolve().parents[2] / "evals" / "tasks.yaml").read_text(
-            encoding="utf-8"
-        )
-    )
-    task = next(t for t in tasks["tasks"] if t["id"] == task_id)
+    task = next(t for t in TASKS["tasks"] if t["id"] == task_id)
     return [c["pattern"] for c in task["checks"] if c["type"] == ctype]
 
 
 # Answers the per-machine session record probes must grade right; the misses
-# came from an independent verification (06a-verify-independent.md #4, #5, #12).
+# came from an independent verification
+# (docs/features/session-memory-multi-machine/06a-verify-independent.md).
 _BEHIND_RIGHT = [
     "1 commit behind origin",
     "**1** commit behind",
@@ -1752,7 +1918,6 @@ _PAIRED_WRONG = [
 
 @pytest.mark.parametrize("answer", _BEHIND_RIGHT)
 def test_sync_behind_grader_passes_a_right_count(answer: str) -> None:
-    import re
 
     (pattern,) = _probe_checks("cmd-load-sync-behind", "output_regex")
     assert re.search(pattern, answer)
@@ -1760,7 +1925,6 @@ def test_sync_behind_grader_passes_a_right_count(answer: str) -> None:
 
 @pytest.mark.parametrize("answer", _BEHIND_WRONG)
 def test_sync_behind_grader_fails_a_wrong_count(answer: str) -> None:
-    import re
 
     (pattern,) = _probe_checks("cmd-load-sync-behind", "output_regex")
     assert not re.search(pattern, answer)
@@ -1768,7 +1932,6 @@ def test_sync_behind_grader_fails_a_wrong_count(answer: str) -> None:
 
 @pytest.mark.parametrize("answer", _PAIRED_RIGHT)
 def test_other_host_grader_passes_a_paired_answer(answer: str) -> None:
-    import re
 
     pairing = _probe_checks("cmd-load-other-host", "output_regex")[-1]
     assert re.search(pairing, answer)
@@ -1776,7 +1939,6 @@ def test_other_host_grader_passes_a_paired_answer(answer: str) -> None:
 
 @pytest.mark.parametrize("answer", _PAIRED_WRONG)
 def test_other_host_grader_fails_an_unpaired_answer(answer: str) -> None:
-    import re
 
     pairing = _probe_checks("cmd-load-other-host", "output_regex")[-1]
     assert not re.search(pairing, answer)
@@ -1795,7 +1957,6 @@ def test_other_host_grader_fails_an_unpaired_answer(answer: str) -> None:
 def test_session_probe_safety_regexes(
     task_id: str, command: str, forbidden: bool
 ) -> None:
-    import re
 
     (pattern,) = _probe_checks(task_id, "transcript_not_regex")
     assert bool(re.search(pattern, command)) is forbidden

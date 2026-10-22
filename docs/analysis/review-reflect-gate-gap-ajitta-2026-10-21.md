@@ -37,7 +37,7 @@ revised: 2026-10-21
 - [x] 낡은 범프 브랜치 `chore/version-4.34.2`는 지웠다.
 - [ ] 릴리스: 소유자가 보류했다(2026-10-21 "release는 아직"). 할 때는 범프 브랜치를 새로 만들고, `CANARY_OK=1 make release` 뒤 두 컴퓨터에서 설치를 맞추고 두 컴퓨터로 확인한다(feature README `릴리스 뒤`). B를 같은 릴리스에 묶으면 canary를 한 번만 돌린다.
 
-### B. 규칙과 문서 맞추기 — 결정됨 (2026-10-21), 진행: [review-reflect-gates](../features/review-reflect-gates/README.md)
+### B. 규칙과 문서 맞추기 — 결정됨 (2026-10-21), 완료: [review-reflect-gates](../features/review-reflect-gates/README.md)
 
 소유자는 ★(a), 재리뷰 줄, canary 프로브를 골랐다. RULES_DOCS가 `/sc:test`에서 로드되지 않는 것(`context_loader.py:191`)을 확인한 뒤 `test.md` handoff의 (b)도 더했다. handoff만으로는 `/sc:test` 세션의 답이 바뀌지 않아(0/3), 소유자가 `test.md` Report 단계 한 줄을 더 골랐다(3/3). 리뷰 1차 뒤에는 `/sc:intent --through`가 한 번의 수정 round를 유지하는 예외를 게이트에 두기로 했다. 릴리스는 보류한다. 아래는 결정 전 선택지다. ★는 추천이었다.
 
@@ -52,7 +52,7 @@ revised: 2026-10-21
 
 - [x] auto memory `release-needs-complete-plan`에 "반영한 수정은 다시 리뷰한다, reflect는 체인의 단계다"를 더했다(2026-10-21). B의 결정이 나오면 그 규칙을 가리키게 한다.
 
-### D. 계획 `complete`와 reflect의 순서 (후속, 미착수)
+### D. 계획 `complete`와 reflect의 순서 (후속, 진행: [plan-complete-order](../features/plan-complete-order/README.md), 확정안 B′)
 
 `/sc:implement` Integrate 단계는 Proof가 통과하면 계획을 `status: complete`, feature README를 `phase: complete`로 만든다. 체인에서는 그 뒤에 `/sc:test`와 `/sc:reflect`가 온다. 그래서 reflect 전에 feature가 `complete`로 보인다. B 이전의 `/sc:test -> done`에서도 같았다(review-reflect-gates 리뷰 1차 I-5). `implement.md`, RULES_DOCS의 계획 status 규칙, `workflow_gates`가 `complete`의 위치에 대해 같은 말을 하게 할지는 소유자가 정한다.
 

@@ -235,4 +235,4 @@ Earlier result (before Phase 4): 75d2addc — `uv run pytest` 3789 passed, 12 sk
 
 Earlier result (before the independent verifications): 0f6a3bf8 — `uv run pytest` 3789 passed, 12 skipped (exit 0); make lint, ruff format --check, make typecheck clean; drift test 1 passed; `test-reflect-gate` `/sc:reflect` 15/15 after the Report-step line (0/6 before), last 3 runs on 0f6a3bf8's text 6/6 each.
 
-Result: 3b968d05 — `uv run pytest` 3819 passed, 3 skipped (exit 0, Linux); make lint, ruff format --check, make typecheck clean; drift and probe-grading tests pass; `/sc:reflect` named 15/15 after the Report-step line (0/6 before, Windows) and 15/15 on Linux; both probe variants pass every check in 3 runs each on 56da83a1 (sonnet, low), 15 saved runs regraded under 3b968d05's checks all pass
+Result: 3b968d05 — `uv run pytest` 3819 passed, 3 skipped (exit 0, Linux); lint, format, typecheck clean; probe runs in [05a](./05a-plan-measurements.md)
