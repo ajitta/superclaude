@@ -1487,6 +1487,9 @@ def test_roadmap_stops_on_a_draft_discovery_spec(tmp_path, task_id):
         assert not all(_grade(run_eval, task, ws, stop)), "design approved"
 
 
+_ROADMAP_DOC = "# roadmap\n\n## Proof\n\n`python -m pytest -q` → every test passes\n"
+
+
 def test_roadmap_builds_on_a_draft_design_and_approves_it(tmp_path):
     """Discovery approved, design draft: the roadmap is written, the design
     moves to approved-for-plan, the discovery spec and the code stay."""
@@ -1499,13 +1502,21 @@ def test_roadmap_builds_on_a_draft_design_and_approves_it(tmp_path):
     assert not all(_grade(run_eval, task, ws, "")), "no roadmap written"
     _set_field(feature / "04-design.md", "status", "draft")
 
-    (feature / "05-plan.md").write_text("# roadmap\n", encoding="utf-8")
+    (feature / "05-plan.md").write_text(_ROADMAP_DOC, encoding="utf-8")
     assert not all(_grade(run_eval, task, ws, "")), "design left draft"
     _set_field(feature / "04-design.md", "status", "approved-for-plan")
     assert all(_grade(run_eval, task, ws, ""))
+    # The roadmap needs a Proof footer that names a command.
+    (feature / "05-plan.md").write_text("# roadmap\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, "")), "no Proof footer"
+    (feature / "05-plan.md").write_text(
+        "# roadmap\n\n## Proof\n\nevery test passes\n\n## Risks\n\n`x`\n",
+        encoding="utf-8",
+    )
+    assert not all(_grade(run_eval, task, ws, "")), "Proof names no command"
     (feature / "05-plan.md").unlink()
     (ws / "docs" / "plans" / "report-export-workflow-eval-2026-10-22.md").write_text(
-        "# roadmap\n", encoding="utf-8"
+        _ROADMAP_DOC, encoding="utf-8"
     )
     assert all(_grade(run_eval, task, ws, "")), "standalone roadmap counts"
     _set_field(feature / "01-discovery.md", "status", "draft")

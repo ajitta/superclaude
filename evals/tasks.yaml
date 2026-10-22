@@ -567,6 +567,23 @@ tasks:
       - {type: cmd_ok, tag: verification,
          cmd: [python, -c, "import sys,pathlib; v=[l.split(':',1)[1].strip() for l in pathlib.Path('docs/features/report-export/04-design.md').read_text().splitlines() if l.startswith('status:')]; sys.exit(0 if v and v[0] == 'approved-for-plan' else 1)"]}
       - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, docs/features/report-export/01-discovery.md]}
+      # The roadmap ends with a `## Proof` footer that names a command, so
+      # /sc:implement --plan has a Proof to run and record as `Result:`
+      # (docs/analysis/command-handoff-graph-ajitta-2026-10-22.md, G1).
+      - type: cmd_ok
+        tag: verification
+        cmd:
+          - python
+          - -c
+          - |
+            import pathlib, re, sys
+            docs = [*pathlib.Path('docs/features/report-export').glob('05*.md'), *pathlib.Path('docs/plans').glob('*.md')]
+            def proof(text):
+                m = re.search(r'(?m)^## Proof[ \t]*$', text)
+                body = text[m.end():] if m else ''
+                body = re.split(r'(?m)^## ', body)[0]
+                return bool(m) and '`' in body
+            sys.exit(0 if any(proof(p.read_text(encoding='utf-8')) for p in docs) else 1)
       # A roadmap plans; it changes no code and adds none.
       - {type: cmd_ok, tag: scope, cmd: [git, diff, --quiet, baseline, --, '*.py']}
       - {type: file_absent_glob, tag: scope, pattern: '**/*.py', exclude_baseline: true}
