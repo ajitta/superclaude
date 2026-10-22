@@ -1,10 +1,10 @@
-branch: master @c5c0b00f (merge c9b0b94d of feature/plan-complete-order; stable == v4.34.1; release held by the owner)
+branch: master @dbcacccb (v4.34.2 released; stable == v4.34.2)
 
 # Session 2026-10-22 — claude-box — review-reflect-gates merged; plan-complete-order built, patchwork audit, merged
 
 ## Start here (next session)
 1. `git fetch origin && git switch master && git pull --ff-only`, then read this file, `session_2026-10-21_chosh-g14_master.md` (other machine) and `docs/plans/remaining-work-ajitta-2026-10-20.md`.
-2. The release is held by the owner. Do not start a bump branch, run canaries for a release or `make release` unasked.
+2. v4.34.2 is released (owner's go 2026-10-22). This VM is on it; the Windows machine needs `superclaude install --force --scope user`.
 
 ## What was done
 - review-reflect-gates: five headless opus verifier rounds (06a–06e), cleanup of patched-in graders, merged 21d2e0fc. Details in its feature folder.
@@ -15,11 +15,12 @@ branch: master @c5c0b00f (merge c9b0b94d of feature/plan-complete-order; stable 
 - Final: full suite on the merge 3857 passed, 3 skipped; lint, format, typecheck clean; canary on b31415c1 (last shipped-text commit) all pass, both reflect probes 3/3; 62 saved real reflect runs regraded under the final checks (closable 31/31, review-due 30/31 — the one failure is the real misread run r8/x3). CI dispatched on master c5c0b00f.
 
 ## Decisions
-- Owner: all ★ recommendations; release held; patchwork audit before every merge after many fix rounds; a narrow Important is fixed with another round, never waived to merge sooner.
+- Owner: all ★ recommendations; 4.34.2 released after both features; patchwork audit before every merge after many fix rounds; a narrow Important is fixed with another round, never waived to merge sooner.
 - Grader proposals from a verifier are regraded against saved real runs before they are applied (one refusal regex failed 14 of 16 real correct answers).
 
 ## Next actions
 - [x] Owner yes (2026-10-22) → plan-complete-order plan `status: complete` + README `phase: complete`.
-- [ ] Release 4.34.2 (owner decides; held). Core and command bodies changed since v4.34.1: `make canary-gates` and `make canary-commands` before `CANARY_OK=1 make release`; CHANGELOG [Unreleased] carries the Upgrade line for plans in progress.
+- [x] Release 4.34.2 (2026-10-22): bump dbcacccb; canary-gates 4/4, canary-commands 13/13 probes all checks; CI green; `CANARY_OK=1 make release` → tag v4.34.2, stable → dbcacccb; this VM installed (`--scope user`, 64 installed).
+- [ ] Owner, Windows: `superclaude install --force --scope user` for 4.34.2.
 - [ ] Owner, Windows: delete `C:/sc-evals/rrg-*` and `C:/sc-evals/smm-final2` after the release.
 - [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). Reviews have no rule for where findings and their acceptance are recorded when `/sc:review` writes no file (06e, outside this branch).
