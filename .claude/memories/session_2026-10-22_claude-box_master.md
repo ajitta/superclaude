@@ -20,6 +20,8 @@ branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; unreleased: the -
 
 - roadmap-plan-gate (docs/analysis/roadmap-plan-gate-ajitta-2026-10-22.md): owner's analysis of design-stage review evaluated (facts right; '97cbac42 = intended no design review' and the two 04a records as evidence overstated; option C unworkable). Owner chose A + probes. Three roadmap probes pre-registered (a9e01360); roadmap-design-draft 0/3 before, 3/3 after; two opus verifier rounds (1 Important: RULES_DOCS:81-82, fixed; round 2 pass); on e03e1889 probes 9/9 and canary-gates 7/7. Next release needs CANARY_OK=1 on those runs (core/ and roadmap.md changed); make canary-commands also picks the three roadmap probes.
 
+- run_eval: a --runs-dir that already holds the arm/task workspace now stops at start with a named error (was a FileExistsError traceback); unreleased, contributor-only.
+
 ## Decisions
 - Owner: all ★ recommendations; 4.34.2 released after both features; patchwork audit before every merge after many fix rounds; a narrow Important is fixed with another round, never waived to merge sooner.
 - Review findings stay unrecorded by commands (option C); reopen only on an observed cross-session failure (F12 rule).
