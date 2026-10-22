@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.34.2] - 2026-10-22
+
 ### Changed
 
 - `/sc:save` names each session record by date, machine and branch: `session_<date>_<host>_<branch>.md`, where `<host>` is your `hostname` in lowercase with other characters turned into `-`. Two computers saving on the same branch on the same day now write separate files instead of both updating one, which got the second push rejected and the pull into a merge conflict. `/sc:load` reads every machine's record of the newest date on the current branch and says which machine wrote each. Existing records keep their names and are still read. The hostname ends up in the filename, so it is committed with `.claude/memories/`.

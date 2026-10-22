@@ -5,7 +5,7 @@
 #### *A Claude Code content framework — fork-origin, now its own project*
 
 <p>
-  <img src="https://img.shields.io/badge/version-4.34.1-blue" alt="Version">
+  <img src="https://img.shields.io/badge/version-4.34.2-blue" alt="Version">
   <a href="https://github.com/ajitta/superclaude/actions/workflows/test.yml">
     <img src="https://github.com/ajitta/superclaude/actions/workflows/test.yml/badge.svg" alt="Tests">
   </a>
@@ -45,7 +45,7 @@ Claude Code reads those files at session start, which is how the framework chang
 
 ## ⚡ **Quick Installation**
 
-### **Current Stable Version (v4.34.1)**
+### **Current Stable Version (v4.34.2)**
 
 There are three ways to install, from quickest to most customizable:
 
