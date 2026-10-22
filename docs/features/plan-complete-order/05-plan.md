@@ -157,7 +157,7 @@ revised: 2026-10-22
 
 ## Deviations
 
-- Phase 9 뒤 canary(c862806d, `$TMPDIR/pco/r9`): review-due 여섯 run 모두 올바르게 답했다(재리뷰를 지목하고 `complete`를 제안하지 않음). 그런데 새 거절 check가 둘을 떨어뜨렸다("Once all three conditions hold, I'll propose"). 조건문 뒤의 구절은 빼게 고쳤다. `reflect-plan-close` 하나는 올바른 제안("One docs-only commit that changes: `05-plan.md`: `status: complete`")이 동사 없이 떨어졌다. `` `status: complete` `` 꼴을 제안으로 센다. 저장된 run 마흔여덟 개로 다시 채점: 닫을 수 있는 답 23/23, review-due 22/23(떨어진 하나가 06e의 오독 run), 바꾸기 전 `reflect-plan-close` 0/1.
+- Phase 9 뒤 canary(c862806d, `$TMPDIR/pco/r9`; 수치와 lookbehind는 Phase 11의 재채점과 문장 첫머리 정규식으로 대체됨): review-due 여섯 run 모두 올바르게 답했다(재리뷰를 지목하고 `complete`를 제안하지 않음). 그런데 새 거절 check가 둘을 떨어뜨렸다("Once all three conditions hold, I'll propose"). 조건문 뒤의 구절은 빼게 고쳤다. `reflect-plan-close` 하나는 올바른 제안("One docs-only commit that changes: `05-plan.md`: `status: complete`")이 동사 없이 떨어졌다. `` `status: complete` `` 꼴을 제안으로 센다. 저장된 run 마흔여덟 개로 다시 채점: 닫을 수 있는 답 23/23, review-due 22/23(떨어진 하나가 06e의 오독 run), 바꾸기 전 `reflect-plan-close` 0/1.
 
 - Phase 9(뒤의 재채점으로 대체됨): 저장된 실제 run 서른여덟 개로 다시 채점(`reflect-plan-close*`): 닫을 수 있는 답 18/18 통과, review-due 답 17/18 통과이고 떨어진 하나가 06e의 오독 run(`r8/x3`)이다, 바꾸기 전 `reflect-plan-close` 0/1. 변이 9건 모두 red(`$TMPDIR/pco/mut9.py`).
 

@@ -722,7 +722,7 @@ tasks:
       # here and proposed `complete`). Only a sentence that opens with the
       # verdict counts, so "once all three hold, I'll propose" passes.
       - {type: output_not_regex, tag: success,
-         pattern: '(?im)(?:^|[.!?;:]\s+)[\s>*_-]*all (?:three|3) (?:Plan-Close )?(?:conditions )?(?:hold|are met)\b'}
+         pattern: '(?im)(?:^|[.!?;:]\s+)[\s>*_-]*(?:all (?:three|3) (?:Plan-Close )?(?:conditions )?(?:hold|are (?:met|satisfied))|(?:every|each) (?:Plan-Close )?condition (?:holds|is (?:met|satisfied)))\b'}
       - *rereview_named
       - *no_py_change
       - *review_untouched

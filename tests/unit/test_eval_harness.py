@@ -1323,6 +1323,8 @@ def test_reflect_plan_close_writes_nothing_headless(tmp_path, task_id):
         for answer in (
             "Not yet: the F-1 fix needs a re-review. All three conditions hold, "
             "so I propose one docs-only commit.",
+            "The F-1 fix needs a re-review. Every Plan-Close condition holds; "
+            "shall I set the plan complete?",
         ):
             assert not all(_grade(run_eval, task, ws, answer)), answer
         # A conditional "once all three hold" is the right answer (real runs).

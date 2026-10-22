@@ -560,6 +560,7 @@ _GATE_ANCHORS = {
         "never sets the plan (index) or the README `complete`",
         "Plan-Close",
         "sets it back to `implementing`",
+        "the README `phase:` never moves back",
         "rewrites `Result:`",
         "A fix to a Critical or Important review finding",
         "Every later code change re-runs the Proof",
@@ -580,7 +581,7 @@ _GATE_ANCHORS = {
         "an open box, a missing `Result:` line or a code commit after its sha",
         "an open finding or a red `Result:` to the user",
         "whose `Result:` is red and not accepted, or whose condition (3) fails",
-        "is proposed back to `implementing`",
+        "is proposed back to `implementing`, the README `phase:` unchanged",
         "any other failing condition leaves it `complete`",
         "the review findings and `git log`",
         "shipped content has had a /sc:review round after it, or the user waived that round",
@@ -590,14 +591,13 @@ _GATE_ANCHORS = {
         "only when the user says yes",
         "in a feature folder",
         "/sc:implement --plan",
-        "back to `implementing`",
     ],
     "reflect bounds": ["without the user's yes or with a Plan-Close condition unmet"],
     "intent Run": [
         "ask nothing",
         "Stop and report instead",
         "cannot be undone or reaches other people",
-        "a red Proof remains after one fix round",
+        "a Critical finding or a red Proof remains after one fix round",
         "fix the Critical and Important ones once",
         "rewrite `Result:`",
         "Plan-Close → propose, write nothing",
@@ -613,8 +613,13 @@ _GATE_ANCHORS = {
         "stays `implementing`",
     ],
     "README review row": ["reviewed again", "acceptance criteria"],
-    "README reflect row": ["done only after this", "which you confirm"],
-    "README --through": ["leaves marking the plan complete"],
+    "README reflect row": [
+        "done only after this",
+        "it proposes marking the plan `complete`, which you confirm",
+    ],
+    "README --through": [
+        "leaves marking the plan complete, any review round its fix still needs"
+    ],
 }
 # Words that soften a rule into a suggestion. Added conditions and moved
 # clauses are left to the canary probes.
