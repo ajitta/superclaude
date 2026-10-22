@@ -13,7 +13,7 @@ revised: 2026-10-22
 
 - `src/superclaude/commands/roadmap.md`:
   - Analyze 단계: 어떤 입력이든 draft discovery spec이면 멈춘다(입력 문서, 또는 `04-design.md`가 있어도 feature 폴더의 `01-discovery.md`). design은 `draft`라는 이유로 멈추지 않는다. 해결되지 않은 Areas of concern이 있으면 그렇다고 말하고 진행할지 묻는다.
-  - Document 단계: Analyze 단계가 읽은 design을 같은 저장에서 `approved-for-plan`으로 바꾼다.
+  - Document 단계: Analyze 단계가 읽은 design을 같은 저장에서 `approved-for-plan`으로 바꾼다(독립 검증 반영에서 "소스인 design"으로 좁혔고, 소스 순서도 더했다).
 - 프로브 `roadmap-draft-spec-gate`, `roadmap-design-discovery-draft`, `roadmap-design-draft`(`evals/tasks.yaml`, fixture `evals/fixtures/roadmap-design-gate`)와 채점 테스트. 측정 전에 커밋했다(a9e01360).
 
 ## 측정
@@ -44,3 +44,18 @@ Linux, sonnet, sc-full, 각 3회. 커밋 a9e01360(변경 전)과 de4e6cb3(변경
 | 5 Areas of concern 분기 프로브 없음 | 하지 않는다. plan에도 같은 프로브가 없고, 관찰된 실패가 없다 |
 | 이 브랜치 밖: README가 plan 관문을 "draft spec"으로 적음 | 같은 관문이라 이 브랜치에서 고쳤다(README `/sc:review` 행과 Tightened Workflow Gates 줄: "discovery spec") |
 | 이 브랜치 밖: `RULES_DOCS.md:81` "Design spec committed"를 확인하는 단계 없음 | 기존 상태라 두었다 |
+
+2차 독립 검증([verify2](./roadmap-plan-gate-verify2-ajitta-2026-10-22.md))은 통과였다(Critical·Important 없음). 1차 발견 다섯이 모두 해결됐다. check 14개를 하나씩 지우는 변이를 하면 14개 모두 red였다. 남은 제안 셋은 다시 round를 돌리지 않고 처리했다.
+
+- `RULES_DOCS.md:82`: "the same gate"를 design 입력에만 붙였다.
+- 이 문서의 변경 절에 좁힌 내용을 표시했다.
+- 소스가 approved discovery이고 옆에 draft design이 있는 경우의 프로브는 두지 않는다. 관찰된 실패가 없고, plan에도 대응 프로브가 없다.
+
+e03e1889에서 돌린 측정:
+
+- roadmap 프로브 3개 × 3회: 9/9 통과
+- `make canary-gates`: hard-gate check 7개 모두 통과
+
+그 뒤 바뀐 것은 `RULES_DOCS.md:82`의 절 순서뿐이다.
+
+남긴 것(이 브랜치 밖): `plan.md` Save의 "the design doc the Load step read"도 "source"로 좁히면 같은 틈이 plan에서도 닫힌다. 이 일은 `plan.md`를 다음에 건드리는 round에서 한다.
