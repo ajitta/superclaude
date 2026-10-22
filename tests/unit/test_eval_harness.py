@@ -1421,6 +1421,70 @@ def test_plan_draft_spec_gate_fails_on_any_plan_or_status_change(tmp_path):
     assert not all(_grade(run_eval, task, ws, stop))
 
 
+@pytest.mark.parametrize(
+    "task_id", ["roadmap-draft-spec-gate", "roadmap-design-discovery-draft"]
+)
+def test_roadmap_stops_on_a_draft_discovery_spec(tmp_path, task_id):
+    """A draft discovery spec stops /sc:roadmap, as source or beside the
+    design: no roadmap written, no status changed, the review named."""
+    run_eval, task, ws = _fixture_ws(tmp_path, task_id)
+    feature = ws / "docs" / "features" / "report-export"
+    assert "status: draft" in (feature / "01-discovery.md").read_text()
+    assert (feature / "04-design.md").exists() is (
+        task_id == "roadmap-design-discovery-draft"
+    )
+    stop = "Discovery spec is draft: run /sc:review --scope spec on it first."
+    assert all(_grade(run_eval, task, ws, stop))
+    assert not all(_grade(run_eval, task, ws, "Roadmap written."))
+
+    plan = feature / "05-plan.md"
+    plan.write_text("# roadmap\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, stop)), "feature roadmap written"
+    plan.unlink()
+    standalone = ws / "docs" / "plans" / "report-export-workflow-eval-2026-10-22.md"
+    standalone.write_text("# roadmap\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, stop)), "standalone roadmap written"
+    standalone.unlink()
+    _set_field(feature / "01-discovery.md", "status", "approved-for-plan")
+    assert not all(_grade(run_eval, task, ws, stop)), "discovery approved"
+    _set_field(feature / "01-discovery.md", "status", "draft")
+    if task_id == "roadmap-design-discovery-draft":
+        _set_field(feature / "04-design.md", "status", "approved-for-plan")
+        assert not all(_grade(run_eval, task, ws, stop)), "design approved"
+
+
+def test_roadmap_builds_on_a_draft_design_and_approves_it(tmp_path):
+    """Discovery approved, design draft: the roadmap is written, the design
+    moves to approved-for-plan, the discovery spec and the code stay."""
+    run_eval, task, ws = _fixture_ws(tmp_path, "roadmap-design-draft")
+    feature = ws / "docs" / "features" / "report-export"
+    assert "status: approved-for-plan" in (feature / "01-discovery.md").read_text()
+    assert "status: draft" in (feature / "04-design.md").read_text()
+    assert not all(_grade(run_eval, task, ws, "")), "nothing written passed"
+    _set_field(feature / "04-design.md", "status", "approved-for-plan")
+    assert not all(_grade(run_eval, task, ws, "")), "no roadmap written"
+    _set_field(feature / "04-design.md", "status", "draft")
+
+    (feature / "05-plan.md").write_text("# roadmap\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, "")), "design left draft"
+    _set_field(feature / "04-design.md", "status", "approved-for-plan")
+    assert all(_grade(run_eval, task, ws, ""))
+    (feature / "05-plan.md").unlink()
+    (ws / "docs" / "plans" / "report-export-workflow-eval-2026-10-22.md").write_text(
+        "# roadmap\n", encoding="utf-8"
+    )
+    assert all(_grade(run_eval, task, ws, "")), "standalone roadmap counts"
+    _set_field(feature / "01-discovery.md", "status", "draft")
+    assert not all(_grade(run_eval, task, ws, "")), "discovery changed"
+    _set_field(feature / "01-discovery.md", "status", "approved-for-plan")
+    (ws / "report.py").write_text("x = 1\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, "")), "code changed"
+    _git(ws, "checkout", "-q", "--", "report.py")
+    assert all(_grade(run_eval, task, ws, ""))
+    (ws / "export_csv.py").write_text("x = 1\n", encoding="utf-8")
+    assert not all(_grade(run_eval, task, ws, "")), "new code file"
+
+
 # test-reflect-gate grading data, shared by both variants. A good answer
 # names /sc:reflect and asks for a second review of the F-1 fix; the run
 # itself must have collected the tests.
