@@ -142,7 +142,7 @@ revised: 2026-10-22
 - [x] Step 1: Plan-Close (3)에서 "after the last /sc:review round"를 지운다. 앵커는 남은 구절 전체로
 - [x] Step 2: review-due 거절 check를 06f의 문장 첫머리 정규식으로, 조건문 답 둘을 채점 테스트에
 - [x] Step 3: 앵커 셋(implement 재리뷰의 Critical or Important, Proof 재실행, intent Report의 Plan-Close 단계). 재리뷰 실패 문장 하나. Phase 9 수치에 대체 표시. 변이 9건 red(`$TMPDIR/pco/mut10.py`, 옛 lookbehind 변이는 원문이 없어 SKIP). 저장된 run 쉰여덟 개 재채점: 닫을 수 있는 답 28/28, review-due 27/28(떨어진 하나가 오독 run `r8/x3`), 바꾸기 전 `reflect-plan-close` 0/1
-- [ ] Commit Phase 11: `fix: Plan-Close condition 3 drops the self-contradicting clause; review-due check reads sentence openings`
+- [x] Commit Phase 11: `fix: Plan-Close condition 3 drops the self-contradicting clause; review-due check reads sentence openings`
 
 ## Integration (커밋 아님)
 
