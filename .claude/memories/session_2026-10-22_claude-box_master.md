@@ -26,7 +26,7 @@ branch: master @ef6d8a09 (v4.34.2 released; stable == v4.34.2; nothing unrelease
 ## Next actions
 - [x] Owner yes (2026-10-22) → plan-complete-order plan `status: complete` + README `phase: complete`.
 - [x] Release 4.34.2 (2026-10-22): bump dbcacccb; canary-gates 4/4, canary-commands 13/13 probes all checks; CI green; `CANARY_OK=1 make release` → tag v4.34.2, stable → dbcacccb; this VM installed (`--scope user`, 64 installed).
-- [ ] Owner, Windows: `superclaude install --force --scope user` for 4.34.2.
-- [ ] Owner, Windows: delete `C:/sc-evals/rrg-*` and `C:/sc-evals/smm-final2` after the release.
+- [x] Owner, Windows: `superclaude install --force --scope user` for 4.34.2 (owner, 2026-10-22).
+- [x] Owner, Windows: deleted the whole `C:/sc-evals/` (owner, 2026-10-22). The raw Windows runs cited in docs (`smm-final2`, `rrg-*`, `verify-1021-win`) are gone; their counts stay in the committed docs, and they can no longer be regraded.
 - [x] Review findings record (analysis § E): decided C 2026-10-22, merged ef6d8a09; CI dispatched on master. No release needed (evals/docs only).
 - [ ] Outside the branch: `test_credential_copies_do_not_outlive_the_run` fails under `PYTHONOPTIMIZE=2` (pre-existing). 
