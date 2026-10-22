@@ -198,3 +198,5 @@ revised: 2026-10-22
 
 - `uv run pytest` → exit 0
 - 새 프로브 셋과 `implement-proof-fail`, `test-reflect-gate`, `test-reflect-gate-complete`가 3회씩 통과(sonnet, low)
+
+Result: f7076dbd — `uv run pytest` 3857 passed, 3 skipped (exit 0, Linux); probes per Measurements (b31415c1, the last shipped-text commit)
