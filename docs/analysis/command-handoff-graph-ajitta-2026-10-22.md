@@ -5,7 +5,7 @@ revised: 2026-10-22
 
 # `/sc:*` 명령 핸드오프 그래프와 구멍
 
-**판정: 실제로 쓰인 경로는 맞물리고, 구멍은 쓰이지 않은 두 영역에 몰려 있다.** plan 이후의 문서 계약(implement가 `Result:`를 쓰고 reflect가 확인)과 brainstorm → review → plan 관문은 이 저장소에서 실제로 작동했다. 구멍은 roadmap 경로(산출물이 plan 문서 계약을 지키지 못함)와 design의 위치(체인 정의가 두 벌)에 있다. 이 구멍들로 인한 실패는 관찰되지 않았다. 고치기 전에 결정이 두 개 필요하다(아래 "결정 사항").
+**판정: 실제로 쓰인 경로는 맞물리고, 구멍은 쓰이지 않은 두 영역에 몰려 있다.** plan 이후의 문서 계약(implement가 `Result:`를 쓰고 reflect가 확인)과 brainstorm → review → plan 관문은 이 저장소에서 실제로 작동했다. 구멍은 roadmap 경로(산출물이 plan 문서 계약을 지키지 못함)와 design의 위치(체인 정의가 두 벌)에 있다. 이 구멍들로 인한 실패는 관찰되지 않았다. 고치기 전에 결정이 두 개 필요하다(아래 "결정 사항"). 이 문서를 검토하면서 심각도를 다시 매기고 사실 오류 셋을 바로잡았다. G5는 roadmap-plan-gate(6d0985c8)에서 이미 해결됐다. 고친 내용과 결정은 끝의 "검토 반영"에 있다.
 
 ## 범위와 방법
 
@@ -52,12 +52,12 @@ flowchart LR
 
 | # | 심각도 | 실제 사용 | 구멍 |
 |---|---|---|---|
-| G1 | Important | 미사용 | roadmap 산출물이 plan 문서 계약을 지키지 못한다 |
-| G2 | Important | 미사용 | roadmap → task로 넘기면 plan 문서가 갱신되지 않는다 |
-| G3 | Important | 명령 쪽 체인만 1회 | 체인 정의가 두 벌이고, design의 위치가 다르다 |
-| G4 | Important | 미사용 | design → implement 간선이 plan을 건너뛴다 |
-| G5 | Medium | 미사용 | roadmap 관문이 "plan과 같은 관문"이라 하지만 규칙이 다르다 |
-| G6 | Low | 원인 | 핸드오프·관문·README가 서로 맞는지 확인하는 테스트가 없다 |
+| G1 | Important(두 파일 불일치) | 미사용 | roadmap 산출물이 plan 문서 계약을 지키지 못한다 |
+| G2 | Important(두 파일 불일치) | 미사용 | roadmap → task로 넘기면 plan 문서가 갱신되지 않는다 |
+| G3 | Low(검토에서 낮춤) | 명령 쪽 체인만 1회 | 체인 정의가 두 벌이고, design의 위치가 다르다 |
+| G4 | Low(검토에서 낮춤) | 미사용 | design → implement 간선이 plan을 건너뛴다 |
+| G5 | 해결됨(6d0985c8) | 미사용 | roadmap 관문이 "plan과 같은 관문"이라 하지만 규칙이 다르다 |
+| G6 | Low | 원인 | plan 이후 구간 밖에서는 핸드오프·관문·README가 서로 맞는지 확인하는 테스트가 없다 |
 | G7 | Low | 무관 | status enum의 고아 값, enum 밖 status 11건 |
 | G8 | Low | 미확인 | spec-panel이 고립돼 있고 관문을 통과시키지 못한다 |
 | G9 | Low | 미확인 | 여러 파일을 바꾸는 명령에 review 간선이 없다 |
@@ -69,7 +69,7 @@ flowchart LR
 - implement는 마지막 박스를 체크한 뒤 "`## Proof` 꼬리말의 명령을 실행하고 `Result:` 줄을 쓴다"(`implement.md:19`). 실행할 Proof가 없다.
 - `Evidence:`는 `implement.md`에 한 번도 나오지 않는다(grep 0건). roadmap이 기대하는 증거 기입을 implement가 하지 않는다.
 - reflect Plan-Close 조건 (2)는 Proof `Result:`가 green이거나 사용자가 수락했을 것을 요구한다(`reflect.md:19`). `RULES_DOCS.md:58`도 plan의 `complete` 조건으로 Proof `Result:`를 요구한다.
-- 결과: roadmap으로 만든 plan은 규칙상 `complete`에 도달할 수 없다.
+- 결과: roadmap으로 만든 plan은 실행할 Proof가 없다. implement는 실행할 수 없는 Proof를 `Result:`로 기록하고 사용자 수락으로 인정받게 하므로(`implement.md:19`) `complete`에 이르는 길은 있다. 하지만 roadmap 문서마다 그 수락을 거쳐야 한다. (검토 정정: 처음 판정은 "규칙상 `complete`에 도달할 수 없다"였다.)
 
 ### G2. roadmap → task로 넘기면 plan 문서가 갱신되지 않는다
 
@@ -84,7 +84,7 @@ flowchart LR
 |---|---|
 | README Large(`README.md:298`, `:303`), `--through`(`intent.md:20`) | brainstorm → review(spec) → **design** → plan |
 | brainstorm flow 6·8단계(`brainstorm.md:18`, `:20`), review 핸드오프(`review.md:76`) | brainstorm → review(spec) → plan |
-| brainstorm 핸드오프 태그(`brainstorm.md:83`), 관문 `brainstorm -> design`(`RULES_DOCS.md:79`) | brainstorm → design(review 언급 없음) |
+| 관문 `brainstorm -> design`(`RULES_DOCS.md:79`) | brainstorm → design(review 조건 없음). 핸드오프 태그(`brainstorm.md:83`)는 `/sc:review /sc:plan /sc:design /sc:research`로 review가 먼저다(검토 정정) |
 
 여기서 두 증상이 나온다.
 
@@ -106,6 +106,8 @@ design 핸드오프에 `/sc:implement`가 있고(`design.md:62`) 관문은 없�
 
 ### G5. roadmap 관문이 "plan과 같은 관문"이라 하지만 규칙이 다르다
 
+**해결됨**: [roadmap-plan-gate](./roadmap-plan-gate-ajitta-2026-10-22.md)(6d0985c8)에서 처리했다. roadmap은 plan의 소스 순서와 관문을 그대로 적용하고, 소스인 design을 승인한다. `RULES_DOCS.md:82`도 고쳤다. probe 3개로 쟀다(`roadmap-design-draft` 0/3 → 3/3). 아래는 d7f04869 시점의 기록이다. "frontmatter 없는 PRD" 행은 구멍이 아니다. PRD는 discovery spec이 아니고, plan의 `--from <PRD>`도 같다.
+
 | | `/sc:plan` | `/sc:roadmap` |
 |---|---|---|
 | 검사 대상 | `01-discovery`(source가 design이어도 검사) | source spec만 |
@@ -122,6 +124,8 @@ design 핸드오프에 `/sc:implement`가 있고(`design.md:62`) 관문은 없�
 ### G6. 일치 여부를 확인하는 테스트가 없다
 
 `test_cross_references.py`는 핸드오프 대상 파일이 존재하는지만 본다. 핸드오프와 관문, 핸드오프와 본문의 금지 문장, 핸드오프와 README 체인이 서로 맞는지는 아무것도 확인하지 않는다. G3과 G5가 생겨 그대로 남은 이유다.
+
+검토 정정: plan 이후 구간에는 가드가 있다. `test_docs_ssot_guards.py`의 `_GATE_ANCHORS`는 RULES_DOCS 관문, test·review·implement·reflect·intent 단계, README 행이 같은 규칙을 적는지 본다. 같은 파일은 `test.md` 핸드오프의 첫 항목이 `/sc:reflect`인지도 본다. 판정의 "실제로 쓰인 경로는 맞물린다"는 이 가드 덕분이다. 가드가 없는 곳은 그 구간 밖이다.
 
 ### G7. status enum의 고아 값과 enum 밖 status
 
@@ -161,14 +165,14 @@ improve(`test analyze`), cleanup(`test build`), `troubleshoot --fix`(`improve im
 | brainstorm → review → plan | 1회. `serena-removal`(05-plan 10-12): discovery `approved-for-plan`, Iteration Log 1건. 관문 정상 작동 |
 | plan 이후 계약 | 15개 중 `complete` 11(박스를 다 채움 10, 박스 없음 1) · `implementing` 2 · `draft` 1 · `approved-for-plan` 1 |
 | roadmap 산출물(`*-plan-workflow*`, `docs/plans/*-workflow-*`, `Evidence:` 줄) | 0건 |
-| roadmap을 다루는 canary probe | 0개(`evals/tasks.yaml`에 `roadmap`은 주석 2줄뿐) |
+| roadmap을 다루는 canary probe | d7f04869 시점 0개. 지금은 3개(roadmap-plan-gate) |
 | README 크기별 체인 | Small·Medium·Large 어디에도 roadmap 없음 |
 
 ## 결정 사항
 
 | 결정 | 선택지 |
 |---|---|
-| D1. roadmap(G1, G2, G5) | ① roadmap 템플릿에 `## Proof` 꼬리말을 넣고 증거 규칙을 implement에 맞춘다. 관문은 plan Load와 같게 하고, 핸드오프에서 task를 뺀다. 크기 S–M<br>② 원인 제거: 한 번도 쓰이지 않은 roadmap을 plan의 옵션으로 흡수하거나 폐기한다. fork 사용자 메모리가 허용하는 것은 "문서화된 CLI 명령을 README와 함께 제거"이고, 슬래시 명령에도 적용되는지는 소유자가 확인해야 한다 |
+| D1. roadmap(G1, G2, G5) | ① roadmap 템플릿에 `## Proof` 꼬리말을 넣고 증거 규칙을 implement에 맞춘다. 관문은 plan Load와 같게 하고, 핸드오프에서 task를 뺀다. 크기 S–M<br>② 원인 제거: 한 번도 쓰이지 않은 roadmap을 plan의 옵션으로 흡수하거나 폐기한다. fork 사용자 메모리가 허용하는 것은 "문서화된 CLI 명령을 README와 함께 제거"이고, 슬래시 명령에도 적용되는지는 소유자가 확인해야 한다. 검토 추가: 같은 흡수안은 이미 reframing-anchoring `04b-ponytail-content-structure-2.md` #13에서 제안됐다. lean-round B4(67215cd7, `docs/features/lean-round/04-batches.md:47`)는 흡수 대신 roadmap에 draft 정지를 넣는 쪽을 택했다. 다시 연다면 그 결정과 무엇이 달라졌는지(사용 0건)를 적어야 한다 |
 | D2. 체인 기준(G3, G4) | ① README와 `--through`를 따른다. brainstorm·review flow와 review 핸드오프에 design을 넣고, design Analyze에 discovery status 검사를 넣는다. design 핸드오프에서 implement를 뺀다<br>② 실제로 쓰인 명령 쪽 체인을 따른다. README Large에서 design을 "선택"으로 표기하고, `brainstorm -> design` 관문에 리뷰 조건을 넣는다 |
 
 어느 쪽을 골라도 G6의 일치 확인 테스트를 같은 변경에 넣어야 같은 어긋남이 다시 생기지 않는다. G7–G10은 D1·D2와 독립적이며, 관찰된 실패가 없으므로 다음에 해당 파일을 고칠 때 함께 처리해도 된다.
@@ -218,3 +222,19 @@ review → (수정) → review
 test → reflect | done
 reflect → done
 ```
+
+## 검토 반영
+
+이 문서를 받은 뒤 master e69cfbe6에서 주장을 다시 확인했다. 확인한 것은 사용 데이터, 상태 집계, enum 밖 status, 핸드오프 표, G1의 핵심이고, 모두 재현됐다. 다음을 바로잡았다.
+
+- 사실 정정 셋: G1의 "`complete`에 도달할 수 없다"(수락 경로가 있다), G3의 brainstorm 핸드오프 태그(review가 먼저다), G6의 "아무것도 확인하지 않는다"(plan 이후 구간에는 `_GATE_ANCHORS`가 있다).
+- G5는 이 문서를 쓰는 사이 master에서 해결됐다(6d0985c8).
+- 심각도: 관찰된 실패가 없으므로 Important는 두 파일이 어긋나는 G1·G2에만 남긴다. G3은 draft spec 위의 design을 plan Load가 나중에 막는다. G4의 implement는 plan 없이 쓰는 정상 경로다. 그래서 둘 다 Low로 낮췄다.
+- D1 ②에 앞선 결정(04b #13, lean-round B4)을 인용했다.
+
+소유자 결정(2026-10-22, 권고대로):
+
+- D1 ①을 가장 작은 범위로 한다. roadmap 산출물에 plan과 같은 `## Proof` 꼬리말을 넣고, 핸드오프에서 `/sc:task`를 뺀다. 관문은 이미 맞췄다(G5).
+- D2는 `/sc:review` 핸드오프에 `/sc:design`을 더하는 것만 한다. design Analyze의 discovery status 검사는 관찰된 실패가 없어 보류한다.
+- G6은 범용 일치 테스트를 만들지 않는다. 이번에 고치는 간선만 기존 가드 방식으로 지킨다.
+- G7–G10은 해당 파일을 다음에 고칠 때 함께 처리한다.
