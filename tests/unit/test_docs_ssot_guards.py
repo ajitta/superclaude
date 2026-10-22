@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -499,9 +500,12 @@ def test_install_surfaces_name_every_component():
     m = re.search(r"What gets installed.*?```\n(.*?)```", text, re.S)
     assert m, "README.md has no 'What gets installed' tree"
     surfaces = {"README.md 'What gets installed'": m.group(1)}
-    help_text = _cli_help()
-    surfaces["superclaude install --help"] = help_text["superclaude install"]
-    surfaces["superclaude uninstall --help"] = help_text["superclaude uninstall"]
+    # Click takes a command's help from its docstring, which python -OO
+    # (PYTHONOPTIMIZE=2) strips; under it only the README tree is checked.
+    if sys.flags.optimize < 2:
+        help_text = _cli_help()
+        surfaces["superclaude install --help"] = help_text["superclaude install"]
+        surfaces["superclaude uninstall --help"] = help_text["superclaude uninstall"]
     bad = [
         f"{label} omits {leaf}"
         for label, body in surfaces.items()

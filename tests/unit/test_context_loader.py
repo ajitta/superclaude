@@ -298,9 +298,13 @@ class TestTriggerMapPaths:
 
     def test_module_docstring_counts_match_composite_flags(self):
         """The module docstring's per-flag MCP counts follow COMPOSITE_FLAGS."""
+        import ast
+
         from superclaude.scripts import context_loader as cl
 
-        doc = cl.__doc__ or ""
+        # From the source, not cl.__doc__: python -OO strips docstrings.
+        tree = ast.parse(Path(cl.__file__).read_text(encoding="utf-8"))
+        doc = ast.get_docstring(tree) or ""
         mismatches = []
         for flag in ("--frontend-verify", "--all-mcp"):
             match = re.search(re.escape(flag) + r" \((\d+) MCP\)", doc)
