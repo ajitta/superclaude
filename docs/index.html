@@ -65,7 +65,7 @@
     .install .wrap > div:first-child { max-width: 68ch; }
     .install p { color: #334f69; }
     .install code, .examples code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    /* Same layout as .install on the page background, so it stands apart from the Plugins section above it. */
+    /* Same layout as .install on the page background, so it stands apart from the Install section above it. */
     .develop { background: none; }
     .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
     .steps > li { counter-increment: step; padding: 1.1rem 0 1.2rem; border-top: 1px solid var(--line); }
@@ -128,7 +128,6 @@
         <a href="#develop">Clone</a>
         <a href="#fork">Fork</a>
         <a href="#commands">Commands</a>
-        <a href="#plugins">Plugin</a>
         <a href="https://github.com/ajitta/superclaude">GitHub ↗</a>
       </nav>
     </div>
@@ -339,44 +338,6 @@ Constraints: limits
 Done when: how you will know it worked</code></div>
             <p>Wrap it in <code>/goal</code> to restart the run if it stops early, and add a line saying that <code>--through</code> is the approval for every step; without it, the evaluator can wait on the commands' own confirmation steps. The full recipe is in the <a href="https://github.com/ajitta/superclaude#-workflows">README</a>.</p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="plugins" class="content install">
-      <div class="wrap">
-        <div>
-          <h2>Socratic plugin for Claude Code</h2>
-          <p>One plugin from this repository's marketplace, <code>socratic</code>, holding two skills. It is separate from the framework: you install it inside Claude Code, without uv or the <code>superclaude</code> CLI.</p>
-          <p>Not the same as <code>/sc:brainstorm</code>, which turns a feature request into requirements and writes docs. These skills only ask questions and never implement anything.</p>
-          <a href="https://github.com/ajitta/superclaude/tree/master/portable-skills">Install on claude.ai or Codex ↗</a>
-        </div>
-        <div>
-          <ol class="steps">
-            <li>
-              <h3>Add the marketplace</h3>
-              <p class="hint">Run this in Claude Code. It registers the marketplace, named <code>ajitta-socratic</code>, and installs nothing by itself.</p>
-              <div class="cmd"><code>/plugin marketplace add ajitta/superclaude</code></div>
-            </li>
-            <li>
-              <h3>Install the plugin</h3>
-              <div class="cmd"><code>/plugin install socratic@ajitta-socratic</code></div>
-              <p class="hint">Had the two earlier plugins, <code>socratic-brainstorm</code> and <code>socratic-elenchus</code>? Run <code>/plugin marketplace update ajitta-socratic</code>; they move to <code>socratic</code> at the next session.</p>
-            </li>
-            <li>
-              <h3>Use it</h3>
-              <p class="hint">Claude Code names a plugin's skill <code>plugin:skill</code>, so each command starts with <code>socratic:</code>. Add your idea after it, or just ask in words ("poke holes in this plan").</p>
-              <div class="example">
-                <div class="cmd cmd-light"><code>/socratic:socratic-brainstorm</code></div>
-                <p>Tests your idea one question at a time, draws out your options, adds up to three of its own, and ends with a verdict (sharpened, open, or refuted) and a short brief. Pick it when you want to leave with a plan.</p>
-              </div>
-              <div class="example">
-                <div class="cmd cmd-light"><code>/socratic:socratic-elenchus</code></div>
-                <p>The method of Plato's dialogues: "what is X?", premises you agree to, a contradiction built from them, and a definition you revise. No advice. Pick it to find out whether you know what you mean.</p>
-              </div>
-              <p class="hint">To use both, settle the key word with elenchus first, then brainstorm. Plugins installed from user settings do not load in cloud sessions.</p>
-            </li>
-          </ol>
         </div>
       </div>
     </section>

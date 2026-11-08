@@ -3,7 +3,7 @@ feature: plugin-install
 phase: planning
 owner: ajitta
 created: 2026-10-05
-updated: 2026-10-05
+updated: 2026-11-08
 ---
 
 # clone 없이 설치: uv tool CLI + Claude Code plugin

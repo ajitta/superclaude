@@ -8,6 +8,11 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+### Removed
+
+- The `socratic` plugin and the whole `portable-skills/` folder: the skills `socratic-brainstorm` and `socratic-elenchus`, the generated plugin and the upload zip `socratic.zip`. The Pages site's Plugin section is gone. The framework (the `superclaude` CLI and the content it installs) is unchanged. The last version stays at tag `v4.34.3`.
+- Upgrade: `.claude-plugin/marketplace.json` stays as the `ajitta-socratic` marketplace with no plugins. On a machine that installed `socratic@ajitta-socratic` (or the earlier `socratic-brainstorm` and `socratic-elenchus`), run `/plugin marketplace remove ajitta-socratic`, which uninstalls the plugin and drops the marketplace. After `/plugin marketplace update ajitta-socratic` instead, Claude Code uninstalls the plugin at the next session start and lists it under Flagged in `/plugin`. A marketplace added this way does not update on its own, so without one of the two the plugin stays installed. A plugin uploaded on claude.ai (Customize › Plugins) and skill folders copied into `~/.claude/skills/` or `~/.agents/skills/` are yours to delete.
+
 ## [4.34.3] - 2026-10-23
 
 ### Changed

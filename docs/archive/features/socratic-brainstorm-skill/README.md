@@ -4,10 +4,12 @@ phase: complete
 owner: ajitta
 created: 2026-10-02
 updated: 2026-10-05
-related: ../../../portable-skills/README.md
+related: https://github.com/ajitta/superclaude/tree/v4.34.3/portable-skills/README.md
 ---
 
 # Socratic brainstorming and Socratic elenchus as portable skills (Claude + Codex, incl. mobile)
+
+**Removed in 4.34.4 (2026-11-08).** The owner no longer uses the skills. Both skills, the `socratic` plugin and `portable-skills/` are gone from the repository; the last version is at tag [v4.34.3](https://github.com/ajitta/superclaude/tree/v4.34.3/portable-skills). `.claude-plugin/marketplace.json` stays as an empty marketplace, so Claude Code uninstalls the plugin from machines that still have it.
 
 SuperClaude already does Socratic brainstorming, but only inside Claude Code and spread over five files: `/sc:brainstorm`, `MODE_Brainstorming`, `socratic-mentor`, `requirements-analyst`, and the panels' `socratic` modes. This feature surveys that state and the published skills that implement the technique, then builds one skill that runs in Claude chat (web, desktop, iOS/Android), Claude Code (terminal and cloud/mobile Code tab) and Codex.
 
@@ -41,6 +43,6 @@ History: v1 shipped as `socratic-brainstorm` 1.0.0 and was mislabeled as the Soc
 - [13-review.md](./13-review.md): independent review (1 high, 6 medium, 12 low), each finding reproduced and fixed; manifest moved out of the source folders
 - [14-pages-guide.md](./14-pages-guide.md): plugin install section for the GitHub Pages site (applied 2026-10-05 as `#plugins`); naming review of marketplace, plugin and skill names
 
-## Use it
+## Last version
 
-See [portable-skills/README.md](../../../portable-skills/README.md). Short version: download the zip(s) from [portable-skills/releases/](../../../portable-skills/releases/) and upload each at claude.ai › Customize › Plugins › Add › Upload plugin. In Claude Code: `/plugin marketplace add ajitta/superclaude`, then `/plugin install socratic-elenchus@ajitta-socratic` (or `socratic-brainstorm@ajitta-socratic`). For Codex, copy the folder to `~/.agents/skills/` or to a repo's `.agents/skills/`.
+The install and invoke guide of the last version is [portable-skills/README.md at v4.34.3](https://github.com/ajitta/superclaude/tree/v4.34.3/portable-skills/README.md). The marketplace no longer lists the plugin, so `/plugin install socratic@ajitta-socratic` fails; a copy of a skill folder from that tag still works as a plain skill.

@@ -1,21 +1,16 @@
 {
   "$schema": "https://code.claude.com/schemas/marketplace.json",
   "name": "ajitta-socratic",
-  "description": "One plugin holding the two portable Socratic skills from portable-skills/: a questioning-led brainstorm and Plato's elenchus. The SuperClaude framework itself is installed with the superclaude CLI, not from this marketplace.",
+  "description": "Retired: this marketplace no longer lists any plugin. The socratic plugin was removed; Claude Code uninstalls it from machines that still have it at the next session start. The SuperClaude framework itself is installed with the superclaude CLI.",
   "owner": {
     "name": "ajitta",
     "email": "ajitta@gmail.com"
   },
-  "plugins": [
-    {
-      "name": "socratic",
-      "source": "./portable-skills/plugins/socratic",
-      "description": "Two Socratic skills. socratic-brainstorm tests an idea one question at a time, then your own options plus up to three labeled ones, convergence by criteria, and an honest verdict with a short brief. socratic-elenchus runs Plato's what-is-X dialogue: premises you agree to, a contradiction built from them, and your revised definitions. Usually ends in aporia. No advice.",
-      "category": "productivity"
-    }
-  ],
+  "plugins": [],
   "renames": {
     "socratic-brainstorm": "socratic",
-    "socratic-elenchus": "socratic"
-  }
+    "socratic-elenchus": "socratic",
+    "socratic": null
+  },
+  "forceRemoveDeletedPlugins": true
 }

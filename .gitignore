@@ -109,8 +109,7 @@ poetry.lock
 .claude/skills/
 
 # Agent Skills install artifacts (npx skills add) - per-machine, not framework content.
-# Anchored to the repo root: an unanchored `skills/` also hid
-# portable-skills/plugins/socratic/skills/ from commits.
+# Anchored to the repo root, so a nested `skills/` folder can still be committed.
 /.agents/
 /agent/
 /skills/
@@ -205,6 +204,3 @@ rtk/history.db
 
 # Downloaded research sources (PDF + markitdown output); docs cite the public URL instead
 docs/research/claude.com/
-
-# Portable skill upload bundles are committed on purpose (download from GitHub)
-!portable-skills/releases/*.zip
