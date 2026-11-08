@@ -1,6 +1,6 @@
 ---
 status: draft
-revised: 2026-10-05
+revised: 2026-11-08
 ---
 
 # clone 없이 설치 (uv tool CLI + Claude Code plugin) Implementation Plan
@@ -38,8 +38,8 @@ revised: 2026-10-05
 - core 크기: FLAGS 4,391자 + PRINCIPLES 1,912자 + RULES 3,900자 = 10,203자. 한 hook으로 출력하면 10,000자를 넘는다.
 - core 파일에는 cp949로 인코딩할 수 없는 문자(`— ⚡ 🔴` 등)가 있다. `print`로 쓰면 기본 로캘이 한국어인 Windows에서 hook이 죽는다.
 - 이미 있는 plugin 기반:
-  - `.claude-plugin/marketplace.json`(이름 `ajitta-socratic`)이 portable-skills plugin 2개를 싣고 있다. description은 "SuperClaude는 이 marketplace에서 설치하지 않는다"라고 적혀 있다.
-  - `tests/unit/test_portable_skills.py:215`가 항목 집합이 portable skill 집합과 정확히 같은지 검사한다.
+  - `.claude-plugin/marketplace.json`(이름 `ajitta-socratic`)은 socratic plugin을 뺀 뒤(2026-11-08) 빈 marketplace다. `plugins`는 비어 있고, `renames`가 이전 이름을 `null`로 보내며, `forceRemoveDeletedPlugins: true`가 아직 설치된 기기에서 plugin을 지운다. 이 두 필드는 `sc`를 추가한 뒤에도 그대로 둔다.
+  - `tests/unit/test_marketplace.py`가 그 상태를 검사한다: 이름, 제거된 이름이 `plugins`에 없음, `renames` 이력, `forceRemoveDeletedPlugins`, 나열된 source 경로의 존재.
 
 ## 범위 결정 (2026-10-04 사용자 결정)
 
@@ -54,7 +54,7 @@ revised: 2026-10-05
 - `CLAUDE_PLUGIN_DATA`에 상태 저장. plugin 모드에서도 hook 상태는 `hook_state_dir()`(`~/.claude/.superclaude_hooks`)에 쓴다. 7일 지나면 정리된다.
 - `superclaude context explain`, `verify-drift`, `uninstall`, `--list-all`의 plugin 지원. 이 명령들은 scope 설치 전용으로 README에 적는다.
 - `install.sh` 정리. 이 작업에서는 건드리지 않는다.
-- marketplace 이름 변경. 이름을 바꾸면 이미 설치된 socratic plugin의 id가 깨진다.
+- marketplace 이름 변경. 설치는 `<plugin>@ajitta-socratic`로 기록되므로, 이름을 바꾸면 socratic이 아직 남은 기기에 자동 제거가 닿지 않는다.
 
 ## Phase 0: 1단계 브랜치
 
@@ -160,7 +160,7 @@ revised: 2026-10-05
 
 ### Task 3.1: manifest 테스트
 
-**Files:** Test: `tests/unit/test_plugin_manifest.py`, `tests/unit/test_portable_skills.py` (:215), `tests/unit/test_version_consistency.py`
+**Files:** Test: `tests/unit/test_plugin_manifest.py`, `tests/unit/test_marketplace.py`, `tests/unit/test_version_consistency.py`
 
 - [ ] Step 1: 실패하는 테스트를 쓴다.
   - `src/superclaude/.claude-plugin/plugin.json`의 `name`은 `sc`다.
@@ -168,17 +168,17 @@ revised: 2026-10-05
   - `hooks` 키가 없다. 있으면 `hooks/hooks.json`과 함께 두 번 로드된다.
   - marketplace의 `sc` 항목은 `source == "./src/superclaude"`이고 `version`이 없다.
   - `test_version_consistency.py`: plugin.json `version`이 pyproject 버전과 같다.
-  - `test_portable_skills.py:215`: portable skill 집합과 비교하는 대상을 `set(entries) - {"sc"}`로 바꾼다.
+  - `test_marketplace.py`의 검사는 그대로 통과해야 한다. `sc` 항목의 `./src/superclaude` source도 존재 검사를 받는다.
 
 ### Task 3.2: manifest와 marketplace 작성
 
 **Files:** Create: `src/superclaude/.claude-plugin/plugin.json`. Modify: `.claude-plugin/marketplace.json`
 
-- [ ] Step 1: plugin.json을 `portable-skills/plugin-manifests/*.json` 형식으로 쓴다.
+- [ ] Step 1: plugin.json을 쓴다(이전 형식은 태그 v4.34.3의 `portable-skills/plugin-manifest.json`).
   - 필드: `name: "sc"`, `displayName: "SuperClaude"`, `version`(현재 pyproject 값), `description`, `author {name, url}`, `license`, `homepage`.
   - `commands`, `agents`, `outputStyles`는 경로를 명시한 배열로 쓴다. 기본 폴더 안의 경로라서 "Default folder ignored" 경고가 나지 않는다.
-- [ ] Step 2: marketplace에 `{"name": "sc", "source": "./src/superclaude", "description": …, "category": "development"}`를 추가한다. 최상위 description은 SuperClaude plugin과 Socratic skill 2개를 함께 소개하도록 새로 쓴다.
-- [ ] Step 3: `uv run pytest tests/unit/test_plugin_manifest.py tests/unit/test_portable_skills.py tests/unit/test_version_consistency.py -q`
+- [ ] Step 2: marketplace에 `{"name": "sc", "source": "./src/superclaude", "description": …, "category": "development"}`를 추가한다. 최상위 description은 SuperClaude plugin을 소개하도록 새로 쓴다.
+- [ ] Step 3: `uv run pytest tests/unit/test_plugin_manifest.py tests/unit/test_marketplace.py tests/unit/test_version_consistency.py -q`
 - [ ] Step 4: hatchling이 wheel에 `.claude-plugin/`을 넣어도 문제는 없다. 설치는 `COMPONENTS`만 복사하기 때문이다(`install_paths.py:27-38`). 확인만 하고 지나간다.
 
 ### Task 3.3: plugin에서 깨지는 content 경로와 README
