@@ -20,4 +20,4 @@ branch: master @20d19dbb (v4.34.4 released; stable == 20d19dbb)
 
 ## Next actions
 - [x] Release 4.34.4 (2026-11-08): CI green on 20d19dbb; `make release` (no canary: only `__init__.py` changed under src/) → tag v4.34.4, stable → 20d19dbb; stable's marketplace.json is the empty one, `portable-skills/` 404s there; this VM installed (`--scope user`), no drift.
-- [ ] Owner, Windows: `superclaude install --force --scope user` for 4.34.3/4.34.4; if the socratic plugin is installed there, `/plugin marketplace remove ajitta-socratic`.
+- [x] Owner, Windows: `superclaude install --force --scope user` for 4.34.4 and `/plugin marketplace remove ajitta-socratic` (owner, 2026-11-08).
