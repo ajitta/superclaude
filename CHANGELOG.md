@@ -8,6 +8,8 @@ Releases before 4.19.0 are not listed. Their history is the git log; the upstrea
 
 ## [Unreleased]
 
+## [4.34.4] - 2026-11-08
+
 ### Removed
 
 - The `socratic` plugin and the whole `portable-skills/` folder: the skills `socratic-brainstorm` and `socratic-elenchus`, the generated plugin and the upload zip `socratic.zip`. The Pages site's Plugin section is gone. The framework (the `superclaude` CLI and the content it installs) is unchanged. The last version stays at tag `v4.34.3`.
